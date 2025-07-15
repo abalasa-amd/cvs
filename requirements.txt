@@ -1,0 +1,6 @@
+pip3 install parallel-ssh
+pip3 install pytest
+pip3 install netmiko
+pip3 install pytest-html
+pip3 install pytest-repeat
+pip3 install pytest-dependency
