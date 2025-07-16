@@ -1,4 +1,4 @@
-# cvs - Cluster Validation Suite
+# Cluster Validation Suite
 CVS is a collection of tests scripts that can validate AMD AI clusters end to end from running single node burn in health tests to cluster wide distributed training and inferencing tests. CVS can be used by AMD customers to verify the health of the cluster as whole which includes verifying the GPU node health, Host OS configuratin checks, NIC validations etc. CVS test suite collection comprises of the following set of tests
 
 1. Platform Tests - Host OS config checks, BIOS checks, Firmware/Driver checks, Network config checks.
