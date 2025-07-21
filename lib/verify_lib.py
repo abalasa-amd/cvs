@@ -10,7 +10,8 @@ err_patterns_dict = {
     'test_fail': 'Test failure',
     'access': 'no-retry page fault|Illegal register access|PROTECTION_FAULT_STATUS',
     'driver': 'Queue preemption failed for queue|Failed to evict process queues',
-    'hardware': 'hardware error|hardware fail|ras error|uncorrectable|correctable err'
+    'hardware': 'hardware error|hardware fail|ras error|uncorrectable|correctable err',
+    'down': 'NIC Link is Down'
 
 }
 

@@ -15,7 +15,7 @@ def build_html_page_header(filename):
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Cluster View</title>
+<title>CVS Cluster View</title>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <!-- DataTables CSS -->
 <style>
@@ -66,6 +66,21 @@ def build_html_page_footer( filename, ):
      "pageLength": 100,
      "autoWidth": true
     });
+    $('#training').DataTable({
+     "scrollX": true,
+     "pageLength": 100,
+     "autoWidth": true
+    });
+    $('#ethtoolstats').DataTable({
+     "scrollX": true,
+     "pageLength": 100,
+     "autoWidth": true
+    });
+    $('#rdmastats').DataTable({
+     "scrollX": true,
+     "pageLength": 100,
+     "autoWidth": true
+    });
     $('#pciexgmimetrics').DataTable({
      "scrollX": true,
      "pageLength": 100,
@@ -84,6 +99,139 @@ def build_html_page_footer( filename, ):
          '''
          fp.write(html_lines)
          fp.close()
+
+
+
+def build_rdma_stats_table( filename, rdma_dict, ):
+    node_0 = list(rdma_dict.keys())[0]
+    err_pattern = 'err|retransmit|drop|discard|naks|invalid|oflow|out_of_buffer'
+    rdma_device_list = rdma_dict[node_0].keys()
+ 
+    with open(filename, 'a') as fp:
+         html_lines='''
+<h2 style="background-color: lightblue">RDMA Statistics Table</h2>
+<table id="rdmastats" class="display cell-border">
+  <thead>
+  <tr>
+  <th>Node</th>'''
+         fp.write(html_lines)
+         for rdma_device in rdma_device_list:
+             fp.write(f'<th>{rdma_device}</th>\n')
+         fp.write('</tr></thead>\n')
+         # End or header, let us start data rows ..
+
+         for node in rdma_dict.keys():
+             # begin each node row
+             fp.write(f'<tr><td>{node}</td>\n')
+             for rdma_device in rdma_device_list:
+                 fp.write(f'<td><table border=1>\n')
+                 stats_dict = rdma_dict[node][rdma_device]
+                 for stats_key in stats_dict.keys():
+                     if stats_key != "ifname":
+                         if int(stats_dict[stats_key]) > 0:
+                             if re.search( f'{err_pattern}', stats_key, re.I ):
+                                 fp.write(f'<tr><td>{stats_key}</td><td><span class="label label-danger">{stats_dict[stats_key]}</td></tr>\n')
+                             else: 
+                                 fp.write(f'<tr><td>{stats_key}</td><td>{stats_dict[stats_key]}</td></tr>\n')
+                 fp.write(f'</table></td>\n')
+             #End of each node row
+             fp.write(f'</tr>\n')
+         html_lines='''
+         </table>
+         <br><br>
+         '''
+         fp.write(html_lines)
+         fp.close()
+             
+        
+
+def build_ethtool_stats_table( filename, d_dict, ):
+    node_0 = list(d_dict.keys())[0]
+    eth_device_list = d_dict[node_0].keys()
+    err_pattern = 'err|retransmit|drop|discard|naks|invalid|oflow|out_of_buffer|collision|reset|uncorrect'
+ 
+    with open(filename, 'a') as fp:
+         html_lines='''
+<h2 style="background-color: lightblue">Ethtool Statistics Table</h2>
+<table id="ethtoolstats" class="display cell-border">
+  <thead>
+  <tr>
+  <th>Node</th>'''
+         fp.write(html_lines)
+         for eth_device in eth_device_list:
+             fp.write(f'<th>{eth_device}</th>\n')
+         fp.write('</tr></thead>\n')
+         # End or header, let us start data rows ..
+
+         for node in d_dict.keys():
+             # begin each node row
+             fp.write(f'<tr><td>{node}</td>\n')
+             for eth_device in eth_device_list:
+                 fp.write(f'<td><table border=1>\n')
+                 stats_dict = d_dict[node][eth_device]
+                 for stats_key in stats_dict.keys():
+                     if int(stats_dict[stats_key]) > 0:
+                         if re.search( f'{err_pattern}', stats_key, re.I ):
+                             fp.write(f'<tr><td>{stats_key}</td><td><span class="label label-danger">{stats_dict[stats_key]}</td></tr>\n')
+                         else: 
+                             fp.write(f'<tr><td>{stats_key}</td><td>{stats_dict[stats_key]}</td></tr>\n')
+                 fp.write(f'</table></td>\n')
+             #End of each node row
+             fp.write(f'</tr>\n')
+         html_lines='''
+         </table>
+         <br><br>
+         '''
+         fp.write(html_lines)
+         fp.close()
+             
+        
+
+
+
+
+
+
+
+def build_training_results_table( filename, out_dict, title ):
+    print('Build HTML training table')
+    with open(filename, 'a') as fp:
+         html_lines='''
+<h2 style="background-color: lightblue">''' + title + '''</h2>
+<table id="training" class="display cell-border">
+  <thead>
+  <tr>
+  <th>Node</th>
+  <th>Throughput per GPU</th>
+  <th>Tokens per GPU</th>
+  <th>Elapsed time per iteration</th>
+  <th>Nan iterations</th>
+  <th>Mem usage</th>
+  <tr>'''
+         fp.write(html_lines)
+         for node in out_dict.keys():
+             d_dict = out_dict[node]
+             html_lines='''
+  <tr>
+  <td>{}</td>
+  <td>{}</td>
+  <td>{}</td>
+  <td>{}</td>
+  <td>{}</td>
+  <td>{}</td>
+  </tr>'''.format( node, d_dict['throughput_per_gpu'],
+             d_dict['tokens_per_gpu'], d_dict['elapsed_time_per_iteration'],
+             d_dict['nan_iterations'], d_dict['mem_usages'] )
+             fp.write(html_lines)
+         html_lines='''
+         </table>
+         <br><br>
+         '''
+         fp.write(html_lines)
+         fp.close()
+
+
+             
 
 
 
@@ -115,6 +263,8 @@ def build_html_nic_table( filename, rdma_dict, lshw_dict, ip_dict ):
              pcie_bus_list = []
              mtu_list = []
              ip_list = []
+             print(rdma_dev_list)
+             print(rdma_dict)
              for rdma_dev in rdma_dev_list:
                  eth_dev = rdma_dict[node][rdma_dev]['eth_device']
                  eth_dev_list.append(eth_dev)

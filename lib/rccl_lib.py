@@ -5,8 +5,12 @@ import netmiko
 from netmiko import ConnectHandler
 from netmiko import redispatch
 
-from lib.utils_lib import *
-from lib.verify_lib import *
+import globals
+
+log = globals.log
+
+from utils_lib import *
+from verify_lib import *
 
 
 
@@ -138,9 +142,14 @@ def rccl_cluster_test( phdl, test_name, node_list, vpc_node_list, user_name, ib_
     print(cmd)
     print('%%%%%%%%%%%%%%%%')
     #output = hdl.send_command(cmd, read_timeout=300)
-    output = hdl.send_command(cmd)
-    print(output)
-    scan_rccl_logs(output)
+    try:
+        output = hdl.send_command(cmd, delay_factor=10)
+        print(output)
+        scan_rccl_logs(output)
+    except Exception as e:
+        log.error(f'Hit Exceptions with rccl cmd {cmd} - exception {e}')
+        fail_test(f'Hit Exceptions with rccl cmd {cmd} - exception {e}')
+
     result_out = hdl.send_command(f'cat {rccl_result_file}') 
     print(result_out)
     smi_out = hdl.send_command('rocm-smi -a')
