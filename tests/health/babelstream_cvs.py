@@ -13,7 +13,7 @@ import netmiko
 from netmiko import ConnectHandler
 from netmiko import redispatch
 
-sys.path.insert( 0, '../../lib' )
+sys.path.insert( 0, './lib' )
 from parallel_ssh_lib import *
 from utils_lib import *
 
