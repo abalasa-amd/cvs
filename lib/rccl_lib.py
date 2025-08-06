@@ -70,7 +70,7 @@ def check_bus_bw( output, exp_res_dict ):
  
 
 
-def rccl_cluster_test( phdl, test_name, node_list, vpc_node_list, user_name, ib_hca_list, \
+def rccl_cluster_test( phdl, test_name, cluster_node_list, vpc_node_list, user_name, ib_hca_list, \
         net_dev_list, oob_port, no_of_global_ranks, rocm_path, ucx_path, mpi_path, \
         rccl_path, rccl_tests_path, nccl_algo='ring', \
         nccl_proto='simple', gid_index=1, qp_count=1, start_msg_size=1024, end_msg_size='16g', \
@@ -81,6 +81,7 @@ def rccl_cluster_test( phdl, test_name, node_list, vpc_node_list, user_name, ib_
         user_key_file=None, verify_avg_bus_bw=False, verify_bus_bw=False, \
         exp_results_dict=None ):
 
+    print(test_name)
     ROCM_PATH=rocm_path
     MPI_PATH=f'{mpi_path}/install/bin'
     UCX_INSTALL_DIR=f'{ucx_path}/install'
@@ -91,15 +92,14 @@ def rccl_cluster_test( phdl, test_name, node_list, vpc_node_list, user_name, ib_
     PATH=f'{MPI_INSTALL_DIR}/bin:{ROCM_PATH}/bin:$PATH'
     LD_LIBRARY_PATH=f'{RCCL_INSTALL_DIR}/lib:{MPI_INSTALL_DIR}/lib:$LD_LIBRARY_PATH'
 
-    if re.search( '[0-9]\.]+', vpc_node_list[0] ):
-        cluster_node_list = list(cluster_dict['node_dict'].keys())
-    else:
-        cluster_node_list = vpc_node_list
-   
-    head_node = node_list[0]
+    print('%%%% vpc_node_list %%%%')
+    print(vpc_node_list)
+    print(vpc_node_list[0])
+
+    head_node = cluster_node_list[0]
     host_params=''
     proc_per_node = int(int(no_of_global_ranks)/len(cluster_node_list))
-    for node in cluster_node_list:
+    for node in vpc_node_list:
         host_params = f'{host_params}{node}:{proc_per_node},'
 
     host_params = host_params.rstrip(',')
