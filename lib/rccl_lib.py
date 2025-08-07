@@ -70,7 +70,7 @@ def check_bus_bw( output, exp_res_dict ):
  
 
 
-def rccl_cluster_test( phdl, test_name, cluster_node_list, vpc_node_list, user_name, ib_hca_list, \
+def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, user_name, ib_hca_list, \
         net_dev_list, oob_port, no_of_global_ranks, rocm_path, ucx_path, mpi_path, \
         rccl_path, rccl_tests_path, nccl_algo='ring', \
         nccl_proto='simple', gid_index=1, qp_count=1, start_msg_size=1024, end_msg_size='16g', \
@@ -105,15 +105,15 @@ def rccl_cluster_test( phdl, test_name, cluster_node_list, vpc_node_list, user_n
     host_params = host_params.rstrip(',')
     print(host_params)
 
-    if user_password is None and user_key_file is None:
-        print('ERROR !! Both password and key file cannot be none, need one to login to the host')
-        return
-    elif user_key_file is None:
-        hdl = ConnectHandler( ip=head_node, device_type='linux', username=user_name, \
-              password = user_password )
-    elif user_password is None:
-        hdl = ConnectHandler( ip=head_node, device_type='linux', username=user_name, \
-              use_keys=True, key_file=user_key_file )
+    #if user_password is None and user_key_file is None:
+    #    print('ERROR !! Both password and key file cannot be none, need one to login to the host')
+    #    return
+    #elif user_key_file is None:
+    #    hdl = ConnectHandler( ip=head_node, device_type='linux', username=user_name, \
+    #          password = user_password )
+    #elif user_password is None:
+    #    hdl = ConnectHandler( ip=head_node, device_type='linux', username=user_name, \
+    #          use_keys=True, key_file=user_key_file )
         
     cmd = f'''{MPI_PATH}/mpirun --np {no_of_global_ranks} \
         --allow-run-as-root \
@@ -143,7 +143,8 @@ def rccl_cluster_test( phdl, test_name, cluster_node_list, vpc_node_list, user_n
     print('%%%%%%%%%%%%%%%%')
     #output = hdl.send_command(cmd, read_timeout=300)
     try:
-        output = hdl.send_command(cmd, delay_factor=10)
+        out_dict = shdl.exec(cmd, timeout=500)
+        output = out_dict[head_node]
         print(output)
         scan_rccl_logs(output)
     except Exception as e:
