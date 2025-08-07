@@ -50,7 +50,6 @@ def  config_dict(config_file):
 
 
 
-# Create connection to DUT, MTPs, Switches and export for later use ..
 @pytest.fixture(scope="module")
 def  phdl(cluster_dict):
      nhdl_dict = {}
@@ -58,6 +57,17 @@ def  phdl(cluster_dict):
      node_list = list(cluster_dict['node_dict'].keys())
      phdl = Pssh( log, node_list, user=cluster_dict['username'], pkey=cluster_dict['priv_key_file'] )
      return phdl
+
+
+@pytest.fixture(scope="module")
+def  shdl(cluster_dict):
+     nhdl_dict = {}
+     node_list = list(cluster_dict['node_dict'].keys())
+     head_node = node_list[0]
+     shdl = Pssh( log, [head_node], user=cluster_dict['username'], pkey=cluster_dict['priv_key_file'] )
+     return shdl
+
+
 
 
 @pytest.fixture(scope="module")
@@ -92,7 +102,7 @@ def  vpc_node_list(cluster_dict):
 #@pytest.mark.parametrize( "qp_scale", ["1"]  )
 
 
-def test_rccl_perf(phdl, cluster_dict, config_dict, rccl_collective, rccl_algo, \
+def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_algo, \
        rccl_protocol, qp_scale ):
 
     start_time = phdl.exec('date')
@@ -108,7 +118,8 @@ def test_rccl_perf(phdl, cluster_dict, config_dict, rccl_collective, rccl_algo, 
         cluster_dict_before = create_cluster_metrics_snapshot( phdl )
 
 
-    result_dict = rccl_lib.rccl_cluster_test( phdl, test_name=rccl_collective, \
+    result_dict = rccl_lib.rccl_cluster_test( phdl, shdl, \
+       test_name               = rccl_collective, \
        cluster_node_list       = node_list, \
        vpc_node_list           = vpc_node_list, \
        user_name               = cluster_dict['username'], \
