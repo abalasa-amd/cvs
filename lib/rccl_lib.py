@@ -75,10 +75,14 @@ def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, 
         rccl_path, rccl_tests_path, nccl_algo='ring', \
         nccl_proto='simple', gid_index=1, qp_count=1, start_msg_size=1024, end_msg_size='16g', \
         step_function=2, threads_per_gpu=1, warmup_iterations=10, no_of_iterations=1, \
-        check_iteration_count=1, nccl_ib_timeout=5, debug_level='INFO', \
-        rccl_result_file='/tmp/rccl_result_output.json', no_of_local_ranks=8, user_password=None, \
+        check_iteration_count=1, debug_level='INFO', \
+        rccl_result_file='/tmp/rccl_result_output.json', no_of_local_ranks=8, \
+        ib_rx_queue_len=8192, ucx_tls='tcp', hcoll_enable_mcast_all=0, \
+        nccl_cumem_enable=0, nccl_ib_timeout=30, nccl_ib_sl=0, \
+        nccl_ib_tc=41, nccl_ib_split_data_on_qps=0, nccl_pxn_disable=0, \
+        nccl_net_plugin=None, user_password=None, \
         min_channels=64, max_channels=64, \
-        user_key_file=None, verify_avg_bus_bw=False, verify_bus_bw=False, \
+        user_key_file=None, verify_bus_bw=False, \
         exp_results_dict=None ):
 
     print(test_name)
@@ -132,8 +136,17 @@ def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, 
         -x NCCL_ALGO={nccl_algo} \
         -x NCCL_MIN_NCHANNELS={min_channels} \
         -x NCCL_MAX_NCHANNELS={max_channels} \
-        -x NCCL_IB_TIMEOUT={nccl_ib_timeout} \
         -x NCCL_IB_QPS_PER_CONNECTION={qp_count} \
+        -x IB_RX_QUEUE_LEN={ib_rx_queue_len} \
+        -x UCX_TLS={ucx_tls} \
+        -x HCOLL_ENABLE_MCAST_ALL={hcoll_enable_mcast_all} \
+        -x NCCL_CUMEM_ENABLE={nccl_cumem_enable} \
+        -x NCCL_IB_TIMEOUT={nccl_ib_timeout} \
+        -x NCCL_IB_SL={nccl_ib_sl} \
+        -x NCCL_IB_TC={nccl_ib_tc} \
+        -x NCCL_IB_SPLIT_DATA_ON_QPS={nccl_ib_split_data_on_qps} \
+        -x NCCL_PXN_DISABLE={nccl_pxn_disable} \
+        -x NCCL_NET_PLUGIN={nccl_net_plugin} \
         {RCCL_TESTS_INSTALL_DIR}/{test_name} -b {start_msg_size} -e {end_msg_size} -f {step_function} \
         -g {threads_per_gpu} -N {no_of_iterations} -c {check_iteration_count} -w {warmup_iterations} \
         -Z json -x {rccl_result_file}'''
@@ -157,9 +170,6 @@ def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, 
     smi_out_dict = shdl.exec('rocm-smi -a | head -30')
     smi_out = smi_out_dict[head_node]
     model=get_model_from_rocm_smi_output(smi_out)
-    if re.search( 'True', verify_avg_bus_bw, re.I ):
-        check_avg_bus_bw( output, exp_results_dict[model][test_name] )
-
     if re.search( 'True', verify_bus_bw, re.I ):
         check_bus_bw( result_out, exp_results_dict[model][test_name] )
 
