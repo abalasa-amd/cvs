@@ -79,27 +79,73 @@ def  vpc_node_list(cluster_dict):
 
 
 
+def pytest_generate_tests(metafunc):
+    config_file = metafunc.config.getoption("config_file")
+    if not config_file:
+        return
+    with open(config_file) as fp:
+        config = json.load(fp)
+
+    # Build test parameters
+    if 'rccl_collective' in config['rccl']:
+        rccl_collective_list = config['rccl']['rccl_collective']
+    else:
+        rccl_collective_list = [ "all_reduce_perf", "all_gather_perf", \
+                                 "scatter_perf", "gather_perf", \
+                                 "reduce_scatter_perf", "sendrecv_perf", \
+                                 "alltoall_perf", "alltoallv_perf", \
+                                 "broadcast_perf"]
+
+    if 'rccl_algo' in config['rccl']:
+        rccl_algo_list = config['rccl']['rccl_algo']
+    else:
+        rccl_algo_list = ["ring", "tree" ]
+
+    if 'rccl_protocol' in config['rccl']:
+        rccl_protocol_list = config['rccl']['rccl_protocol']
+    else:
+        rccl_protocol_list = ["simple", "LL128", "LL" ]
+
+    if 'qp_scale' in config['rccl']:
+        qp_scale_list = config['rccl']['qp_scale']
+    else:
+        qp_scale_list = [ "1", "2", ]
+
+
+    # Invoke parametrize
+    if "rccl_collective" in metafunc.fixturenames:
+        metafunc.parametrize( "rccl_collective", rccl_collective_list )
+
+    if "rccl_algo" in metafunc.fixturenames:
+        metafunc.parametrize( "rccl_algo", rccl_algo_list )
+
+
+    if "rccl_protocol" in metafunc.fixturenames:
+        metafunc.parametrize( "rccl_protocol", rccl_protocol_list )
+
+    if "qp_scale" in metafunc.fixturenames:
+        metafunc.parametrize( "qp_scale", qp_scale_list )
 
 
 
-# Parametrize all collectives
-@pytest.mark.parametrize( "rccl_collective", ["all_reduce_perf", "all_gather_perf", \
-                                            "scatter_perf", "gather_perf", \
-                                            "reduce_scatter_perf", "sendrecv_perf", \
-                                            "alltoall_perf", "alltoallv_perf", \
-                                            "broadcast_perf"])
 
-#@pytest.mark.parametrize( "rccl_collective", ["all_reduce_perf"] )
+# Start of test cases.
 
-# Parametrize the algorithms ..
-@pytest.mark.parametrize( "rccl_algo", ["ring", "tree"] )
+def test_collect_hostinfo( phdl ):
+    globals.error_list = []
+    phdl.exec('cat /opt/rocm/.info/version')
+    phdl.exec('hipconfig')
+    phdl.exec('rocm_agent_enumerator')
+    update_test_result()
 
-# Parametrize the protocols ..
-@pytest.mark.parametrize( "rccl_protocol", ["simple", "LL128"] )
 
-# Parametrize the QP scale
-@pytest.mark.parametrize( "qp_scale", ["1", "8", "16", "32", "64", "128"] )
-#@pytest.mark.parametrize( "qp_scale", ["1"]  )
+
+def test_collect_networkinfo( phdl ):
+    globals.error_list = []
+    phdl.exec('rdma link')
+    phdl.exec('ibv_devinfo')
+    update_test_result()
+
 
 
 def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_algo, \
@@ -143,13 +189,21 @@ def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_
        warmup_iterations       = config_dict['warmup_iterations'], \
        no_of_iterations        = config_dict['no_of_iterations'], \
        check_iteration_count   = config_dict['check_iteration_count'], \
-       nccl_ib_timeout         = config_dict['nccl_ib_timeout'], \
        debug_level             = config_dict['debug_level'], \
        rccl_result_file        = config_dict['rccl_result_file'], \
        no_of_local_ranks       = config_dict['no_of_local_ranks'], \
+       ib_rx_queue_len         = config_dict['ib_rx_queue_len'], \
+       ucx_tls                 = config_dict['ucx_tls'], \
+       hcoll_enable_mcast_all  = config_dict['hcoll_enable_mcast_all'], \
+       nccl_cumem_enable       = config_dict['nccl_cumem_enable'], \
+       nccl_ib_timeout         = config_dict['nccl_ib_timeout'], \
+       nccl_ib_sl              = config_dict['nccl_ib_sl'], \
+       nccl_ib_tc              = config_dict['nccl_ib_tc'], \
+       nccl_ib_split_data_on_qps  = config_dict['nccl_ib_split_data_on_qps'], \
+       nccl_pxn_disable        = config_dict['nccl_pxn_disable'], \
+       nccl_net_plugin         = config_dict['nccl_net_plugin'], \
        user_key_file           = cluster_dict['priv_key_file'], \
        verify_bus_bw           = config_dict['verify_bus_bw'], \
-       verify_avg_bus_bw       = config_dict['verify_avg_bus_bw'], \
        exp_results_dict        = config_dict['results']
     )
 
@@ -165,6 +219,5 @@ def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_
 
     # Update test results based on any failures ..
     update_test_result()
-
 
 
