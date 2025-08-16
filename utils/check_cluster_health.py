@@ -11,7 +11,7 @@ import time
 log = logging.getLogger()
 
 
-sys.path.insert( 0, '../lib' )
+sys.path.insert( 0, './lib' )
 
 
 import parallel_ssh_lib
@@ -33,6 +33,8 @@ def general_health_checks( phdl, ):
     verify_lib.full_dmesg_scan( phdl )
     # Check Dmesg for AMD GPU driver errors
     verify_lib.verify_driver_errors( phdl )
+    # journlctl scan
+    verify_lib.full_journalctl_scan( phdl )
     # Check for any link flap evidence
     verify_lib.verify_nic_link_flap( phdl )
     # Check for GPU PCIe errors from amd-smi commands
@@ -51,19 +53,6 @@ def general_health_checks( phdl, ):
 
 
 
-def init_nic_dict( phdl, nic_dict ):
-    print('Initialize NIC dict')
-    nic_dict  = {}
-    nic_dict['rdma_stats'] = {}
-    nic_dict['eth_stats'] = {}
-    nic_dict['pcie_stats'] = {}
-    nic_dict['vendor_stats'] = {}
-    for host in phdl.host_list:
-        nic_dict['rdma_stats'][host] = {}
-        nic_dict['eth_stats'][host] = {}
-        nic_dict['pcie_stats'][host] = {}
-
-
 
 
 def main():
@@ -79,12 +68,6 @@ def main():
           help="Number of iterations to run the checks" )
     parser.add_argument("--time_between_iters", type=int, default=60, \
           help="Time duration to sleep between iterations .." )
-    parser.add_argument("--check_nic", type=bool, default=True, \
-          help="Check NIC related metrics" )
-    parser.add_argument("--check_gpu", type=bool, default=True, \
-          help="Check gpu related metrics" )
-    parser.add_argument("--check_dmesg", type=bool, default=True, \
-          help="Scan dmesg for errors" )
     parser.add_argument("--report_file", default="./cluster_report.html" )
     args = parser.parse_args()
 
@@ -125,7 +108,7 @@ def main():
     # Vendor specific stats
     # Add NIC MTU Check
     # Add PFC, ECN config checks
-    #
+    # Ping Mesh check ..
 
     general_health_checks( phdl )
 
@@ -141,18 +124,22 @@ def main():
         print(f'Starting Iteration - {i}')
         print('#------------------------------------------------------------#')
         snapshot_iters_dict[i] = verify_lib.create_cluster_metrics_snapshot( phdl )
+        print('#............................................................#')
+        print(f'Waiting for {args.time_between_iters} for time between iterations - Iteration {i}')
+        print('#............................................................#')
         time.sleep(int(args.time_between_iters))
 
 
-    print('#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#')
     print('Completed all iterations, taking final snapshot for comparison')
-    print('#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#')
 
     snapshot_dict_after = verify_lib.create_cluster_metrics_snapshot( phdl )
     verify_lib.compare_cluster_metrics_snapshots( snapshot_dict_before, snapshot_dict_after )
 
+
+    print('#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#')
+    print('Completed all iterations, script completed, scan logs for ERROR, WARN')
+    print('#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#')
 if __name__ == "__main__":
     main()
-
 
 
