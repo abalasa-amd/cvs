@@ -18,7 +18,7 @@ import parallel_ssh_lib
 import verify_lib
 import linux_utils
 import rocm_plib
-
+import html_lib
 
 
 
@@ -42,6 +42,37 @@ def general_health_checks( phdl, ):
     # Verify PCIe status from Host OS side ..
     verify_lib.verify_host_lspci( phdl)
 
+
+
+
+
+
+def build_html_report( phdl, html_file ):
+
+    lshw_dict = linux_utils.get_lshw_network_dict(phdl)
+    rdma_nic_dict = linux_utils.get_rdma_nic_dict( phdl )
+    ip_dict = linux_utils.get_ip_addr_dict( phdl )
+
+    model_dict = rocm_plib.get_gpu_model_dict( phdl )
+    fw_dict = rocm_plib.get_gpu_fw_dict( phdl )
+    use_dict = rocm_plib.get_gpu_use_dict( phdl )
+    mem_dict = rocm_plib.get_gpu_mem_use_dict( phdl )
+    metrics_dict = rocm_plib.get_gpu_metrics_dict( phdl )
+    amd_dict = rocm_plib.get_amd_smi_metric_dict( phdl )
+    rdma_stats_dict = linux_utils.get_rdma_stats_dict( phdl )
+    ethtool_stats_dict = linux_utils.get_nic_ethtool_stats_dict( phdl )
+
+    html_lib.build_html_page_header(html_file)
+    html_lib.build_html_cluster_product_table( html_file, model_dict, fw_dict )
+    html_lib.build_html_gpu_utilization_table( html_file, use_dict )
+    html_lib.build_html_mem_utilization_table( html_file, mem_dict, amd_dict )
+    html_lib.build_html_nic_table( html_file, rdma_nic_dict, lshw_dict, ip_dict )
+    html_lib.build_html_pcie_xgmi_metrics_table( html_file, metrics_dict, amd_dict )
+    html_lib.build_html_error_table( html_file, metrics_dict, amd_dict )
+    html_lib.build_rdma_stats_table( html_file, rdma_stats_dict )
+    html_lib.build_ethtool_stats_table( html_file, ethtool_stats_dict)
+
+    html_lib.build_html_page_footer(html_file)
 
 
 #Things to do
@@ -81,6 +112,7 @@ def main():
         print("ERROR !! No hosts in the file, this is mandatory, aborting !!")
         sys.exit(1)
 
+    html_report_file = args.report_file
 
     # Connect to all hosts in the cluster ..
     if args.key_file:
@@ -110,9 +142,12 @@ def main():
     # Add PFC, ECN config checks
     # Ping Mesh check ..
 
+    # Run general health checks and scan historic errors
     general_health_checks( phdl )
 
-
+    # Build cluster html report
+    build_html_report( phdl, html_report_file )
+    
 
     # Take cluster metrics snapshot before iterations ..
     snapshot_dict_before = verify_lib.create_cluster_metrics_snapshot( phdl )
