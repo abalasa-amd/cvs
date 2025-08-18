@@ -466,12 +466,16 @@ def build_html_mem_utilization_table( filename, use_dict, amd_dict ):
              '''.format(node)
              fp.write(html_lines)
              u_dict = use_dict[node]
-             a_list = amd_dict[node]
+             #a_list = amd_dict[node]
+             if isinstance( amd_dict[node], dict ):
+                 # handling different between rocm6.x and 7.x
+                 if 'gpu_data' in amd_dict[node].keys():
+                     a_list = amd_dict[node]['gpu_data']
+             else:
+                 a_list = amd_dict[node]
              for j in range(0,8):
                  card = 'card' + str(j)
                  a_dict = a_list[j]
-                 #print('^^^')
-                 #print(a_dict)
                  html_lines='''
   <td>{}</td>
   <td>{}</td>
@@ -541,7 +545,12 @@ def build_html_pcie_xgmi_metrics_table( filename, metrics_dict, amd_dict ):
              '''.format(node)
              fp.write(html_lines)
              d_dict = metrics_dict[node]
-             a_list = amd_dict[node]
+             if isinstance( amd_dict[node], dict ):
+                 # handling different between rocm6.x and 7.x
+                 if 'gpu_data' in amd_dict[node].keys():
+                      a_list = amd_dict[node]['gpu_data']
+             else:
+                 a_list = amd_dict[node]
              for j in range(0,8):
                  card = 'card' + str(j)
                  a_dict = a_list[j]
@@ -624,7 +633,12 @@ def build_html_error_table( filename, metrics_dict, amd_dict ):
              '''.format(node)
              fp.write(html_lines)
              d_dict = metrics_dict[node]
-             a_list = amd_dict[node]
+             if isinstance( amd_dict[node], dict ):
+                 # handling different between rocm6.x and 7.x
+                 if 'gpu_data' in amd_dict[node].keys():
+                     a_list = amd_dict[node]['gpu_data']
+             else:
+                 a_list = amd_dict[node]
              for j in range(0,8):
                  card = 'card' + str(j)
                  a_dict = a_list[j]

@@ -35,7 +35,7 @@ def verify_gpu_pcie_bus_width( phdl, expected_cards=8, gpu_pcie_speed=32, gpu_pc
     for node in out_dict.keys():
         card_list = out_dict[node].keys()
         if len(card_list)!= expected_cards:
-            fail_test('ERROR !! Number of cards not matching expected no {expected_cards} on node {node}')
+            fail_test(f'ERROR !! Number of cards not matching expected no {expected_cards} on node {node}')
     # Let us take the last card_list for further checks ..
     for card_no in card_list:
         cmd_list = []
@@ -70,6 +70,9 @@ def verify_gpu_pcie_errors( phdl ):
                     {d_dict[card]['pcie_nak_rcvd_count_acc (Count)']}") 
 
 
+
+
+
 def verify_dmesg_for_errors(phdl, start_time_dict, end_time_dict ):
     print('scan dmesg')
     node0 = list(start_time_dict.keys())[0]
@@ -79,7 +82,7 @@ def verify_dmesg_for_errors(phdl, start_time_dict, end_time_dict ):
     start_pattern = match.group(1)
     match = re.search( '([a-zA-Z]+\s+[a-zA-Z]+\s+[0-9]+\s+[0-9]+\:[0-9]+\:[0-9]+)\s', end_time)
     end_pattern = match.group(1)
-    output_dict = phdl.exec(f"sudo dmesg -T | awk '/{start_pattern}.*/,/{end_pattern}.*/' | grep -v ALLOWED --color=never")
+    output_dict = phdl.exec(f"sudo dmesg -T | awk '/{start_pattern}.*/,/{end_pattern}.*/' | egrep -v 'ALLOWED|DENIED' --color=never")
     #print(output_dict) 
     for node in output_dict.keys():
         for line in output_dict[node].split("\n"):
@@ -130,11 +133,18 @@ def verify_host_lspci( phdl, pcie_speed=32, pcie_width=16 ):
 
 
 
+def full_journalctl_scan( phdl ):
+    out_dict = phdl.exec( 'sudo journalctl -k | egrep "amdgpu|interrupt|error|fail|timeout|fault"')
+    for node in out_dict.keys():
+        for line in out_dict[node].split("\n"):
+            for err_key in err_patterns_dict.keys():
+                if re.search( f'{err_patterns_dict[err_key]}', line, re.I ):
+                    fail_test(f'ERROR - Failure pattern *** {line} *** seen in Dmesg on node {node}')
 
 
 def full_dmesg_scan(phdl,):
     print('scan dmesg')
-    output_dict = phdl.exec(f"sudo dmesg -T | grep -v initialized | grep -v ALLOWED | grep -v denied --color=never")
+    output_dict = phdl.exec(f"sudo dmesg -T | grep -v initialized | egrep -v 'ALLOWED|DENIED' --color=never")
     for node in output_dict.keys():
         for line in output_dict[node].split("\n"):
             for err_key in err_patterns_dict.keys():
@@ -205,16 +215,18 @@ def compare_cluster_metrics_snapshots( s_dict_before, s_dict_after ):
                 for stat_nam in diff_dict[key_nam][node][dev_nam].keys():
                     if re.search( f'{warn_stats_pattern}', stat_nam, re.I ):
                         if int(diff_dict[key_nam][node][dev_nam][stat_nam]) > 0:
-                            log.warn(f'WARN !! cluster snapshot showing some warning counters going up - {key_nam} {node} {dev_nam} {stat_nam} has incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
-                            print(f'WARN !! cluster snapshot showing some warning counters going up - {key_nam} {node} {dev_nam} {stat_nam} has incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
+                            log.warn(f'WARN !! cluster snapshot showing some warning counters going up - {key_nam} {node} {dev_nam} {stat_nam} have incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
+                            print(f'WARN !! cluster snapshot showing some warning counters going up - {key_nam} {node} {dev_nam} {stat_nam} have incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
                     elif re.search( f'{err_stats_pattern}', stat_nam, re.I ):
                         if int(diff_dict[key_nam][node][dev_nam][stat_nam]) > 0:
-                            log.error(f'ERROR !! cluster snapshot showing some error counters going up - {key_nam} {node} {dev_nam} {stat_nam} has incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
-                            print(f'ERROR !! cluster snapshot showing some error counters going up - {key_nam} {node} {dev_nam} {stat_nam} has incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
+                            log.error(f'ERROR !! cluster snapshot showing some error counters going up - {key_nam} {node} {dev_nam} {stat_nam} have incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
+                            print(f'ERROR !! cluster snapshot showing some error counters going up - {key_nam} {node} {dev_nam} {stat_nam} have incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
                     elif re.search( f'{threshold_stats_pattern}', stat_nam, re.I ):
                         if int(diff_dict[key_nam][node][dev_nam][stat_nam]) > threshold_counter_val:
-                            log.error(f'WARN !! cluster snapshot showing some threshold warn counters going up - {key_nam} {node} {dev_nam} {stat_nam} has incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
-                            print(f'WARN !! cluster snapshot showing some threshold warn counters going up - {key_nam} {node} {dev_nam} {stat_nam} has incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
+                            log.error(f'WARN !! cluster snapshot showing some threshold warn counters going up - {key_nam} {node} {dev_nam} {stat_nam} have incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
+                            print(f'WARN !! cluster snapshot showing some threshold warn counters going up - {key_nam} {node} {dev_nam} {stat_nam} have incremented by {diff_dict[key_nam][node][dev_nam][stat_nam]} Before = {s_dict_before[key_nam][node][dev_nam][stat_nam]} After = {s_dict_after[key_nam][node][dev_nam][stat_nam]}')
+    print('Completed comparing the cluster snapshots')
+
 
 
 
