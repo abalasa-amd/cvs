@@ -692,7 +692,7 @@ def build_html_error_table( filename, metrics_dict, amd_dict ):
                      '''.format(a_dict['ecc']['cache_uncorrectable_count'])
                  fp.write(html_lines)
   
-                 if int(d_dict[card]['pcie_l0_to_recov_count_acc (Count)']) > 0:
+                 if int(d_dict[card]['pcie_l0_to_recov_count_acc (Count)']) > 4:
                      html_lines='''
                      <td><span class="label label-danger">{}</td>
                      '''.format(d_dict[card]['pcie_l0_to_recov_count_acc (Count)'])

@@ -78,9 +78,11 @@ def verify_dmesg_for_errors(phdl, start_time_dict, end_time_dict ):
     node0 = list(start_time_dict.keys())[0]
     start_time = start_time_dict[node0]
     end_time = end_time_dict[node0]
-    match = re.search( '([a-zA-Z]+\s+[a-zA-Z]+\s+[0-9]+\s+[0-9]+\:[0-9]+\:[0-9]+)\s', start_time)
+    pattern = r"([a-zA-Z]+\s+[a-zA-Z]+\s+[0-9]+\s+[0-9]+\:[0-9]+\:[0-9]+)\s"
+    match = re.search( pattern, start_time)
     start_pattern = match.group(1)
-    match = re.search( '([a-zA-Z]+\s+[a-zA-Z]+\s+[0-9]+\s+[0-9]+\:[0-9]+\:[0-9]+)\s', end_time)
+    pattern = r"([a-zA-Z]+\s+[a-zA-Z]+\s+[0-9]+\s+[0-9]+\:[0-9]+\:[0-9]+)\s"
+    match = re.search( pattern, end_time)
     end_pattern = match.group(1)
     output_dict = phdl.exec(f"sudo dmesg -T | awk '/{start_pattern}.*/,/{end_pattern}.*/' | egrep -v 'ALLOWED|DENIED' --color=never")
     #print(output_dict) 
@@ -115,7 +117,8 @@ def verify_host_lspci( phdl, pcie_speed=32, pcie_width=16 ):
     bdf_dict = {}
     for node in out_dict.keys():
         bdf_list_out =  out_dict[node]
-        bdf_list = re.findall( 'BDF:\s+([0-9a-f\:\.]+)', out_dict[node], re.I )
+        pattern = r"BDF:\s+([0-9a-f\:\.]+)"
+        bdf_list = re.findall( pattern, out_dict[node], re.I )
         bdf_dict[node] = bdf_list
     for i in range(0,len(bdf_list)):
         cmd_list = []
@@ -123,9 +126,11 @@ def verify_host_lspci( phdl, pcie_speed=32, pcie_width=16 ):
                    cmd_list.append(f'sudo lspci -vvv -s {bdf_list[i]} | grep Sta: --color=never')
         lspci_dict = phdl.exec_cmd_list(cmd_list)
         for lnode in lspci_dict.keys():
-            if not re.search( f'LnkSta:\s+Speed\s+{pcie_speed}GT', lspci_dict[lnode], re.I ):
+            pattern = r"LnkSta:\s+Speed\s+" + str(pcie_speed) + "GT"
+            if not re.search( pattern, lspci_dict[lnode], re.I ):
                 fail_test(f'ERROR !! PCIe Link speed not matching with expected output on node {lnode} - expected {pcie_speed}')
-            if not re.search( f'Width\s+x{pcie_width}', lspci_dict[lnode], re.I ):
+            pattern = r"Width\s+x" + str(pcie_width)
+            if not re.search( pattern, lspci_dict[lnode], re.I ):
                 fail_test(f'ERROR !! PCIe Link width not matching with expected output on node {lnode} - expected {pcie_width}')
             if not re.search( 'CorrErr+|FatalErr+|RxErr+|BadTLP+|BadDLLP+|DLP+|SDES+|ExOF+|TLP+|MalfTLP+', lspci_dict[lnode], re.I ):
                 fail_test(f'ERROR !! PCIe corretable or uncorrectable error indications on Host side on node {lnode}')
@@ -192,7 +197,8 @@ def get_metrics_snapshot_diff_dict( s_dict_before, s_dict_after ):
                 for stat_nam in s_dict_before[key_nam][node][dev_nam].keys():
                     if not isinstance( s_dict_before[key_nam][node][dev_nam][stat_nam], list ):
                         if isinstance( s_dict_before[key_nam][node][dev_nam][stat_nam], str ):
-                            if not re.search( '[a-z\.\_\-]+', s_dict_before[key_nam][node][dev_nam][stat_nam], re.I ):
+                            pattern = r"[a-z\.\_\-]+"
+                            if not re.search( pattern, s_dict_before[key_nam][node][dev_nam][stat_nam], re.I ):
                                 diff_dict[key_nam][node][dev_nam][stat_nam] =  \
                                        int(s_dict_after[key_nam][node][dev_nam][stat_nam]) - \
                                        int(s_dict_before[key_nam][node][dev_nam][stat_nam])
