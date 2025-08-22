@@ -19,13 +19,36 @@ rccl_err_dict = {
 
 
 def scan_rccl_logs( output ):
-    error_list = []
-    warn_list = []
+    """
+    Scan RCCL test stdout for known error/warning patterns and enforce failure criteria.
+
+    Parameters:
+      output (str): Combined stdout/stderr text from an RCCL test run.
+
+    Behavior:
+      - Iterates over each line to detect:
+        * Errors matching patterns in rccl_err_dict (e.g., ORTE/NCCL/FS errors).
+        * NCCL WARN lines, which are collected and printed (but not fatal).
+      - Fails the test immediately on the first matched error via fail_test(...).
+      - After scanning, if no '# Avg bus bandwidth' marker exists in the entire output,
+        fails the test because results are considered incomplete.
+      
+    Notes:
+      - Expects rccl_err_dict (dict of error_name -> regex pattern) to be defined in scope.
+      - Expects fail_test(...) to be available, which should raise/exit the test on failure.
+      - Uses simple regex searches; patterns in rccl_err_dict can include alternations.
+    """
+    error_list = []    # Accumulates lines that match known error patterns (for context/auditing)
+    warn_list = []     # Accumulates NCCL warning lines (non-fatal but useful for visibility)
+
+    # Process output line-by-line to catch and act on errors/warnings
     for line in output.split("\n"):
         for err_key in rccl_err_dict.keys():
+            # Check each line against all known error signatures
             if re.search( f'{rccl_err_dict[err_key]}', line ):
                 error_list.append(line)
                 fail_test(f'ERROR - {line}')
+        # Collect NCCL warnings (do not fail the test)
         if re.search('NCCL WARN', line ):
             warn_list.append(line)
     if len(warn_list) > 0:
@@ -38,6 +61,9 @@ def scan_rccl_logs( output ):
   
 
 
+
+
+# Not using the avg bus bandwidth verification currently ..
 def check_avg_bus_bw( output, exp_res_dict ):
     if re.search('#\sAvg bus bandwidth\s+:\s+[0-9\.]+', output, re.I ):
         match = re.search('#\sAvg bus bandwidth\s+:\s+([0-9\.]+)', output, re.I )
@@ -49,6 +75,35 @@ def check_avg_bus_bw( output, exp_res_dict ):
 
 
 def check_bus_bw( test_name, output, exp_res_dict ):
+    """
+    Validate bus bandwidth results from an RCCL test against expected thresholds.
+
+    Parameters:
+      test_name (str): Name of the RCCL test (e.g., alltoall, all_reduce_perf).
+                       Determines whether to check in-place or out-of-place results.
+      output (str): JSON string (possibly with newlines) produced by the RCCL test,
+                    containing a list of result dictionaries. Each entry typically includes:
+                      - 'size'   : message size for the measurement
+                      - 'busBw'  : measured bus bandwidth
+                      - 'inPlace': 0 (out-of-place) or 1 (in-place)
+      exp_res_dict (dict): Expected results dictionary with the structure:
+                    {
+                      'bus_bw': {
+                          <msg_size>: <min_expected_bus_bw>, ...
+                      }
+                    }
+
+    Behavior:
+      - Parses the JSON output and iterates over measured entries.
+      - For alltoall/all_to_all tests, validates out-of-place measurements (inPlace == 0).
+      - For other tests, validates in-place measurements (inPlace == 1).
+      - Compares measured busBw to minimum expected thresholds per message size.
+      - Calls fail_test(...) if any measurement is below expectation.
+
+    Notes:
+      - Message sizes are compared as strings to avoid type mismatches between JSON and expectations.
+      - Assumes fail_test(...) is available in scope to signal test failure.
+    """
     actual_bw_dict = {}
     msg_size_list = list(exp_res_dict['bus_bw'].keys())
     print(test_name)
@@ -71,6 +126,10 @@ def check_bus_bw( test_name, output, exp_res_dict ):
  
 
 
+
+# Main RCCL Test library which gets invoked from cvs/test/rccl tests and accepts most of the 
+# standard NCCL environment variables ..
+#
 def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, user_name, ib_hca_list, \
         net_dev_list, oob_port, no_of_global_ranks, rocm_path_var, mpi_dir, mpi_path_var, \
         rccl_dir, rccl_path_var, rccl_tests_dir, nccl_algo='ring', \
@@ -86,9 +145,40 @@ def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, 
         user_key_file=None, verify_bus_bw=False, \
         exp_results_dict=None ):
 
+
+    """
+    Run an RCCL collective test across a cluster via MPI and verify results.
+
+    Arguments:
+      phdl: Parallel ssh handle to run commands on all nodes.
+      shdl: ssh handle to the first node in the cluster.
+      test_name: RCCL test binary name (e.g., all_reduce_perf).
+      cluster_node_list: List of cluster node hostnames/IPs (first is treated as head node).
+      vpc_node_list: List of hostnames/IPs to pass to mpirun -H as hosts - \
+         Make sure passwordless ssh works between them
+      user_name: Username for remote ops (unused here).
+      ib_hca_list: Comma-separated IB HCA devices for NCCL (NCCL_IB_HCA).
+      net_dev_list: UCX network device(s) to use (UCX_NET_DEVICES).
+      oob_port: Interface for MPI TCP OOB (btl_tcp_if_include).
+      no_of_global_ranks: Total MPI ranks to launch across the cluster.
+      rocm_path_var, mpi_dir, mpi_path_var, rccl_dir, rccl_path_var, rccl_tests_dir: Installation paths.
+      nccl_algo, nccl_proto, gid_index, qp_count, ...: NCCL/UCX/MPI tuning parameters.
+      start_msg_size, end_msg_size, step_function: Message size sweep setup.
+      threads_per_gpu, warmup_iterations, check_iteration_count: Test execution tuning.
+      debug_level: NCCL_DEBUG level.
+      rccl_result_file: Path where the RCCL test writes JSON results (-Z json -x file).
+      verify_bus_bw: If 'True' (string), compare bus BW vs expected thresholds.
+      exp_results_dict: Dict of expected results per test for verification.
+
+    Returns:
+      result_out: The raw JSON string read from rccl_result_file on the head node.
+    """
+
     print(f'Starting RCCL Test ..........................................{test_name}')
+    # Base ROCm path as provided by caller
     ROCM_PATH=rocm_path_var
 
+    # Resolve tool/library install locations
     #MPI_PATH=f'{mpi_path}/install/bin'
     MPI_PATH=f'{mpi_path_var}'
     MPI_INSTALL_DIR=f'{mpi_dir}'
@@ -96,17 +186,23 @@ def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, 
     RCCL_PATH=f'{rccl_path_var}'
     RCCL_TESTS_INSTALL_DIR=f'{rccl_tests_dir}'
 
+
+    # Environment variables exported into the mpirun context
     PATH=f'{MPI_PATH}/bin:{ROCM_PATH}/bin:$PATH'
     LD_LIBRARY_PATH=f'{RCCL_PATH}:{MPI_PATH}/lib:{ROCM_PATH}/lib:$LD_LIBRARY_PATH'
 
     print(f'%% VPC Node IPs {vpc_node_list}')
 
+
+    # Use the first cluster node as the head node (source for collected outputs)
     head_node = cluster_node_list[0]
     host_params=''
     proc_per_node = int(int(no_of_global_ranks)/len(cluster_node_list))
     for node in vpc_node_list:
         host_params = f'{host_params}{node}:{proc_per_node},'
 
+
+    # Compute processes per node and build the -H host mapping string: host:N,host:N,...
     host_params = host_params.rstrip(',')
     print(f'RCCL Hosts -H value {host_params}')
 
@@ -156,11 +252,16 @@ def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, 
         log.error(f'Hit Exceptions with rccl cmd {cmd} - exception {e}')
         fail_test(f'Hit Exceptions with rccl cmd {cmd} - exception {e}')
 
+    # Read the JSON results emitted by the RCCL test binary
     result_dict_out = shdl.exec(f'cat {rccl_result_file}')
     result_out = result_dict_out[head_node]
+
+    # Collect basic GPU information via rocm-smi
     smi_out_dict = shdl.exec('rocm-smi -a | head -30')
     smi_out = smi_out_dict[head_node]
     model=get_model_from_rocm_smi_output(smi_out)
+
+    # If requested, verify measured bus bandwidths against provided expected Bandwidth
     if re.search( 'True', verify_bus_bw, re.I ):
         check_bus_bw( test_name, result_out, exp_results_dict[test_name] )
 
