@@ -106,7 +106,7 @@ def build_rdma_stats_table( filename, rdma_dict, ):
     node_0 = list(rdma_dict.keys())[0]
     err_pattern = 'err|retransmit|drop|discard|naks|invalid|oflow|out_of_buffer'
     rdma_device_list = rdma_dict[node_0].keys()
- 
+    device_count = len(rdma_device_list) 
     with open(filename, 'a') as fp:
          html_lines='''
 <h2 style="background-color: lightblue">RDMA Statistics Table</h2>
@@ -115,17 +115,18 @@ def build_rdma_stats_table( filename, rdma_dict, ):
   <tr>
   <th>Node</th>'''
          fp.write(html_lines)
-         for rdma_device in rdma_device_list:
-             fp.write(f'<th>{rdma_device}</th>\n')
+         for j in range(0,len(rdma_device_list)):
+             fp.write(f'<th>rdma_device_{j}</th>\n')
          fp.write('</tr></thead>\n')
          # End or header, let us start data rows ..
 
          for node in rdma_dict.keys():
              # begin each node row
              fp.write(f'<tr><td>{node}</td>\n')
-             for rdma_device in rdma_device_list:
+             for rdma_device in rdma_dict[node].keys():
                  fp.write(f'<td><table border=1>\n')
                  stats_dict = rdma_dict[node][rdma_device]
+                 fp.write(f'<tr><td>rdma_device</td><td>{rdma_device}</td></tr>\n')
                  for stats_key in stats_dict.keys():
                      if stats_key != "ifname":
                          if int(stats_dict[stats_key]) > 0:
@@ -148,6 +149,7 @@ def build_rdma_stats_table( filename, rdma_dict, ):
 def build_ethtool_stats_table( filename, d_dict, ):
     node_0 = list(d_dict.keys())[0]
     eth_device_list = d_dict[node_0].keys()
+    device_count = len(eth_device_list) 
     err_pattern = 'err|retransmit|drop|discard|naks|invalid|oflow|out_of_buffer|collision|reset|uncorrect'
  
     with open(filename, 'a') as fp:
@@ -158,16 +160,17 @@ def build_ethtool_stats_table( filename, d_dict, ):
   <tr>
   <th>Node</th>'''
          fp.write(html_lines)
-         for eth_device in eth_device_list:
-             fp.write(f'<th>{eth_device}</th>\n')
+         for j in range(0,device_count):
+             fp.write(f'<th>eth_device_{j}</th>\n')
          fp.write('</tr></thead>\n')
          # End or header, let us start data rows ..
 
          for node in d_dict.keys():
              # begin each node row
              fp.write(f'<tr><td>{node}</td>\n')
-             for eth_device in eth_device_list:
+             for eth_device in d_dict[node].keys():
                  fp.write(f'<td><table border=1>\n')
+                 fp.write(f'<tr><td>eth_device</td><td>{eth_device}</td></tr>\n')
                  stats_dict = d_dict[node][eth_device]
                  for stats_key in stats_dict.keys():
                      if int(stats_dict[stats_key]) > 0:
@@ -263,8 +266,6 @@ def build_html_nic_table( filename, rdma_dict, lshw_dict, ip_dict ):
              pcie_bus_list = []
              mtu_list = []
              ip_list = []
-             print(rdma_dev_list)
-             print(rdma_dict)
              for rdma_dev in rdma_dev_list:
                  eth_dev = rdma_dict[node][rdma_dev]['eth_device']
                  eth_dev_list.append(eth_dev)
@@ -323,8 +324,6 @@ def build_html_cluster_product_table( filename, model_dict, fw_dict ):
          for node in model_dict.keys():
              m_dict = model_dict[node]["card0"]
              f_dict = fw_dict[node]["card0"]
-             print(m_dict)
-             print(f_dict)
              if not 'SOS firmware version' in f_dict:
                  f_dict['SOS firmware version'] = "-"
              html_lines='''
@@ -362,8 +361,6 @@ def build_html_cluster_product_table( filename, model_dict, fw_dict ):
 
 def build_html_gpu_utilization_table( filename, use_dict ):
     print('Build HTML utilization table')
-    print('^^^^^')
-    #print(use_dict)
     with open(filename, 'a') as fp:
          html_lines='''
 <h2 style="background-color: lightblue">GPU Utilization</h2>

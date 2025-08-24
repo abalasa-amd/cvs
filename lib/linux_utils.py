@@ -97,6 +97,27 @@ def get_rdma_nic_dict( phdl ):
     return rdma_dict
 
             
+def get_active_rdma_nic_dict( phdl ):
+    rdma_dict = {}
+    out_dict = phdl.exec('sudo rdma link')
+    #gid_dict_t = phdl.exec('sudo show_gids | grep -i v2 --color=never')
+    for node in out_dict.keys():
+        rdma_dict[node] = {}
+        for line in out_dict[node].split("\n"):
+            if re.search( '^link', line ):
+                pattern = r"link\s+([a-zA-Z0-9\_\-\.]+)\/([0-9]+)\s+state\s+([A-Za-z]+)\s+physical_state\s+([A-Za-z\_]+)\s+netdev\s+([a-z0-9A-Z\.]+)"
+                match = re.search( pattern, line)
+                dev = match.group(1)
+                status = match.group(3)
+                if re.search( 'ACTIVE', status, re.I ):
+                    rdma_dict[node][dev] = {}
+                    rdma_dict[node][dev]['port'] = match.group(2)
+                    rdma_dict[node][dev]['device_status'] = status
+                    rdma_dict[node][dev]['link_status'] = match.group(4)
+                    rdma_dict[node][dev]['eth_device'] = match.group(5)
+    return rdma_dict
+
+            
    
 
 def get_backend_nic_dict( phdl ):
@@ -127,7 +148,7 @@ def get_backend_nic_dict( phdl ):
 def get_backend_rdma_nic_dict( phdl ):
     bck_rdma_nic_dict = {}
     bck_nic_dict = get_backend_nic_dict( phdl )
-    rdma_nic_dict = get_rdma_nic_dict( phdl )
+    rdma_nic_dict = get_active_rdma_nic_dict( phdl )
     for node in rdma_nic_dict.keys():
         bck_rdma_nic_dict[node] = {}
         bck_nic_list = bck_nic_dict[node]
@@ -155,11 +176,14 @@ def convert_ethtool_out_to_dict( ethtool_out, vendor=None ):
  
 def get_nic_ethtool_stats_dict( phdl, vendor=None ):
     stats_dict = {}
-    bck_nic_dict = get_backend_nic_dict( phdl )
+    bck_nic_dict = get_backend_rdma_nic_dict( phdl )
+    print('%%%%%%%%')
+    print(bck_nic_dict)
     node_list = list(bck_nic_dict.keys())
     node_0 = node_list[0]
     no_of_nics = len(bck_nic_dict[node_0])
-    #print(no_of_nics)
+    print('^^^^^')
+    print(no_of_nics)
     # initialize stats dict
     for node in node_list:
         stats_dict[node] = {}
@@ -168,19 +192,26 @@ def get_nic_ethtool_stats_dict( phdl, vendor=None ):
     # interface names across nodes and we still want to do parallel execution ..
     # cmd_dict is a dict with key as nodes and value as list of cmds
     cmd_dict = {}
+    eth_dev_dict = {}
     print(node_list)
     print(bck_nic_dict)
-    for i in range(0,no_of_nics):
+    for node in node_list:
+        node_nic_dict = bck_nic_dict[node]
+        eth_dev_dict[node] = []
+        for dev_name in list(node_nic_dict.keys()):
+            intf_name = node_nic_dict[dev_name]['eth_device']
+            eth_dev_dict[node].append(intf_name)
+    for i in range(0, no_of_nics):
         cmd_dict[i] = []
         for node in node_list:
-            intf_nam = bck_nic_dict[node][i]
-            cmd_dict[i].append( f'sudo ethtool -S {intf_nam}' )
-            stats_dict[node][intf_nam] = {}
-    for i in range(0,no_of_nics):
+            intf_nam = eth_dev_dict[node][i]
+            cmd_dict[i].append(f'sudo ethtool -S {intf_nam} | grep -v "\[" --color=never')
+
+    for i in range(0, no_of_nics):
         cmd_list = cmd_dict[i]
         stats_dict_out = phdl.exec_cmd_list(cmd_list)
         for node in stats_dict_out:
-            intf_nam = bck_nic_dict[node][i]
+            intf_nam = eth_dev_dict[node][i]
             stats_dict[node][intf_nam] = convert_ethtool_out_to_dict(stats_dict_out[node], vendor )
 
     for node in stats_dict.keys():
@@ -189,6 +220,7 @@ def get_nic_ethtool_stats_dict( phdl, vendor=None ):
                 if re.search( 'err|discard|drop|crc|fcs|reset', counter, re.I ):
                     if int(stats_dict[node][intf][counter]) > 0:
                         print(f'WARN !! {node} {intf} {counter} {stats_dict[node][intf][counter]}')
+
     return stats_dict
             
 
