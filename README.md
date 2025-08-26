@@ -17,6 +17,9 @@ CVS Repository is organized as the following directories
 4. utils directory - This is a collection of standalone scripts which can be run natively without pytest and offer different utility functions.
 
 # How to install
+
+It is recommended to run CVS from a runner machine - Ubuntu VM or bare metal and in the absence of a dedicated runner machine, you can also install and run it from the first host in your cluster. It is recommended to run from a dedicated runner machine as if we hit some catastrophic failure like some uncorrectable errors during a burn-in health test which results in host reboot, the test will be abruptly aborted and you will loose the test report.
+
 ```
 ubuntu-host1# 
 ubuntu-host1# git clone https://github.com/rocm/cvs
@@ -34,6 +37,21 @@ ubuntu-host1#
 ubuntu-host1# ls -ld cvs
 drwxrwxr-x 7 venksrin venksrin 4096 Aug 26 16:36 cvs
 ubuntu-host1#
+```
+
+# Setting up your environment for CVS
+
+Enter your venv environment and from there install the required python packages using the following commands
+
+```
+[venksrin@ubuntu-host1]~:$
+[venksrin@ubuntu-host1]~:$source myenv/bin/activate
+(myenv) [venksrin@ubuntu-host1]~:$
+(myenv) [venksrin@ubuntu-host1]~:$cd cvs
+(myenv) [venksrin@ubuntu-host1]~/cvs:(main)$ls -l requirements.txt 
+-rw-rw-r-- 1 venksrin venksrin 181 Aug 26 17:16 requirements.txt
+(myenv) [venksrin@ubuntu-host1]~/cvs:(main)$
+(myenv) [venksrin@ubuntu-host1]~/cvs:(main)$pip install -r requirements.txt 
 ```
 
 # How to run CVS Tests
