@@ -8,3 +8,44 @@ CVS is a collection of tests scripts that can validate AMD AI clusters end to en
 5. Distributed Inferencing Tests - Work in Progress
 
 CVS leverages the PyTest open source framework to run the tests and generate reports and can be launched from a head-node or any linux management station which has connectivity to the cluster nodes via SSH. The single node tests are run in parallel cluster wide using the parallel-ssh open source python modules to optimize the time for running them. Currently CVS has been validated only on Ubuntu based Linux distro clusters. 
+
+CVS Repository is organized as the following directories
+
+1. tests directory - This comprises of the actual pytest scripts that would be run which internally will be calling the library functions under the ./lib directory which are in native python and can be invoked from any python scripts for reusability. The tests directory has sub folder based on the nature of the tests like health, rccl, training etc.
+2. lib directory - This is a collection of python modules which offer a wide range of utility functions and can be reused in other python scripts as well.
+3. input directory - This is a collection of the input json files that are provided to the pytest scripts using the 2 arguments --cluster_file and the --config_file. The cluster_file is a JSON file which captures all the aspects of the cluster testbed, things like the IP address/hostnames, username, keyfile etc. We avoid putting a lot of other information like linux net devices names or rdma device names etc to keep it user friendly and auto-discover them.
+4. utils directory - This is a collection of standalone scripts which can be run natively without pytest and offer different utility functions.
+
+# How to install
+```
+ubuntu-host1# 
+ubuntu-host1# git clone https://github.com/rocm/cvs
+Cloning into 'cvs'...
+Username for 'https://github.com': venksrin09
+Password for 'https://venksrin09@github.com': 
+remote: Enumerating objects: 245, done.
+remote: Counting objects: 100% (245/245), done.
+remote: Compressing objects: 100% (174/174), done.
+remote: Total 245 (delta 127), reused 166 (delta 56), pack-reused 0 (from 0)
+Receiving objects: 100% (245/245), 122.52 KiB | 2.78 MiB/s, done.
+Resolving deltas: 100% (127/127), done.
+ubuntu-host1# 
+ubuntu-host1# 
+ubuntu-host1# ls -ld cvs
+drwxrwxr-x 7 venksrin venksrin 4096 Aug 26 16:36 cvs
+ubuntu-host1#
+```
+
+# How to run CVS Tests
+
+All the Pytest scripts from cvs/tests folder must be run from the cvs root folder as shown below as the system lib paths have been set accordingly. 
+
+```
+ubuntu-host1# 
+ubuntu-host1# pwd
+/home/venksrin/cvs
+ubuntu-host1# 
+ubuntu-host1# pytest -vvv -log-file=/tmp/rccl_test.log -s ./tests/rccl/rccl_multinode_cvs.py --cluster_file ./input/mi325_cluster.json --config_file ./input/rccl/rccl_config.json --html=/var/www/html/cvs/rccl_test_report.html --capture=tee-sys --self-contained-html
+```
+
+
