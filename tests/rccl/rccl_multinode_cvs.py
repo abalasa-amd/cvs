@@ -23,63 +23,184 @@ log = globals.log
 # Importing additional cmd line args to script ..
 @pytest.fixture(scope="module")
 def cluster_file(pytestconfig):
+    """
+    Return the path to the cluster configuration JSON file passed via pytest CLI.
+
+    Expects:
+      - pytest to be invoked with: --cluster_file <path>
+
+    Args:
+      pytestconfig: Built-in pytest config object used to access CLI options.
+
+    Returns:
+      str: Filesystem path to the cluster configuration file.
+    """
     return pytestconfig.getoption("cluster_file")
 
 
 @pytest.fixture(scope="module")
 def config_file(pytestconfig):
+    """
+    Return the path to the test configuration JSON file passed via pytest CLI.
+
+    Expects:
+      - pytest to be invoked with: --config_file <path>
+
+    Args:
+      pytestconfig: Built-in pytest config object used to access CLI options.
+
+    Returns:
+      str: Filesystem path to the test configuration file.
+    """
     return pytestconfig.getoption("config_file")
 
 
-# Importing the cluster and cofig files to script to access node, switch, test config params
 @pytest.fixture(scope="module")
 def  cluster_dict(cluster_file):
+     """
+    Load and expose full cluster configuration for the test module.
+
+    Behavior:
+      - Opens the JSON at cluster_file and parses it into a Python dict.
+      - Logs the parsed dictionary for visibility and debugging.
+      - Returns the entire cluster configuration (node list, credentials, etc.).
+
+    Args:
+      cluster_file (str): Path to the cluster configuration JSON.
+
+    Returns:
+      dict: Parsed cluster configuration. Expected keys include:
+            - 'node_dict': Map of node name -> node metadata
+            - 'username': SSH username
+            - 'priv_key_file': Path to SSH private key
+    """
      with open(cluster_file) as json_file:
         cluster_dict = json.load(json_file)
      log.info(cluster_dict)
      return cluster_dict
 
-@pytest.fixture(scope="module")
-def  config_dict(config_file):
-     with open(config_file) as json_file:
-        config_dict_t = json.load(json_file)
-     config_dict = config_dict_t['rccl']
-     log.info(config_dict)
-     return config_dict
-
 
 
 
 @pytest.fixture(scope="module")
-def  phdl(cluster_dict):
-     nhdl_dict = {}
-     print(cluster_dict)
-     node_list = list(cluster_dict['node_dict'].keys())
-     phdl = Pssh( log, node_list, user=cluster_dict['username'], pkey=cluster_dict['priv_key_file'] )
-     return phdl
+def config_dict(config_file):
+    """
+    Load and return the RCCL-specific configuration dictionary for the test module.
 
+    Args:
+      config_file (str): Path to a JSON config file provided by another fixture.
 
-@pytest.fixture(scope="module")
-def  shdl(cluster_dict):
-     nhdl_dict = {}
-     node_list = list(cluster_dict['node_dict'].keys())
-     head_node = node_list[0]
-     shdl = Pssh( log, [head_node], user=cluster_dict['username'], pkey=cluster_dict['priv_key_file'] )
-     return shdl
+    Returns:
+      dict: The value of the "rccl" key from the loaded JSON, logged for visibility.
+
+    Notes:
+      - Expects the JSON file to contain a top-level key "rccl".
+      - Uses module scope so the config is parsed once per test module.
+      - Consider adding validation (e.g., assert "rccl" in config) to fail fast on bad configs.
+     """
+    with open(config_file) as json_file:
+       config_dict_t = json.load(json_file)
+    config_dict = config_dict_t['rccl']
+    log.info(config_dict)
+    return config_dict
 
 
 
 
 @pytest.fixture(scope="module")
-def  vpc_node_list(cluster_dict):
-     vpc_node_list = []
-     for node in list(cluster_dict['node_dict'].keys()):
-         vpc_node_list.append(cluster_dict['node_dict'][node]['vpc_ip']) 
-     return vpc_node_list
+def phdl(cluster_dict):
+     """
+    Build and return a parallel SSH handle (Pssh) for all cluster nodes.
+
+    Args:
+      cluster_dict (dict): Cluster metadata fixture containing:
+        - node_dict: dict of node_name -> node_details
+        - username: SSH username
+        - priv_key_file: path to SSH private key
+
+    Returns:
+      Pssh: Handle configured for all nodes (for broadcast/parallel operations).
+
+    Notes:
+      - Prints the cluster_dict for quick debugging; consider replacing with log.debug.
+      - Module-scoped so a single shared handle is used across all tests in the module.
+      - nhdl_dict is currently unused; it can be removed unless used elsewhere.
+      - Assumes Pssh(log, node_list, user=..., pkey=...) is available in scope.
+    """
+    nhdl_dict = {}
+    print(cluster_dict)
+    node_list = list(cluster_dict['node_dict'].keys())
+    phdl = Pssh( log, node_list, user=cluster_dict['username'], pkey=cluster_dict['priv_key_file'] )
+    return phdl
+
+
+@pytest.fixture(scope="module")
+def shdl(cluster_dict):
+    """
+    Build and return a parallel SSH handle (Pssh) for the head node only.
+
+    Args:
+      cluster_dict (dict): Cluster metadata fixture (see phdl docstring).
+
+    Returns:
+      Pssh: Handle configured for the first node (head node) in node_dict.
+
+    Notes:
+      - Useful when commands should be executed only from a designated head node.
+      - Module scope ensures a single connection context for the duration of the module.
+      - nhdl_dict is currently unused; it can be removed unless used elsewhere.
+    """
+    nhdl_dict = {}
+    node_list = list(cluster_dict['node_dict'].keys())
+    head_node = node_list[0]
+    shdl = Pssh( log, [head_node], user=cluster_dict['username'], pkey=cluster_dict['priv_key_file'] )
+    return shdl
+
+
+
+
+@pytest.fixture(scope="module")
+def vpc_node_list(cluster_dict):
+    """
+    Collect and return a list of VPC IPs for all nodes in the cluster.
+
+    Args:
+      cluster_dict (dict): Cluster metadata fixture containing node_dict with vpc_ip per node.
+
+    Returns:
+      list[str]: List of VPC IP addresses in the cluster, ordered by node_dict iteration.
+
+    Notes:
+      - Iteration order depends on the insertion order of node_dict.
+      - Consider validating that each node entry contains a 'vpc_ip' key.
+    """
+    vpc_node_list = []
+    for node in list(cluster_dict['node_dict'].keys()):
+        vpc_node_list.append(cluster_dict['node_dict'][node]['vpc_ip']) 
+    return vpc_node_list
 
 
 
 def pytest_generate_tests(metafunc):
+
+    """
+    Dynamically parametrize RCCL-related tests based on a JSON config file.
+
+    Behavior:
+      - Reads the config file path from pytest's --config_file option.
+      - Loads the JSON and extracts rccl parameters:
+          * rccl_collective: list of collectives to test (defaults provided)
+          * rccl_algo: list of algorithms (defaults: ["ring", "tree"])
+          * rccl_protocol: list of protocols (defaults: ["simple", "LL128", "LL"])
+          * qp_scale: list of queue pair scaling values (defaults: ["1", "2"])
+      - If a corresponding fixture name is present in a test function, applies
+        parametrize with the built list.
+
+    Notes:
+      - If no config_file is provided, the hook returns without parametrizing.
+      - Defaults are used when keys are absent under config['rccl'].
+    """
+
     config_file = metafunc.config.getoption("config_file")
     if not config_file:
         return
@@ -132,6 +253,18 @@ def pytest_generate_tests(metafunc):
 # Start of test cases.
 
 def test_collect_hostinfo( phdl ):
+
+    """
+    Collect basic ROCm/host info from all nodes.
+
+    Behavior:
+      - Executes common ROCm commands to capture version and agent info.
+      - Does not parse output; relies on update_test_result to finalize status.
+
+    Notes:
+      - globals.error_list is reset before test (pattern used across tests).
+    """
+
     globals.error_list = []
     phdl.exec('cat /opt/rocm/.info/version')
     phdl.exec('hipconfig')
@@ -141,6 +274,15 @@ def test_collect_hostinfo( phdl ):
 
 
 def test_collect_networkinfo( phdl ):
+
+    """
+    Collect basic RDMA/verbs info from all nodes.
+
+    Behavior:
+      - Executes 'rdma link' and 'ibv_devinfo' to snapshot network capabilities.
+      - Does not parse output; relies on update_test_result to finalize status.
+    """
+
     globals.error_list = []
     phdl.exec('rdma link')
     phdl.exec('ibv_devinfo')
@@ -151,9 +293,39 @@ def test_collect_networkinfo( phdl ):
 def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_algo, \
        rccl_protocol, qp_scale ):
 
+    """
+    Execute RCCL performance test across the cluster with given parameters.
+
+    Parameters (from fixtures and config):
+      - phdl: parallel execution handle for nodes (expects exec/exec_cmd_list).
+      - shdl: switch or auxiliary handle used by rccl_lib (implementation-specific).
+      - cluster_dict: cluster topology and credentials (expects node_dict, username, etc.).
+      - config_dict: test configuration with RCCL/MPI paths, env, and thresholds.
+      - rccl_collective: which RCCL collective test to run (e.g., "all_reduce_perf").
+      - rccl_algo: RCCL algorithm (e.g., "ring", "tree").
+      - rccl_protocol: RCCL protocol (e.g., "simple", "LL128", "LL").
+      - qp_scale: Queue pair scaling factor as a string (e.g., "1", "2").
+
+    Flow:
+      1) Capture start time to bound dmesg checks later.
+      2) Optionally snapshot cluster metrics before the test (for debugging/compare).
+      3) Optionally source environment script if provided in config.
+      4) Invoke rccl_lib.rccl_cluster_test with parameters built from config and fixtures.
+      5) Capture end time and verify dmesg for errors between start/end.
+      6) Optionally snapshot metrics again and compare before/after.
+      7) Call update_test_result() to finalize test status.
+
+    Notes:
+      - cluster_snapshot_debug controls whether before/after snapshots are taken.
+    """
+
     start_time = phdl.exec('date')
     globals.error_list = []
     node_list = list(cluster_dict['node_dict'].keys())
+
+    # Build list of nodes and their VPC IPs (used by the RCCL test)
+    # make sure the VPC IPs are reachable from all nodes for passwordless ssh
+    # otherwise use the regular mgmt-ip if that is reachable.
     vpc_node_list = []
     for node in list(cluster_dict['node_dict'].keys()):
         vpc_node_list.append(cluster_dict['node_dict'][node]['vpc_ip']) 
@@ -164,9 +336,11 @@ def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_
         cluster_dict_before = create_cluster_metrics_snapshot( phdl )
 
 
+    # Optionally source environment (e.g., set MPI/ROCm env) before running RCCL tests
     if not re.search( 'None', config_dict['env_source_script'], re.I ):
         phdl.exec(f'bash {config_dict['env_source_script']}')
 
+    # Execute the RCCL cluster test with parameters sourced from config_dict
     result_dict = rccl_lib.rccl_cluster_test( phdl, shdl, \
        test_name               = rccl_collective, \
        cluster_node_list       = node_list, \
@@ -211,6 +385,8 @@ def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_
        exp_results_dict        = config_dict['results']
     )
 
+
+    print(result_dict)
 
     # Scan dmesg between start and end times cluster wide ..
     end_time = phdl.exec('date')
