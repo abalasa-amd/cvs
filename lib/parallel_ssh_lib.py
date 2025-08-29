@@ -59,36 +59,49 @@ class Pssh():
                 print(line)
                 cmd_out_str = cmd_out_str + line.replace( '\t', '   ')
                 cmd_out_str = cmd_out_str + '\n'
+            if item.stderr:
+                for line in item.stderr:
+                    print(line)
+                    cmd_out_str = cmd_out_str + line.replace( '\t', '   ')
+                    cmd_out_str = cmd_out_str + '\n'
             cmd_output[item.host] = cmd_out_str
+
         return cmd_output
 
 
     def exec_cmd_list(self, cmd_list, timeout=None ):
         """
+        Run different commands on different hosts compared to to exec 
+        which runs the same command on all hosts.
         Returns a dictionary of host as key and command output as values
         """
         cmd_output = {}
-        print('^^^^^^')
         print(cmd_list)
         if timeout is None:
             output = self.client.run_command( '%s', host_args=cmd_list )
         else:
             output = self.client.run_command( '%s', host_args=cmd_list, read_timeout=timeout )
-        i = 0
+        #i = 0
         for item in output:
             print('#----------------------------------------------------------#')
             print(f'Host == {item.host} ==')
             print('#----------------------------------------------------------#')
             cmd_out_str = ''
+            cmd_out_err = ''
             print(cmd_list[i])
             for line in item.stdout:
                 print(line)
                 cmd_out_str = cmd_out_str + line.replace( '\t', '   ')
                 cmd_out_str = cmd_out_str + '\n'
+            if item.stderr:
+                for line in item.stderr:
+                    print(line)
+                    cmd_out_str = cmd_out_str + line.replace( '\t', '   ')
+                    cmd_out_str = cmd_out_str + '\n'
+            #i=i+1
             cmd_output[item.host] = cmd_out_str
-            i=i+1
-        return cmd_output
 
+        return cmd_output
 
 
 
@@ -102,6 +115,7 @@ class Pssh():
             except IOError:
                raise Exception("Expected IOError exception, got none")
         return
+
 
     def reboot_connections(self ):
         print('Rebooting Connections')
