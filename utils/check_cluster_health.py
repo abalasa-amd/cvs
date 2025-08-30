@@ -26,29 +26,34 @@ import html_lib
 
 
 def general_health_checks( phdl, ):
+    health_dict = {}
     print('Verify General Health Checks')
     # Check PCIe Bus and Width
-    verify_lib.verify_gpu_pcie_bus_width( phdl )
+    health_dict['gpu_pcie_link'] = verify_lib.verify_gpu_pcie_bus_width( phdl )
     # Check Dmesg for errors
-    verify_lib.full_dmesg_scan( phdl )
+    health_dict['dmesg_scan'] = verify_lib.full_dmesg_scan( phdl )
     # Check Dmesg for AMD GPU driver errors
-    verify_lib.verify_driver_errors( phdl )
+    health_dict['driver_errors'] = verify_lib.verify_driver_errors( phdl )
     # journlctl scan
-    verify_lib.full_journalctl_scan( phdl )
+    health_dict['journlctl_scan'] = verify_lib.full_journalctl_scan( phdl )
     # Check for any link flap evidence
-    verify_lib.verify_nic_link_flap( phdl )
+    health_dict['nic_link_flap'] = verify_lib.verify_nic_link_flap( phdl )
     # Check for GPU PCIe errors from amd-smi commands
-    verify_lib.verify_gpu_pcie_errors( phdl )
+    health_dict['gpu_pcie_errors'] = verify_lib.verify_gpu_pcie_errors( phdl )
     # Verify PCIe status from Host OS side ..
-    verify_lib.verify_host_lspci( phdl)
+    health_dict['host_pcie'] = verify_lib.verify_host_lspci( phdl)
+    return health_dict
 
 
 
 
 
 
-def build_html_report( phdl, html_file ):
+def build_html_report( phdl, html_file, gen_health_dict, \
+        snapshot_err_dict, snapshot_err_stats_dict ):
 
+
+    # stats collection
     lshw_dict = linux_utils.get_lshw_network_dict(phdl)
     rdma_nic_dict = linux_utils.get_rdma_nic_dict( phdl )
     ip_dict = linux_utils.get_ip_addr_dict( phdl )
@@ -59,19 +64,54 @@ def build_html_report( phdl, html_file ):
     mem_dict = rocm_plib.get_gpu_mem_use_dict( phdl )
     metrics_dict = rocm_plib.get_gpu_metrics_dict( phdl )
     amd_dict = rocm_plib.get_amd_smi_metric_dict( phdl )
+
+    lldp_dict = linux_utils.get_lldp_dict( phdl )
+
     rdma_stats_dict = linux_utils.get_rdma_stats_dict( phdl )
     ethtool_stats_dict = linux_utils.get_nic_ethtool_stats_dict( phdl )
 
+    # Html headers
     html_lib.build_html_page_header(html_file)
+
+    # GPU Info tables
     html_lib.build_html_cluster_product_table( html_file, model_dict, fw_dict )
     html_lib.build_html_gpu_utilization_table( html_file, use_dict )
     html_lib.build_html_mem_utilization_table( html_file, mem_dict, amd_dict )
-    html_lib.build_html_nic_table( html_file, rdma_nic_dict, lshw_dict, ip_dict )
     html_lib.build_html_pcie_xgmi_metrics_table( html_file, metrics_dict, amd_dict )
     html_lib.build_html_error_table( html_file, metrics_dict, amd_dict )
+
+    # LLDP Table
+    html_lib.build_lldp_table( html_file, lldp_dict )
+
+
+    # NIC Info tables
+    html_lib.build_html_nic_table( html_file, rdma_nic_dict, lshw_dict, ip_dict )
     html_lib.build_rdma_stats_table( html_file, rdma_stats_dict )
     html_lib.build_ethtool_stats_table( html_file, ethtool_stats_dict)
 
+    print(snapshot_err_dict)
+    print(snapshot_err_dict.keys())
+    # Snapshot tables
+
+
+    # Historic Info Tables
+    html_lib.build_historic_err_log_table( html_file, gen_health_dict['gpu_pcie_errors'], \
+            'GPU PCIE Errors Table', 'gpupcieerrtable', 'gpupcieerrid' )
+    html_lib.build_historic_err_log_table( html_file, gen_health_dict['gpu_pcie_link'], \
+            'GPU PCIE Link Status Errors', 'gpupcielinktable', 'gpupcielinkid' )
+    html_lib.build_historic_err_log_table( html_file, gen_health_dict['host_pcie'], \
+            'Host Side PCIE Status Errors', 'hostpcielinktable', 'hostpcielinkid' )
+    html_lib.build_historic_err_log_table( html_file, gen_health_dict['dmesg_scan'], \
+            'Dmesg Error Table', 'dmesgerrtable', 'dmesgerrid' )
+    html_lib.build_historic_err_log_table( html_file, gen_health_dict['driver_errors'], \
+            'GPU Driver Error Table', 'gpudrivererrtable', 'gpudrivererrid' )
+    html_lib.build_historic_err_log_table( html_file, gen_health_dict['journlctl_scan'], \
+            'Journlctl Error Table', 'journlctlerrtable', 'journlctlerrid' )
+    html_lib.build_historic_err_log_table( html_file, gen_health_dict['nic_link_flap'], \
+            'NIC Link Flap Logs Table', 'niclinkflaptable', 'niclinkflapid' )
+    #html_lib.build_historic_pcie_err_table( html_file, gen_health_dict['gpu_pcie'] )
+
+    # Html footers
     html_lib.build_html_page_footer(html_file)
 
 
@@ -143,11 +183,8 @@ def main():
     # Ping Mesh check ..
 
     # Run general health checks and scan historic errors
-    general_health_checks( phdl )
+    gen_health_dict = general_health_checks( phdl )
 
-    # Build cluster html report
-    build_html_report( phdl, html_report_file )
-    
 
     # Take cluster metrics snapshot before iterations ..
     snapshot_dict_before = verify_lib.create_cluster_metrics_snapshot( phdl )
@@ -168,8 +205,16 @@ def main():
     print('Completed all iterations, taking final snapshot for comparison')
 
     snapshot_dict_after = verify_lib.create_cluster_metrics_snapshot( phdl )
-    verify_lib.compare_cluster_metrics_snapshots( snapshot_dict_before, snapshot_dict_after )
+    (snapshot_err_dict, snapshot_err_stats_dict ) = \
+            verify_lib.compare_cluster_metrics_snapshots( snapshot_dict_before, snapshot_dict_after )
 
+
+    # Build cluster html report
+    build_html_report( phdl, html_report_file, gen_health_dict, \
+            snapshot_err_dict, snapshot_err_stats_dict )
+
+
+    print(gen_health_dict)
 
     print('#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#')
     print('Completed all iterations, script completed, scan logs for ERROR, WARN')
