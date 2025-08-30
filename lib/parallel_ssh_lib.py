@@ -81,7 +81,7 @@ class Pssh():
             output = self.client.run_command( '%s', host_args=cmd_list )
         else:
             output = self.client.run_command( '%s', host_args=cmd_list, read_timeout=timeout )
-        #i = 0
+        i = 0
         for item in output:
             print('#----------------------------------------------------------#')
             print(f'Host == {item.host} ==')
@@ -98,7 +98,7 @@ class Pssh():
                     print(line)
                     cmd_out_str = cmd_out_str + line.replace( '\t', '   ')
                     cmd_out_str = cmd_out_str + '\n'
-            #i=i+1
+            i=i+1
             cmd_output[item.host] = cmd_out_str
 
         return cmd_output

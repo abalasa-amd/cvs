@@ -49,6 +49,129 @@ def build_html_page_header(filename):
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <!-- DataTables CSS -->
 <style>
+
+   /* ---- Design tokens ---- */
+  :root{
+    --sidebar-w: 220px;
+    --radius: 14px;
+    --gap: 6px;
+    --border: 1px solid color-mix(in oklab, canvasText 8%, transparent);
+    --accent: #60a5f1; /* tweak as you like */
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ color-scheme: dark; }
+    aside{
+    //background: #0b1b3a;
+    linear-gradient(180deg, #0b1b3a 0%, #0a2540 45%, #0b2e59 100%);
+    color: #e6f0ff;
+    border-right: 1px solid rgba(255,255,255,.18);
+    }
+    .item:hover{ background: rgba(255,255,255,.04) }
+    .item[aria-current="page"]{
+       background: rgba(255,255,255,.16);
+       outline-color: var(--accent);
+    }
+  }
+
+  /* ---- Base ---- */
+  *{ box-sizing:border-box }
+  body{
+    margin:0;
+    font:12px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: canvas; color: canvasText;
+  }
+    a{ color: inherit; text-decoration:none }
+  a:hover{ text-decoration:underline }
+  .btn{
+    display:inline-flex; align-items:center; gap:.5rem;
+    border: var(--border); padding:.55rem .8rem; border-radius: 999px;
+    background: color-mix(in oklab, canvas 85%, canvasText 5%);
+  }
+
+  /* ---- Layout ---- */
+  .app{
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+  }
+  header{
+    position: sticky; top:0; z-index: 5;
+    grid-column: 1 / -1;
+    display:flex; align-items:center; gap: .75rem; padding: .75rem .9rem;
+    border-bottom: var(--border);
+    backdrop-filter: saturate(1.1) blur(4px);
+    background: color-mix(in oklab, canvas 92%, transparent);
+  }
+  .toggle{
+    display:none; /* shown on small screens */
+    //display:inline-flex;
+  }
+
+  aside{
+    position: sticky; top:0; height: calc(100dvh - 56px); /* 56px ~ header */
+    align-self:start;
+    border-right: var(--border);
+    padding: 1rem;
+    overflow:auto;
+    background: #0f172a;    /* dark slate */
+    color: #e5e7eb;         /* light text for contrast */
+    //background: color-mix(in oklab, canvas 98%, canvasText 2%);
+  }
+  main{
+    padding: 1.25rem 1.25rem 4rem;
+    max-width: 1200px;
+  }
+
+  /* ---- Sidebar nav ---- */
+  nav[aria-label="Sidebar"] ul{ list-style:none; margin:0; padding:0 }
+  .group{ margin-bottom: 1rem }
+  .group > .title{
+    font-size: .85rem; letter-spacing:.02em; text-transform:uppercase;
+    opacity:.7; margin: .5rem 0 .25rem .75rem;
+  }
+  .item{
+    display:flex; align-items:center; gap:.6rem;
+    padding:.55rem .7rem; border-radius: var(--radius);
+    margin:.15rem 0;
+  }
+  .item:hover{ background: color-mix(in oklab, canvasText 6%, transparent) }
+  .item[aria-current="page"]{
+    background: color-mix(in oklab, var(--accent) 14%, transparent);
+    outline:1.5px solid color-mix(in oklab, var(--accent) 55%, transparent);
+  }
+  .icon{ inline-size:1.1em }
+
+  /* ---- Mobile: off-canvas ---- */
+  @media (max-width: 900px){
+    .app{ grid-template-columns: 1fr }
+    .toggle{ display:inline-flex }
+    aside{
+      position: fixed; inset: 56px auto 0 0; /* below header */
+      width: min(88vw, var(--sidebar-w));
+      transform: translateX(-105%);
+      transition: transform .28s ease;
+      box-shadow: 0 10px 30px color-mix(in oklab, black 15%, transparent);
+      z-index: 20;
+    }
+   body.menu-open aside{ transform: translateX(0) }
+    /* dim overlay */
+    .overlay{
+      position: fixed; inset: 56px 0 0 0;
+      background: color-mix(in oklab, black 45%, transparent);
+      opacity: 0; pointer-events: none; transition: opacity .2s;
+      z-index: 15;
+    }
+    body.menu-open .overlay{ opacity:1; pointer-events:auto }
+  }
+
+  /* ---- Demo content cards ---- */
+  .card{
+    border: var(--border); border-radius: var(--radius);
+    padding: 1rem; margin: .75rem 0;
+    background: color-mix(in oklab, canvas 95%, transparent);
+  }
+
+
    .highlight-red {
       color: red;
    }
@@ -58,6 +181,75 @@ def build_html_page_header(filename):
 </style>
 </head>
 <body>
+
+<div class="app">
+  <header>
+    <button class="btn toggle" id="menuBtn" aria-label="Open menu" aria-controls="sidebar" aria-expanded="true"> Menu</button>
+    <center>    <strong>CVS - Cluster Validation Suite</strong> </center>
+  </header>
+
+  <aside id="sidebar" aria-hidden="false">
+    <nav aria-label="Sidebar">
+
+
+
+      <div class="group">
+        <div class="title"><b>Cluster Summary</b></div>
+        <ul>
+          <li><a class="item" href="#clustsummary"><span class="icon">*</span>Cluster Summary</a></li>
+          <li><a class="item" href="#gpuinfo"><span class="icon">*</span>GPU Info</a></li>
+          <li><a class="item" href="#nicinfo"><span class="icon">*</span>NIC Info</a></li>
+          <li><a class="item" href="#lldpinfo"><span class="icon">*</span>LLDP Neighbors </a></li>
+        </ul>
+      </div>
+
+
+      <div class="group">
+        <div class="title"><b>GPU Info</b></div>
+        <ul>
+          <li><a class="item" href="#gpuinfo"><span class="icon">*</span>GPU Info</a></li>
+          <li><a class="item" href="#nicinfo"><span class="icon">*</span>NIC Info</a></li>
+          <li><a class="item" href="#lldpinfo"><span class="icon">*</span>LLDP Neighbors </a></li>
+        </ul>
+      </div>
+
+
+      <div class="group">
+        <div class="title"><b>NIC Info</b></div>
+        <ul>
+          <li><a class="item" href="#gpuinfo"><span class="icon">*</span>GPU Info</a></li>
+          <li><a class="item" href="#nicinfo"><span class="icon">*</span>NIC Info</a></li>
+          <li><a class="item" href="#lldpinfo"><span class="icon">*</span>LLDP Neighbors </a></li>
+        </ul>
+      </div>
+
+
+
+      <div class="group">
+        <div class="title"> Cluster Snapshot</div>
+        <ul>
+          <li><a class="item" href="#snapdmesg"><span class="icon">*</span>Dmesg Diff</a></li>
+          <li><a class="item" href="#snapgpumetrics"><span class="icon">*</span>GPU Metrics Diff</a></li>
+          <li><a class="item" href="#snapnicmetrics"><span class="icon">*</span>NIC Metrics Diff</a></li>
+        </ul>
+      </div>
+
+      <div class="group">
+        <div class="title"><b>Historic Err Info</b></div>
+        <ul>
+          <li><a class="item" href="#histdmesg"><span class="icon">*</span>Logs</a></li>
+          <li><a class="item" href="#histgpumetrics"><span class="icon">*</span>GPU Metrics</a></li>
+          <li><a class="item" href="#histnicmetrics"><span class="icon">*</span>NIC Metrics</a></li>
+        </ul>
+      </div>
+
+      </nav>
+    </aside>
+
+    <div class="overlay" hidden></div>
+    <main id="content" tabindex="-1">
+
+
          '''
          fp.write(html_lines)
          fp.close()
@@ -102,21 +294,36 @@ def build_html_page_footer( filename, ):
 <script>
   // Initialize DataTable
   $(document).ready(function() {
-    $('#prod').DataTable({
+    $('#prodtable').DataTable({
      "pageLength": 100,
      "autoWidth": true
     });
-    $('#gpuuse').DataTable({
+    $('#gpuusetable').DataTable({
      "scrollX": true,
      "pageLength": 100,
      "autoWidth": true
     });
-    $('#memuse').DataTable({
+    $('#pciexgmimettable').DataTable({
+     "scrollX": true,
+     "pageLength": 100,
+     "autoWidth": true
+    });                  
+    $('#memusetable').DataTable({
+     "scrollX": true,    
+     "pageLength": 100,  
+     "autoWidth": true   
+    });
+    $('#gpuerrortable').DataTable({
+     "scrollX": true,    
+     "pageLength": 100,  
+     "autoWidth": true   
+    });                  
+    $('#lldptable').DataTable({
      "scrollX": true,
      "pageLength": 100,
      "autoWidth": true
     });
-    $('#nic').DataTable({
+    $('#nictable').DataTable({
      "scrollX": true,
      "pageLength": 100,
      "autoWidth": true
@@ -126,12 +333,12 @@ def build_html_page_footer( filename, ):
      "pageLength": 100,
      "autoWidth": true
     });
-    $('#ethtoolstats').DataTable({
+    $('#ethtoolstatstable').DataTable({
      "scrollX": true,
      "pageLength": 100,
      "autoWidth": true
     });
-    $('#rdmastats').DataTable({
+    $('#rdmastatstable').DataTable({
      "scrollX": true,
      "pageLength": 100,
      "autoWidth": true
@@ -141,11 +348,18 @@ def build_html_page_footer( filename, ):
      "pageLength": 100,
      "autoWidth": true
     });
+    $('#histdmesgtable').DataTable({
+     "scrollX": true,
+     "pageLength": 100,
+     "autoWidth": true
+    });
     $('#error').DataTable({
      "scrollX": true,
      "pageLength": 100,
      "autoWidth": true
     });
+
+
   });
 </script>
 
@@ -207,7 +421,7 @@ def build_rdma_stats_table( filename, rdma_dict, ):
     with open(filename, 'a') as fp:
          html_lines='''
 <h2 style="background-color: lightblue">RDMA Statistics Table</h2>
-<table id="rdmastats" class="display cell-border">
+<table id="rdmastatstable" class="display cell-border">
   <thead>
   <tr>
   <th>Node</th>'''
@@ -295,7 +509,7 @@ def build_ethtool_stats_table( filename, d_dict, ):
     with open(filename, 'a') as fp:
          html_lines='''
 <h2 style="background-color: lightblue">Ethtool Statistics Table</h2>
-<table id="ethtoolstats" class="display cell-border">
+<table id="ethtoolstatstable" class="display cell-border">
   <thead>
   <tr>
   <th>Node</th>'''
@@ -339,6 +553,59 @@ def build_ethtool_stats_table( filename, d_dict, ):
          fp.close()
              
         
+
+
+
+
+
+
+def build_lldp_table( filename, lldp_dict ):
+    print('Build HTML training table')
+    with open(filename, 'a') as fp:
+         html_lines='''
+<h2 id="lldpinfo"></h2><br>
+<h2 style="background-color: lightblue">Cluster LLDP Table</h2>
+<table id="lldptable" class="display cell-border">
+  <thead>
+  <tr>
+  <th>Node</th>
+  <th>local Intf</th>
+  <th>Neighbor Name</th>
+  <th>Neighbor Descr</th>
+  <th>Neighbor GMAC</th>
+  <th>Neighbor Mgmt-IP</th>
+  <th>Neighbor Port</th>
+  </tr>
+  </thead>
+  '''
+         fp.write(html_lines)
+         for node in lldp_dict.keys():
+             if 'lldp' in lldp_dict[node].keys():
+                 l_dict_list = lldp_dict[node]['lldp']['interface']
+                 for l_dict in l_dict_list:
+                     intf = list(l_dict.keys())[0]
+                     print(intf)
+                     print(l_dict)
+                     chassis_key = list(l_dict[intf]['chassis'].keys())[0]
+                     chassis_dict = l_dict[intf]['chassis'][chassis_key]
+                     if 'descr' in chassis_dict:
+                         html_lines=f'''
+                         <tr>
+                         <td>{node}</td>
+                         <td>{intf}</td>
+                         <td>{chassis_key}</td>
+                         <td>{chassis_dict['descr']}</td>
+                         <td>{chassis_dict['id']['value']}</td>
+                         <td>{chassis_dict['mgmt-ip']}</td>
+                         <td>{l_dict[intf]['port']['id']['value']}</td>
+                         </tr>'''
+                         fp.write(html_lines)
+         html_lines='''
+         </table>
+         <br><br>
+         '''
+         fp.write(html_lines)
+         fp.close()
 
 
 
@@ -395,7 +662,8 @@ def build_training_results_table( filename, out_dict, title ):
   <th>Elapsed time per iteration</th>
   <th>Nan iterations</th>
   <th>Mem usage</th>
-  <tr>'''
+  <tr>
+  </thead>'''
          fp.write(html_lines)
          for node in out_dict.keys():
              d_dict = out_dict[node]
@@ -418,6 +686,42 @@ def build_training_results_table( filename, out_dict, title ):
          fp.write(html_lines)
          fp.close()
 
+
+
+
+
+
+def build_historic_err_log_table( filename, d_dict, title, table_name, id_name ):
+    print(f'Build HTML Historic error table {title}')
+    with open(filename, 'a') as fp:
+         html_lines=f'''
+<h2 id="{id_name}"></h2><br>
+<h2 style="background-color: lightblue">{title}</h2>
+<table id="{table_name}" class="display cell-border">
+  <thead>
+  <tr>
+  <th>Node</th>
+  <th>Error Logs</th>
+  </tr>
+  </thead>'''
+         fp.write(html_lines)
+         for node in d_dict.keys():
+             html_lines = f'''
+             <tr>
+             <td>{node}</td>
+             '''
+             fp.write(html_lines)
+             html_lines = '<td>'
+             for err_line in d_dict[node]:
+                 html_lines = html_lines + err_line + '<br>'
+             html_lines = html_lines + '</td></tr>'
+             fp.write(html_lines)
+         html_lines='''
+         </table>
+         <br><br>
+         '''
+         fp.write(html_lines)
+         fp.close()
 
              
 
@@ -477,8 +781,10 @@ def build_html_nic_table( filename, rdma_dict, lshw_dict, ip_dict ):
 
     with open(filename, 'a') as fp:
          html_lines='''
+
+<h2 id="nicinfo">NIC Information</h2><br>
 <h2 style="background-color: lightblue">Network Info</h2>
-<table id="nic" class="display cell-border">
+<table id="nictable" class="display cell-border">
   <thead>
   <tr>
   <th>Node</th>
@@ -610,8 +916,11 @@ def build_html_cluster_product_table( filename, model_dict, fw_dict ):
     # Append to the existing HTML file (assumes <body> already opened elsewhere)
     with open(filename, 'a') as fp:
          html_lines='''
-<h2 style="background-color: lightblue">Product Info</h2>
-<table id="prod" class="display cell-border">
+
+<h2 id="gpuinfo">GPU Information</h2><br>
+
+<h2 style="background-color: lightblue">Firmware Info</h2>
+<table id="prodtable" class="display cell-border">
   <thead>
   <tr>
   <th>Node</th>
@@ -710,7 +1019,7 @@ def build_html_gpu_utilization_table( filename, use_dict ):
     with open(filename, 'a') as fp:
          html_lines='''
 <h2 style="background-color: lightblue">GPU Utilization</h2>
-<table id="gpuuse" class="display cell-border">
+<table id="gpuusetable" class="display cell-border">
   <thead>
   <tr>
   <th>Node</th>
@@ -832,7 +1141,7 @@ def build_html_mem_utilization_table( filename, use_dict, amd_dict ):
     with open(filename, 'a') as fp:
          html_lines='''
 <h2 style="background-color: lightblue">GPU Memory Utilization</h2>
-<table id="memuse" class="display cell-border">
+<table id="memusetable" class="display cell-border">
   <thead>
   <tr>
   <th>Node</th>
@@ -969,7 +1278,7 @@ def build_html_pcie_xgmi_metrics_table( filename, metrics_dict, amd_dict ):
     with open(filename, 'a') as fp:
          html_lines='''
 <h2 style="background-color: lightblue">GPU PCIe XGMI Metrics Table</h2>
-<table id="pciexgmimetrics" class="display cell-border">
+<table id="pciexgmimettable" class="display cell-border">
   <thead>
   <tr>
   <th>Node</th>
@@ -1117,7 +1426,7 @@ def build_html_error_table( filename, metrics_dict, amd_dict ):
     with open(filename, 'a') as fp:
          html_lines='''
 <h2 style="background-color: lightblue">GPU Error Metrics Table</h2>
-<table id="error" class="display cell-border">
+<table id="gpuerrortable" class="display cell-border">
   <thead>
   <tr>
   <th>Node</th>
