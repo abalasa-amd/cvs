@@ -8,9 +8,6 @@ import time
 import json
 import logging
 
-import netmiko
-from netmiko import ConnectHandler
-from netmiko import redispatch
 
 sys.path.insert( 0, './lib' )
 from parallel_ssh_lib import *
@@ -164,7 +161,6 @@ def parse_tb_example_test_results( out_dict, exp_dict ):
 
 
 
-# Create connection to DUT, MTPs, Switches and export for later use ..
 @pytest.fixture(scope="module")
 def  phdl(cluster_dict):
      print(cluster_dict)
@@ -173,38 +169,9 @@ def  phdl(cluster_dict):
      return phdl
 
 
-@pytest.fixture(scope="module")
-def  hdl(cluster_dict):
-     node_list = list(cluster_dict['node_dict'].keys())
-     hdl = ConnectHandler( ip=node_list[0], device_type='linux', username=cluster_dict['username'], \
-         use_keys=True, key_file=cluster_dict['priv_key_file'] )
-     return hdl
 
 
 
-@pytest.mark.dependency(name="init")
-def test_install_transferbench(hdl, phdl, config_dict ):
-    # For install case, if the systems are using NFS, use single connection to 
-    # just first node with netmiko
-    globals.error_list = []
-    log.info('Testcase install transferbench')
-    package_path = config_dict['package_path']
-    git_url = config_dict['git_url']
-    print(package_path)
-    out = hdl.send_command(f'rm -rf TransferBench')
-    out = hdl.send_command(f'cd {package_path};git clone {git_url};cd', delay_factor=10)
-    #out_dict = phdl.exec(f'cd {package_path};git clone {git_url}', delay_factor=10)
-    print(out)
-    out_dict = phdl.exec(f'cd {package_path}/TransferBench;CC=hipcc make')
-    out_dict = phdl.exec(f'ls -l /opt/amd/transferbench')
-    for node in out_dict.keys():
-        if not re.search( 'TransferBench', out_dict[node] ):
-            fail_test(f'Transfer bench installation failed on node {node}')
-    update_test_result()   
- 
-
-
-@pytest.mark.dependency(depends=["init"])
 def test_transfer_bench_example_tests_1_6_t(phdl, config_dict ):
     globals.error_list = []
     log.info('Testcase Run TransferBench example tests 1-6')
@@ -221,7 +188,6 @@ def test_transfer_bench_example_tests_1_6_t(phdl, config_dict ):
 
 
 
-@pytest.mark.dependency(depends=["init"])
 def test_transfer_bench_a2a(phdl, config_dict, ):
     globals.error_list = []
     log.info('Testcase Run Transferbench a2a')
@@ -236,7 +202,6 @@ def test_transfer_bench_a2a(phdl, config_dict, ):
 
 
 
-@pytest.mark.dependency(depends=["init"])
 def test_transfer_bench_p2p(phdl, config_dict, ):
     globals.error_list = []
     log.info('Testcase Run Transferbench p2p')
@@ -250,7 +215,6 @@ def test_transfer_bench_p2p(phdl, config_dict, ):
 
 
 
-@pytest.mark.dependency(depends=["init"])
 def test_transfer_bench_healthcheck(phdl, config_dict, ):
     globals.error_list = []
     log.info('Testcase Run TransferBench healthcheck')
@@ -263,7 +227,6 @@ def test_transfer_bench_healthcheck(phdl, config_dict, ):
 
 
 
-@pytest.mark.dependency(depends=["init"])
 def test_transfer_bench_a2asweep(phdl, config_dict, ):
     globals.error_list = []
     log.info('Testcase Run TransferBench a2asweep')
@@ -276,7 +239,6 @@ def test_transfer_bench_a2asweep(phdl, config_dict, ):
 
 
 
-@pytest.mark.dependency(depends=["init"])
 def test_transfer_bench_scaling(phdl, config_dict, ):
     globals.error_list = []
     log.info('Testcase Run TransferBench scaling')
@@ -289,7 +251,6 @@ def test_transfer_bench_scaling(phdl, config_dict, ):
 
 
 
-@pytest.mark.dependency(depends=["init"])
 def test_transfer_bench_schmoo(phdl, config_dict, ):
     globals.error_list = []
     log.info('Testcase Run TransferBench schmoo')
