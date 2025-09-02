@@ -226,21 +226,30 @@ def build_html_page_header(filename):
       </div>
 
 
-
-      <div class="group">
-        <div class="title"> Snapshot Diffs</div>
-        <ul>
-          <li><a class="item" href="#snapdmesg"><span class="icon">*</span>Dmesg Diff</a></li>
-          <li><a class="item" href="#snapgpumetrics"><span class="icon">*</span>GPU Metrics Diff</a></li>
-          <li><a class="item" href="#snapnicmetrics"><span class="icon">*</span>NIC Metrics Diff</a></li>
-        </ul>
-      </div>
-
       <div class="group">
         <div class="title"><b>Historic Err Logs</b></div>
         <ul>
           <li><a class="item" href="#dmesgerrid"><span class="icon">*</span>Dmesg Logs</a></li>
           <li><a class="item" href="#journlctlerrid"><span class="icon">*</span>Journctl Logs</a></li>
+          <li><a class="item" href="#gpupcieerrid"><span class="icon">*</span>GPU PCIe Error Logs</a></li>
+          <li><a class="item" href="#gpupcielinkid"><span class="icon">*</span>GPU PCIe Link State Errors</a></li>
+          <li><a class="item" href="#hostpcielinkid"><span class="icon">*</span>Host PCIe Link Errors</a></li>
+          <li><a class="item" href="#niclinkflapid"><span class="icon">*</span>NIC Link Flap Errors</a></li>
+        </ul>
+      </div>
+
+
+      <div class="group">
+        <div class="title"> Snapshot Diffs</div>
+        <ul>
+          <li><a class="item" href="#snapdmesg"><span class="icon">*</span>Dmesg Diff</a></li>
+          <li><a class="item" href="#snaperrlogsethid"><span class="icon">*</span>NIC Ethtool stats Diff logs</a></li>
+          <li><a class="item" href="#snapethstatsid"><span class="icon">*</span>Ethtool Stats Diff</a></li>
+          <li><a class="item" href="#snaperrlogsrdmaid"><span class="icon">*</span>NIC RDMA stats Diff logs</a></li>
+          <li><a class="item" href="#snaprdmastatsid"><span class="icon">*</span>RDMA Stats Diff</a></li>
+          <li><a class="item" href="#snaperrlogspcieid"><span class="icon">*</span>PCIe Error stats Diff logs</a></li>
+          <li><a class="item" href="#snaperrlogsrasid"><span class="icon">*</span>GPU RAS Metrics Diff logs</a></li>
+          <li><a class="item" href="#snaprasstatsid"><span class="icon">*</span>GPU RAS Stats Diff</a></li>
         </ul>
       </div>
 
@@ -355,27 +364,27 @@ def build_html_page_footer( filename, ):
      "autoWidth": true
     });
     $('#snapdmesgtable').DataTable({
-     "scrollX": true,
+     //"scrollX": true,
      "pageLength": 100,
      "autoWidth": true
     });
     $('#snaperrlogsethtable').DataTable({
-     "scrollX": true,
+     //"scrollX": true,
      "pageLength": 100,
      "autoWidth": true
     });
     $('#snaperrlogspcietable').DataTable({
-     "scrollX": true,
+     //"scrollX": true,
      "pageLength": 100,
      "autoWidth": true
     });
     $('#snaperrlogsrastable').DataTable({
-     "scrollX": true,
+     //"scrollX": true,
      "pageLength": 100,
      "autoWidth": true
     });
     $('#snaperrlogsrdmatable').DataTable({
-     "scrollX": true,
+     //"scrollX": true,
      "pageLength": 100,
      "autoWidth": true
     });
