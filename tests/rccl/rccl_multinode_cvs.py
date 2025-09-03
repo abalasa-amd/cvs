@@ -387,6 +387,8 @@ def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_
        nccl_net_plugin         = config_dict['nccl_net_plugin'], \
        user_key_file           = cluster_dict['priv_key_file'], \
        verify_bus_bw           = config_dict['verify_bus_bw'], \
+       verify_bw_dip           = config_dict['verify_bw_dip'], \
+       verify_lat_dip          = config_dict['verify_lat_dip'], \
        exp_results_dict        = config_dict['results']
     )
 
