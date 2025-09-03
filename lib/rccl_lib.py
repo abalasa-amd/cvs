@@ -127,6 +127,61 @@ def check_bus_bw( test_name, output, exp_res_dict ):
 
 
 
+def check_bw_dip( test_name, output, exp_res_dict ):
+    act_res_dict = json.loads(output.replace( '\n', '').replace( '\r', ''))
+    if re.search( 'alltoall|all_to_all', test_name, re.I ):
+        last_bw = 0.0
+        last_msg_size = act_res_dict[0]['size']
+        for act_dict in act_res_dict:
+            if act_dict['inPlace'] == 0:
+                if float(act_dict['busBw']) < float(last_bw):
+                    fail_test(f"The BusBW for msg size {act_dict['size']} = {act_dict['busBw']} is less than the earlier msg size {last_msg_size} = BW {last_bw}")
+                last_bw = act_dict['busBw']
+                last_msg_size = act_dict['size']
+    else:
+        last_bw = 0.0
+        last_msg_size = act_res_dict[0]['size']
+        for act_dict in act_res_dict:
+            if act_dict['inPlace'] == 1:
+                if float(act_dict['busBw']) < float(last_bw):
+                    fail_test(f"The BusBW for msg size {act_dict['size']} = {act_dict['busBw']} is less than the earlier msg size {last_msg_size} = BW {last_bw}")
+                last_bw = act_dict['busBw']
+                last_msg_size = act_dict['size']
+
+
+
+def check_lat_dip( test_name, output, exp_res_dict ):
+    act_res_dict = json.loads(output.replace( '\n', '').replace( '\r', ''))
+    if re.search( 'alltoall|all_to_all', test_name, re.I ):
+        last_time = 0.0
+        last_msg_size = act_res_dict[0]['size']
+        for act_dict in act_res_dict:
+            if act_dict['inPlace'] == 0:
+                if float(act_dict['time']) < float(last_time):
+                    fail_test(f"The latency for msg size {act_dict['size']} = {act_dict['time']} is less than the earlier msg size {last_msg_size} = BW {last_time}")
+                last_time = act_dict['time']
+                last_msg_size = act_dict['size']
+    else:
+        last_time = 0.0
+        last_msg_size = act_res_dict[0]['size']
+        for act_dict in act_res_dict:
+            if act_dict['inPlace'] == 1:
+                if float(act_dict['time']) < float(last_time):
+                    fail_test(f"The latency for msg size {act_dict['size']} = {act_dict['time']} is less than the earlier msg size {last_msg_size} = BW {last_time}")
+                last_time = act_dict['time']
+                last_msg_size = act_dict['size']
+
+
+
+
+
+
+
+
+
+
+
+
 # Main RCCL Test library which gets invoked from cvs/test/rccl tests and accepts most of the 
 # standard NCCL environment variables ..
 #
@@ -143,7 +198,7 @@ def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, 
         nccl_net_plugin=None, user_password=None, \
         min_channels=64, max_channels=64, \
         user_key_file=None, verify_bus_bw=False, \
-        exp_results_dict=None ):
+        verify_bw_dip=True, verify_lat_dip=True, exp_results_dict=None ):
 
 
     """
@@ -264,5 +319,11 @@ def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, 
     # If requested, verify measured bus bandwidths against provided expected Bandwidth
     if re.search( 'True', verify_bus_bw, re.I ):
         check_bus_bw( test_name, result_out, exp_results_dict[test_name] )
+
+    if re.search( 'True', verify_bw_dip, re.I ):
+        check_bw_dip( test_name, result_out, exp_results_dict[test_name] )
+
+    if re.search( 'True', verify_lat_dip, re.I ):
+        check_lat_dip( test_name, result_out, exp_results_dict[test_name] )
 
     return result_out
