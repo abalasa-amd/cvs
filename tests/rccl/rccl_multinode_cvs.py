@@ -109,7 +109,7 @@ def config_dict(config_file):
 
 @pytest.fixture(scope="module")
 def phdl(cluster_dict):
-     """
+    """
     Build and return a parallel SSH handle (Pssh) for all cluster nodes.
 
     Args:
@@ -319,7 +319,12 @@ def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_
       - cluster_snapshot_debug controls whether before/after snapshots are taken.
     """
 
-    start_time = phdl.exec('date')
+    # Log a message to Dmesg to create a timestamp record
+    phdl.exec( f'sudo echo "Starting Test {rccl_collective} {rccl_algo} {rccl_protocol}" | sudo tee /dev/kmsg' )
+
+
+    #start_time = phdl.exec('date')
+    start_time = phdl.exec('date +"%a %b %e %H:%M"')
     globals.error_list = []
     node_list = list(cluster_dict['node_dict'].keys())
 
@@ -388,9 +393,13 @@ def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_
 
     print(result_dict)
 
+
     # Scan dmesg between start and end times cluster wide ..
-    end_time = phdl.exec('date')
-    verify_dmesg_for_errors( phdl, start_time, end_time )
+    #end_time = phdl.exec('date')
+    phdl.exec( f'sudo echo "End of Test {rccl_collective} {rccl_algo} {rccl_protocol}" | sudo tee /dev/kmsg' )
+
+    end_time = phdl.exec('date +"%a %b %e %H:%M"')
+    verify_dmesg_for_errors( phdl, start_time, end_time, till_end_flag=True )
 
     # Get new cluster snapshot and compare ..
     if re.search( 'True', config_dict['cluster_snapshot_debug'], re.I ):
