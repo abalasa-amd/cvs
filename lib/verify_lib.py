@@ -174,7 +174,7 @@ def verify_gpu_pcie_errors( phdl ):
 
 
 
-def verify_dmesg_for_errors(phdl, start_time_dict, end_time_dict ):
+def verify_dmesg_for_errors(phdl, start_time_dict, end_time_dict, till_end_flag=True ):
    
     """
     Scan kernel logs (dmesg) between given start and end timestamps across nodes
@@ -210,22 +210,25 @@ def verify_dmesg_for_errors(phdl, start_time_dict, end_time_dict ):
 
     # Use the first node key to derive the time window to search .. assume cluster has NTP
     node0 = list(start_time_dict.keys())[0]
-    start_time = start_time_dict[node0]
-    end_time = end_time_dict[node0]
+    start_time = start_time_dict[node0].rstrip("\n")
+    end_time = end_time_dict[node0].rstrip("\n")
 
     # Extract the "Mon Jan  2 03:04:05" style prefix from the provided timestamps
-    pattern = r"([a-zA-Z]+\s+[a-zA-Z]+\s+[0-9]+\s+[0-9]+\:[0-9]+\:[0-9]+)\s"
+    pattern = r"([a-zA-Z]+\s+[a-zA-Z]+\s+[0-9]+\s+[0-9]+\:[0-9]+)"
     match = re.search( pattern, start_time)
     start_pattern = match.group(1)
 
     # Extract end timestamp prefix similarly
-    pattern = r"([a-zA-Z]+\s+[a-zA-Z]+\s+[0-9]+\s+[0-9]+\:[0-9]+\:[0-9]+)\s"
+    pattern = r"([a-zA-Z]+\s+[a-zA-Z]+\s+[0-9]+\s+[0-9]+\:[0-9]+)"
     match = re.search( pattern, end_time)
     end_pattern = match.group(1)
 
     # Pull human-readable dmesg and slice the lines between start and end timestamps.
     # Filter out allowed/denied lines to reduce noise. Return is a dict keyed by node.
-    output_dict = phdl.exec(f"sudo dmesg -T | awk '/{start_pattern}.*/,/{end_pattern}.*/' | egrep -v 'ALLOWED|DENIED' --color=never")
+    if till_end_flag:
+        output_dict = phdl.exec(f"sudo dmesg -T | sed -n '/{start_pattern}/,$p' | egrep -v 'ALLOWED|DENIED' --color=never")
+    else:
+        output_dict = phdl.exec(f"sudo dmesg -T | awk '/{start_pattern}.*/,/{end_pattern}.*/' | egrep -v 'ALLOWED|DENIED' --color=never")
     #print(output_dict)
     for node in output_dict.keys():
         err_dict[node] = []
