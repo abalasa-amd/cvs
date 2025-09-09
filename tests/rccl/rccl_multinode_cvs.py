@@ -434,10 +434,16 @@ def test_gen_graph():
     print(rccl_res_dict)
     rccl_graph_dict = rccl_lib.convert_to_graph_dict(rccl_res_dict)
     print(rccl_graph_dict)
-    html_file = '/tmp/rccl_res_am.html'
+
+    proc_id = os.getpid()
+
+    html_file = f'/tmp/rccl_perf_report_{proc_id}.html'
 
     html_lib.add_html_begin( html_file )
     html_lib.build_rccl_amcharts_graph( html_file, 'rccl', rccl_graph_dict )
     html_lib.insert_chart( html_file, 'rccl' )
     html_lib.build_rccl_result_table( html_file, rccl_graph_dict )
+    html_lib.add_json_data( html_file, json.dumps(rccl_graph_dict) )
     html_lib.add_html_end( html_file )
+
+    print(f'Perf report is saved under {html_file}, pls copy it to your web server under /var/www/html folder to view')
