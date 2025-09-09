@@ -7,9 +7,13 @@ import sys
 import time
 import json
 import logging
+import itertools
+
 
 sys.path.insert( 0, './lib' )
 import rccl_lib
+import html_lib
+
 from parallel_ssh_lib import *
 from utils_lib import *
 from verify_lib import *
@@ -18,6 +22,8 @@ import globals
 
 log = globals.log
 
+
+rccl_res_dict = {}
 
 
 # Importing additional cmd line args to script ..
@@ -200,52 +206,59 @@ def pytest_generate_tests(metafunc):
       - If no config_file is provided, the hook returns without parametrizing.
       - Defaults are used when keys are absent under config['rccl'].
     """
-
     config_file = metafunc.config.getoption("config_file")
     if not config_file:
         return
+
     with open(config_file) as fp:
-        config = json.load(fp)
+        cfg = json.load(fp)
+    rccl = cfg.get("rccl", {})
 
-    # Build test parameters
-    if 'rccl_collective' in config['rccl']:
-        rccl_collective_list = config['rccl']['rccl_collective']
-    else:
-        rccl_collective_list = [ "all_reduce_perf", "all_gather_perf", \
-                                 "scatter_perf", "gather_perf", \
-                                 "reduce_scatter_perf", "sendrecv_perf", \
-                                 "alltoall_perf", "alltoallv_perf", \
-                                 "reduce_scatter_perf", "broadcast_perf"]
+    # Defaults (dedup'd)
+    rccl_collective_list = rccl.get(
+        "rccl_collective",
+        [
+            "all_reduce_perf", "all_gather_perf",
+            "scatter_perf", "gather_perf",
+            "reduce_scatter_perf", "sendrecv_perf",
+            "alltoall_perf", "alltoallv_perf",
+            "broadcast_perf",
+        ],
+    )
+    rccl_algo_list = rccl.get("rccl_algo", ["ring", "tree"])
+    rccl_protocol_list = rccl.get("rccl_protocol", ["simple", "LL128", "LL"])
+    qp_scale_list = rccl.get("qp_scale", ["1", "2"])
+    nccl_pxn_disable_list = rccl.get("nccl_pxn_disable", [ "1", "0" ])
 
-    if 'rccl_algo' in config['rccl']:
-        rccl_algo_list = config['rccl']['rccl_algo']
-    else:
-        rccl_algo_list = ["ring", "tree" ]
+    # Only parametrize fixtures used by this test
+    all_keys = ("rccl_collective", "rccl_algo", "rccl_protocol", "qp_scale", "nccl_pxn_disable")
 
-    if 'rccl_protocol' in config['rccl']:
-        rccl_protocol_list = config['rccl']['rccl_protocol']
-    else:
-        rccl_protocol_list = ["simple", "LL128", "LL" ]
+    active = [k for k in all_keys if k in metafunc.fixturenames]
+    if not active:
+        return
 
-    if 'qp_scale' in config['rccl']:
-        qp_scale_list = config['rccl']['qp_scale']
-    else:
-        qp_scale_list = [ "1", "2", ]
+    domain_by_key = {
+        "rccl_collective": rccl_collective_list,
+        "rccl_algo": rccl_algo_list,
+        "rccl_protocol": rccl_protocol_list,
+        "qp_scale": qp_scale_list,
+        "nccl_pxn_disable": nccl_pxn_disable_list,
+    }
+    domains = [domain_by_key[k] for k in active]
 
+    params, ids = [], []
+    for values in itertools.product(*domains):
+        combo = dict(zip(active, values))
 
-    # Invoke parametrize
-    if "rccl_collective" in metafunc.fixturenames:
-        metafunc.parametrize( "rccl_collective", rccl_collective_list )
+        if combo.get("rccl_algo") == "tree":
+            if combo.get("rccl_collective") != "all_reduce_perf":
+                continue
 
-    if "rccl_algo" in metafunc.fixturenames:
-        metafunc.parametrize( "rccl_algo", rccl_algo_list )
-
-
-    if "rccl_protocol" in metafunc.fixturenames:
-        metafunc.parametrize( "rccl_protocol", rccl_protocol_list )
-
-    if "qp_scale" in metafunc.fixturenames:
-        metafunc.parametrize( "qp_scale", qp_scale_list )
+        params.append(values)
+      
+        ids.append("|".join(f"{k}={combo[k]}" for k in active))
+    metafunc.parametrize(",".join(active), params, ids=ids)
+    
 
 
 
@@ -291,7 +304,7 @@ def test_collect_networkinfo( phdl ):
 
 
 def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_algo, \
-       rccl_protocol, qp_scale ):
+       rccl_protocol, qp_scale, nccl_pxn_disable ):
 
     """
     Execute RCCL performance test across the cluster with given parameters.
@@ -383,7 +396,7 @@ def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_
        nccl_ib_sl              = config_dict['nccl_ib_sl'], \
        nccl_ib_tc              = config_dict['nccl_ib_tc'], \
        nccl_ib_split_data_on_qps  = config_dict['nccl_ib_split_data_on_qps'], \
-       nccl_pxn_disable        = config_dict['nccl_pxn_disable'], \
+       nccl_pxn_disable        = nccl_pxn_disable, \
        nccl_net_plugin         = config_dict['nccl_net_plugin'], \
        user_key_file           = cluster_dict['priv_key_file'], \
        verify_bus_bw           = config_dict['verify_bus_bw'], \
@@ -394,7 +407,8 @@ def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_
 
 
     print(result_dict)
-
+    key_name = f'{rccl_collective}-{rccl_algo}-{rccl_protocol}-{qp_scale}-{nccl_pxn_disable}'
+    rccl_res_dict[key_name] = result_dict
 
     # Scan dmesg between start and end times cluster wide ..
     #end_time = phdl.exec('date')
@@ -412,3 +426,18 @@ def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_
     update_test_result()
 
 
+
+
+
+def test_gen_graph():
+    print('Final Global result dict')
+    print(rccl_res_dict)
+    rccl_graph_dict = rccl_lib.convert_to_graph_dict(rccl_res_dict)
+    print(rccl_graph_dict)
+    html_file = '/tmp/rccl_res_am.html'
+
+    html_lib.add_html_begin( html_file )
+    html_lib.build_rccl_amcharts_graph( html_file, 'rccl', rccl_graph_dict )
+    html_lib.insert_chart( html_file, 'rccl' )
+    html_lib.build_rccl_result_table( html_file, rccl_graph_dict )
+    html_lib.add_html_end( html_file )
