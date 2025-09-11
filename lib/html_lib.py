@@ -427,6 +427,323 @@ def build_html_page_footer( filename, ):
 
 
 
+def normalize_bytes(n_bytes, si=False, precision=2 ):
+    """
+    Convert a byte count to a human string using B, KB, MB, or GB.
+
+    Args:
+        n_bytes: Size in bytes.
+        si: If True, use decimal (kB=1000). If False (default), binary (KB=1024).
+        precision: Decimal places for KB/MB/GB.
+
+    Returns:
+        A formatted string like "932 B", "1.23 KB", "45.6 MB", or "3.14 GB".
+        Values >= 1 GB stay in GB (not TB+) since only KB/MB/GB are requested.
+    """
+    if not isinstance(n_bytes, (int, float)):
+        raise TypeError("n_bytes must be an int or float")
+
+    sign = "-" if n_bytes < 0 else ""
+    n = abs(float(n_bytes))
+
+    step = 1000.0 if si else 1024.0
+    units = ["B", "kB" if si else "KB", "MB", "GB"]
+
+    if n < step:
+        return f"{sign}{int(n)} {units[0]}"
+    elif n < step**2:
+        val, unit = n / step, units[1]
+    elif n < step**3:
+        val, unit = n / (step**2), units[2]
+    else:
+        # cap at GB per request; if you want TB+, extend units and logic
+        val, unit = n / (step**3), units[3]
+
+    s = f"{val:.{precision}f}".rstrip("0").rstrip(".")
+    return f"{sign}{s} {unit}"
+
+
+
+
+def build_rccl_heatmap( filename, chart_name, title, act_data_json, ref_data_json ):
+
+    try:
+        with open( act_data_json, 'r') as fp1:
+             act_data_dict = json.load(fp1)
+    except Exception as e:
+        print(f'Error reading file {act_data_json} - {e}')
+
+
+    try:
+        with open( ref_data_json, 'r') as fp2:
+             ref_data_dict = json.load(fp2)
+    except Exception as e:
+        print(f'Error reading file {ref_data_json} - {e}')
+
+
+    with open(filename, 'a') as fp:
+         html_lines='''
+         <h2 style="background-color: lightblue">''' + str(title) + '''</h2>
+
+
+<!-- Styles -->
+<style>
+#chartdiv {
+  width: 120%;
+  height: 500px;
+}
+</style>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+<!-- Chart code -->
+<script>
+am5.ready(function() {
+
+// Create root element
+// https://www.amcharts.com/docs/v5/getting-started/#Root_element
+var root = am5.Root.new("chartdiv");
+
+// Set themes
+// https://www.amcharts.com/docs/v5/concepts/themes/
+root.setThemes([
+  am5themes_Animated.new(root)
+]);
+
+// Create chart
+// https://www.amcharts.com/docs/v5/charts/xy-chart/
+var chart = root.container.children.push(
+  am5xy.XYChart.new(root, {
+    panX: false,
+    panY: false,
+    wheelX: "none", 
+    wheelY: "none",
+    paddingLeft: 0,
+    paddingRight: 0,
+    layout: root.verticalLayout
+  })
+);
+
+
+// Create axes and their renderers
+var yRenderer = am5xy.AxisRendererY.new(root, {
+  visible: false,
+  minGridDistance: 20,
+  inversed: true,
+  minorGridEnabled: true
+});
+
+yRenderer.grid.template.set("visible", false);
+
+yRenderer.labels.template.setAll({
+     fontSize: 10 // You can also use a number for pixel size
+});
+
+var yAxis = chart.yAxes.push(
+  am5xy.CategoryAxis.new(root, {
+    renderer: yRenderer,
+    categoryField: "category"
+  })
+);
+
+var xRenderer = am5xy.AxisRendererX.new(root, {
+  visible: false,
+  minGridDistance: 10,
+  inversed: true,
+  minorGridEnabled: true
+});
+
+xRenderer.grid.template.set("visible", false);
+
+xRenderer.labels.template.setAll({
+     fontSize: 10 // You can also use a number for pixel size
+});
+
+
+var xAxis = chart.xAxes.push(
+  am5xy.CategoryAxis.new(root, {
+    renderer: xRenderer,
+    categoryField: "category"
+  })
+);
+
+
+xAxis.set("numberFormatter", am5.NumberFormatter.new(root, {
+ numberFormat: "#.0b",
+   numericFields: ["valueX"]
+  }));
+
+
+// Create series
+// https://www.amcharts.com/docs/v5/charts/xy-chart/#Adding_series
+var series = chart.series.push(
+  am5xy.ColumnSeries.new(root, {
+    calculateAggregates: true,
+    stroke: am5.color(0xffffff),
+    clustered: false,
+    xAxis: xAxis,
+    yAxis: yAxis,
+    categoryXField: "x",
+    categoryYField: "y",
+    valueField: "value"
+  })
+);
+
+series.columns.template.setAll({
+  tooltipText: "{value}",
+  strokeOpacity: 1,
+  strokeWidth: 2,
+  cornerRadiusTL: 5,
+  cornerRadiusTR: 5,
+  cornerRadiusBL: 5,
+  cornerRadiusBR: 5,
+  width: am5.percent(100),
+  height: am5.percent(100),
+  templateField: "columnSettings"
+});
+
+var squareTemplate = am5.Template.new({});
+
+// Add heat rule
+// https://www.amcharts.com/docs/v5/concepts/settings/heat-rules/
+series.set("heatRules", [{
+  target: squareTemplate,
+  min: 10,
+  max: 10,
+  dataField: "value",
+  //key: "radius"
+}]);
+series.bullets.push(function () {
+  return am5.Bullet.new(root, {
+    sprite: am5.Rectangle.new(
+      root,
+      {
+        fill: am5.color(0x000000),
+        fillOpacity: 0.5,
+        strokeOpacity: 0
+      },
+      squareTemplate
+    )
+  });
+});
+
+
+
+series.bullets.push(function () {
+  return am5.Bullet.new(root, {
+   sprite: am5.Label.new(root, {
+      fill: am5.color(0xffffff),
+      populateText: true,
+      centerX: am5.p50,
+      centerY: am5.p50,
+      fontSize: 12,
+      text: "{value}%"
+    })
+  });
+});
+
+
+
+var colors = {
+  critical: am5.color(0xca0101),
+  bad: am5.color(0xe17a2d),
+  medium: am5.color(0xe1d92d),
+  good: am5.color(0x5dbe24),
+  verygood: am5.color(0x0b7d03)
+};
+
+// Set data
+// https://www.amcharts.com/docs/v5/charts/xy-chart/#Setting_data
+var data = [
+         '''
+         fp.write(html_lines)
+         for collective_name in act_data_dict.keys():
+             for msg_size in act_data_dict[collective_name].keys():
+
+                 norm_msg_size = normalize_bytes(int(msg_size))
+                 # calculate % diff between actual value and ref value
+                 act_bus_bw = act_data_dict[collective_name][msg_size]['bus_bw']
+                 ref_bus_bw = ref_data_dict[collective_name][msg_size]['bus_bw']
+
+                 pct_incr = ( (act_bus_bw - ref_bus_bw)/ref_bus_bw ) * 100
+                 pct_val = round(float(pct_incr + 100), 2 )
+
+                 if pct_val > 100:
+                     fill_color = "colors.verygood"
+                 elif pct_val == 100:
+                     fill_color = "colors.good"
+                 elif (pct_val < 100) and (pct_val > 95):
+                     fill_color = "colors.good"
+                 elif (pct_val < 95) and (pct_val > 75):
+                     fill_color = "colors.medium"
+                 elif pct_val < 75:
+                     fill_color = "colors.critical"
+                 else:
+                     fill_color = "colors.bad"
+
+
+                 html_lines = '''
+  {
+    y: "''' + str(collective_name) + '''",
+    x: "''' + str(norm_msg_size) + '''",
+    columnSettings: {
+      fill: ''' + fill_color + '''
+    },
+    value: ''' + str(pct_val) + '''
+  },
+                 '''
+                 fp.write(html_lines)
+
+         html_lines = '''
+];
+
+series.data.setAll(data);
+
+yAxis.data.setAll([
+         '''
+         fp.write(html_lines)
+         for collective_name in act_data_dict.keys():
+             html_lines = '''
+             { category: "''' + collective_name + '''"},
+             '''
+             fp.write(html_lines)
+         html_lines = '''
+]);
+
+xAxis.data.setAll([
+         '''
+         fp.write(html_lines)
+
+         first_collective = list(act_data_dict.keys())[0]
+         msg_size_list = list(act_data_dict[first_collective].keys())
+
+         for msg_size in msg_size_list:
+             norm_msg_size = normalize_bytes(int(msg_size))
+             html_lines = '''
+             { category: "''' + str(norm_msg_size) + '''"},
+             '''
+             fp.write(html_lines)
+         html_lines = '''
+]);
+
+// Make stuff animate on load
+// https://www.amcharts.com/docs/v5/concepts/animations/#Initial_animation
+chart.appear(1000, 100);
+
+}); // end am5.ready()
+</script>
+
+<!-- HTML -->
+<div id="chartdiv"></div>
+
+
+
+</script>
+         '''
+         fp.write(html_lines)
 
 
 
