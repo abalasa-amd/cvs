@@ -1,3 +1,10 @@
+'''
+Copyright 2025 Advanced Micro Devices, Inc.
+All rights reserved. This notice is intended as a precaution against inadvertent publication and does not imply publication or any waiver of confidentiality.
+The year included in the foregoing notice is the year of creation of the work.
+All code contained here is Property of Advanced Micro Devices, Inc.
+'''
+
 import pytest
 
 import re
@@ -146,7 +153,7 @@ def test_check_os_release(phdl, config_dict, ):
     for node in out_dict.keys():
         # If expected version is not present, extract the actual version and fail
         if not re.search( f'{os_version}', out_dict[node], re.I ):
-            match = re.search( 'VERSION=\"([0-9\.\-\_A-Z]+)\s+)', out_dict[node], re.I )
+            match = re.search( 'VERSION=\"(([0-9\.\-\_A-Z]+)\s+)', out_dict[node], re.I )
             actual_ver = match.group(1)
             fail_test(f'Installed OS Version {actual_ver} not matching expected version {os_version} on node {node}')
     # Consolidate and record the test result
