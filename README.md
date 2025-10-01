@@ -21,22 +21,20 @@ CVS Repository is organized as the following directories
 It is recommended to run CVS from a runner machine - Ubuntu VM or bare metal and in the absence of a dedicated runner machine, you can also install and run it from the first host in your cluster. It is recommended to run from a dedicated runner machine as if we hit some catastrophic failure like some uncorrectable errors during a burn-in health test which results in host reboot, the test will be abruptly aborted and you will loose the test report.
 
 ```
-ubuntu-host1# 
-ubuntu-host1# git clone https://github.com/rocm/cvs
+abc@123# git clone https://github.com/rocm/cvs
 Cloning into 'cvs'...
-Username for 'https://github.com': venksrin09
-Password for 'https://venksrin09@github.com': 
+Username for 'https://github.com': 
+Password for 'https://user@github.com': 
 remote: Enumerating objects: 245, done.
 remote: Counting objects: 100% (245/245), done.
 remote: Compressing objects: 100% (174/174), done.
 remote: Total 245 (delta 127), reused 166 (delta 56), pack-reused 0 (from 0)
 Receiving objects: 100% (245/245), 122.52 KiB | 2.78 MiB/s, done.
 Resolving deltas: 100% (127/127), done.
-ubuntu-host1# 
-ubuntu-host1# 
-ubuntu-host1# ls -ld cvs
-drwxrwxr-x 7 venksrin venksrin 4096 Aug 26 16:36 cvs
-ubuntu-host1#
+abc@123#  
+abc@123# ls -ld cvs
+drwxrwxr-x 7 abc abc 4096 Aug 26 16:36 cvs
+abc@123#
 ```
 
 # Setting up your environment for CVS
@@ -44,14 +42,14 @@ ubuntu-host1#
 Enter your venv environment and from there install the required python packages using the following commands
 
 ```
-[venksrin@ubuntu-host1]~:$
-[venksrin@ubuntu-host1]~:$source myenv/bin/activate
-(myenv) [venksrin@ubuntu-host1]~:$
-(myenv) [venksrin@ubuntu-host1]~:$cd cvs
-(myenv) [venksrin@ubuntu-host1]~/cvs:(main)$ls -l requirements.txt 
--rw-rw-r-- 1 venksrin venksrin 181 Aug 26 17:16 requirements.txt
-(myenv) [venksrin@ubuntu-host1]~/cvs:(main)$
-(myenv) [venksrin@ubuntu-host1]~/cvs:(main)$pip install -r requirements.txt 
+abc@123~:$
+abc@123~:$source myenv/bin/activate
+(myenv) abc@123~:$
+(myenv) abc@123~:$cd cvs
+(myenv) abc@123~/cvs:(main)$ls -l requirements.txt 
+-rw-rw-r-- 1 abc abc 181 Aug 26 17:16 requirements.txt
+(myenv) abc@123~/cvs:(main)$
+(myenv) abc@123~/cvs:(main)$pip install -r requirements.txt 
 ```
 
 # How to run CVS Tests
@@ -59,11 +57,10 @@ Enter your venv environment and from there install the required python packages 
 All the Pytest scripts from cvs/tests folder must be run from the cvs root folder as shown below as the system lib paths have been set accordingly. 
 
 ```
-ubuntu-host1# 
-ubuntu-host1# pwd
-/home/venksrin/cvs
-ubuntu-host1# 
-ubuntu-host1# pytest -vvv -log-file=/tmp/rccl_test.log -s ./tests/rccl/rccl_multinode_cvs.py --cluster_file ./input/mi325_cluster.json --config_file ./input/rccl/rccl_config.json --html=/var/www/html/cvs/rccl_test_report.html --capture=tee-sys --self-contained-html
+abc@123# 
+abc@123# pwd
+/home/user/cvs
+abc@123# pytest -vvv -log-file=/tmp/rccl_test.log -s ./tests/rccl/rccl_multinode_cvs.py --cluster_file ./input/mi325_cluster.json --config_file ./input/rccl/rccl_config.json --html=/var/www/html/cvs/rccl_test_report.html --capture=tee-sys --self-contained-html
 ```
 
 The arguments used are
