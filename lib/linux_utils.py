@@ -9,6 +9,7 @@ import re
 import sys
 import os
 import json
+import rocm_plib
 
 from utils_lib import *
 
@@ -734,3 +735,74 @@ def get_linux_perf_tuning_dict( phdl ):
     out_dict['cpu_power_profile'] = phdl.exec('sudo cpupower info')
 
 
+
+
+
+
+def get_gpu_nic_mapping_dict( phdl,):
+
+    gpu_pcie_dict = rocm_plib.get_gpu_pcie_bus_dict( phdl )
+    lshw_dict = get_lshw_network_dict( phdl )
+    rdma_nic_dict = get_active_rdma_nic_dict( phdl )
+    gpu_nic_dict = {}
+    for node in gpu_pcie_dict.keys():
+        gpu_nic_dict[node] = {}
+        for card in gpu_pcie_dict[node].keys():
+            gpu_nic_dict[node][card] = {}
+            gpu_bdf = gpu_pcie_dict[node][card]['PCI Bus']
+            gpu_nic_dict[node][card]['gpu_bdf'] = gpu_bdf
+            match = re.search( '[0-9a-f]+\:([0-9a-f]+)\:[0-9a-f]+\.[0-9a-f]', gpu_bdf, re.I )
+            bus_no = match.group(1)
+            for eth_dev in lshw_dict[node].keys():
+                nic_pci = lshw_dict[node][eth_dev]['pci_bus']
+                match = re.search( '[0-9a-f]+\:([0-9a-f]+)\:[0-9a-f]+\.[0-9a-f]', nic_pci, re.I )
+                nic_bus_no = match.group(1)
+                if hex( int(bus_no, 16) + 1 ) == hex(int(nic_bus_no,16 )):
+                    gpu_nic_dict[node][card]['eth_dev'] = eth_dev
+                    for rdma_dev in rdma_nic_dict[node].keys():
+                        if rdma_nic_dict[node][rdma_dev]['eth_device'] == eth_dev:
+                            gpu_nic_dict[node][card]['rdma_dev'] = rdma_dev
+                            gpu_nic_dict[node][card]['nic_bdf'] = nic_pci
+                    continue
+    print(gpu_nic_dict)
+    return gpu_nic_dict
+
+
+
+
+
+def get_gpu_numa_dict( phdl ):
+    gpu_numa_dict = {}
+    gpu_pcie_dict = rocm_plib.get_gpu_pcie_bus_dict( phdl )
+
+    first_node = list(gpu_pcie_dict.keys())[0]
+    card_list = list(gpu_pcie_dict[first_node].keys())
+    for node in gpu_pcie_dict.keys():
+        gpu_numa_dict[node] = {}
+        for card in card_list:
+            gpu_numa_dict[node][card] = {}
+
+    # Build cmd list
+    for card in card_list:
+        cmd_list = []
+        for node in gpu_pcie_dict.keys():
+            gpu_bdf = str(gpu_pcie_dict[node][card]['PCI Bus']).lower()
+            cmd_list.append( f'cat /sys/bus/pci/devices/{gpu_bdf}/local_cpulist' )
+
+        out_dict = phdl.exec_cmd_list(cmd_list)
+        for node in out_dict.keys():
+            gpu_numa_dict[node][card]['local_cpulist'] = str(out_dict[node]).rstrip('\n').rstrip('\r')
+
+    # Build cmd list
+    for card in card_list:
+        cmd_list = []
+        for node in gpu_pcie_dict.keys():
+            gpu_bdf = str(gpu_pcie_dict[node][card]['PCI Bus']).lower()
+            cmd_list.append( f'cat /sys/bus/pci/devices/{gpu_bdf}/numa_node' )
+
+        out_dict = phdl.exec_cmd_list(cmd_list)
+        for node in out_dict.keys():
+            gpu_numa_dict[node][card]['numa_node'] = str(out_dict[node]).rstrip('\n').rstrip('\r')
+
+    print(gpu_numa_dict)
+    return gpu_numa_dict
