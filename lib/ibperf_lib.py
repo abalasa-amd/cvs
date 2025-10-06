@@ -796,11 +796,11 @@ def generate_ibperf_lat_chart( res_dict, excel_file='ib_lat_perf.xlsx' ):
                         d_tavg_gpu_7_list.append( res_dict[app_name][msg_size][node][gpu_no]['t_avg'] )
                         d_tstdev_gpu_7_list.append( res_dict[app_name][msg_size][node][gpu_no]['t_stdev'] )
                         d_t99pct_gpu_7_list.append( res_dict[app_name][msg_size][node][gpu_no]['t_99_pct'] )
-                tot_tmin = tot_tmin + float(res_dict[app_name][msg_size][node][gpu_no]['t_min'])
-                tot_tmax = tot_tmax + float(res_dict[app_name][msg_size][node][gpu_no]['t_max'])
-                tot_tavg = tot_tavg + float(res_dict[app_name][msg_size][node][gpu_no]['t_avg'])
-                tot_tstdev = tot_tstdev + float(res_dict[app_name][msg_size][node][gpu_no]['t_stdev'])
-                tot_t99pct = tot_t99pct + float(res_dict[app_name][msg_size][node][gpu_no]['t_99_pct'])
+                    tot_tmin = tot_tmin + float(res_dict[app_name][msg_size][node][gpu_no]['t_min'])
+                    tot_tmax = tot_tmax + float(res_dict[app_name][msg_size][node][gpu_no]['t_max'])
+                    tot_tavg = tot_tavg + float(res_dict[app_name][msg_size][node][gpu_no]['t_avg'])
+                    tot_tstdev = tot_tstdev + float(res_dict[app_name][msg_size][node][gpu_no]['t_stdev'])
+                    tot_t99pct = tot_t99pct + float(res_dict[app_name][msg_size][node][gpu_no]['t_99_pct'])
                 d_avg_tmin_list.append(tot_tmin/8)
                 d_avg_tmax_list.append(tot_tmax/8)
                 d_avg_tavg_list.append(tot_tavg/8)
@@ -895,14 +895,14 @@ def generate_ibperf_lat_chart( res_dict, excel_file='ib_lat_perf.xlsx' ):
             avg_tmax_gpu6_data = average_of_lists( split_tmax_gpu6_list )
             avg_tmax_gpu7_data = average_of_lists( split_tmax_gpu7_list )
 
-            avg_tavg_gpu0_data = average_of_lists( split_tmax_gpu0_list )
-            avg_tavg_gpu1_data = average_of_lists( split_tmax_gpu1_list )
-            avg_tavg_gpu2_data = average_of_lists( split_tmax_gpu2_list )
-            avg_tavg_gpu3_data = average_of_lists( split_tmax_gpu3_list )
-            avg_tavg_gpu4_data = average_of_lists( split_tmax_gpu4_list )
-            avg_tavg_gpu5_data = average_of_lists( split_tmax_gpu5_list )
-            avg_tavg_gpu6_data = average_of_lists( split_tmax_gpu6_list )
-            avg_tavg_gpu7_data = average_of_lists( split_tmax_gpu7_list )
+            avg_tavg_gpu0_data = average_of_lists( split_tavg_gpu0_list )
+            avg_tavg_gpu1_data = average_of_lists( split_tavg_gpu1_list )
+            avg_tavg_gpu2_data = average_of_lists( split_tavg_gpu2_list )
+            avg_tavg_gpu3_data = average_of_lists( split_tavg_gpu3_list )
+            avg_tavg_gpu4_data = average_of_lists( split_tavg_gpu4_list )
+            avg_tavg_gpu5_data = average_of_lists( split_tavg_gpu5_list )
+            avg_tavg_gpu6_data = average_of_lists( split_tavg_gpu6_list )
+            avg_tavg_gpu7_data = average_of_lists( split_tavg_gpu7_list )
 
             avg_tstdev_gpu0_data = average_of_lists( split_tstdev_gpu0_list )
             avg_tstdev_gpu1_data = average_of_lists( split_tstdev_gpu1_list )
@@ -952,7 +952,7 @@ def generate_ibperf_lat_chart( res_dict, excel_file='ib_lat_perf.xlsx' ):
         cur_row = 4
         msg_list_len = len(msg_size_list)
         for node_ip in node_list:
-            worksheet.merge_range( f"A{cur_row}:A{cur_row+msg_list_len-1}", node_ip )
+            worksheet.merge_range( f"A{cur_row}:A{cur_row+msg_list_len-1}", node_ip, node_merge_format )
             cur_row = cur_row + msg_list_len
 
         # For the cluster Avg
