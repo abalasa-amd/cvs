@@ -123,7 +123,7 @@ def run_ib_perf_bw_test( phdl, bw_test, gpu_numa_dict, gpu_nic_dict, bck_nic_dic
     result_dict = {}
     i=0
     cmd_dict = {}
-    phdl.exec('rm -rf /tmp/ib_cmds_file.txt')
+    phdl.exec('sudo rm -rf /tmp/ib_cmds_file.txt')
     phdl.exec('touch /tmp/ib_cmds_file.txt')
     server_addr = None
     for node in bck_nic_dict.keys():
@@ -139,7 +139,7 @@ def run_ib_perf_bw_test( phdl, bw_test, gpu_numa_dict, gpu_nic_dict, bck_nic_dic
             for gpu_no in range(0,8):
                 card_no = 'card' + str(gpu_no)
                 rdma_dev = gpu_nic_dict[node][card_no]['rdma_dev']
-                cmd = f'numactl --physcpubind={gpu_numa_dict[node][card_no]["local_cpulist"]} --localalloc {app_path}/{bw_test} -d {rdma_dev} --use_rocm={gpu_no} -x {gid_index} --report_gbits -b -F -D {duration} -p {port_no} -R -s {msg_size} -q {qp_count} > /tmp/ib_perf_{inst_count}_logs &  2>&1'
+                cmd = f'numactl --physcpubind={gpu_numa_dict[node][card_no]["local_cpulist"]} --localalloc {app_path}/{bw_test} -d {rdma_dev} --use_rocm={gpu_no} -x {gid_index} --report_gbits -b -F -D {duration} -p {port_no} -s {msg_size} -q {qp_count} > /tmp/ib_perf_{inst_count}_logs &  2>&1'
                 cmd_dict[node].append( f'echo "{cmd}" >> /tmp/ib_cmds_file.txt' )
                 inst_count = inst_count + 1
                 port_no = port_no + 1
@@ -152,7 +152,7 @@ def run_ib_perf_bw_test( phdl, bw_test, gpu_numa_dict, gpu_nic_dict, bck_nic_dic
             for gpu_no in range(0,8):
                 card_no = 'card' + str(gpu_no)
                 rdma_dev = gpu_nic_dict[node][card_no]['rdma_dev']
-                cmd = f'numactl --physcpubind={gpu_numa_dict[node][card_no]["local_cpulist"]} --localalloc {app_path}/{bw_test} -d {rdma_dev} --use_rocm={gpu_no} -x {gid_index} --report_gbits -b -F -D {duration} -p {port_no} -R -s {msg_size} -q {qp_count} {server_addr} > /tmp/ib_perf_{inst_count}_logs &  2>&1'
+                cmd = f'numactl --physcpubind={gpu_numa_dict[node][card_no]["local_cpulist"]} --localalloc {app_path}/{bw_test} -d {rdma_dev} --use_rocm={gpu_no} -x {gid_index} --report_gbits -b -F -D {duration} -p {port_no} -s {msg_size} -q {qp_count} {server_addr} > /tmp/ib_perf_{inst_count}_logs &  2>&1'
                 cmd_dict[node].append( f'echo "{cmd}" >> /tmp/ib_cmds_file.txt' )
                 inst_count = inst_count + 1
                 port_no = port_no + 1
@@ -217,7 +217,7 @@ def run_ib_perf_lat_test( phdl, lat_test, gpu_numa_dict, gpu_nic_dict, bck_nic_d
             for gpu_no in range(0,8):
                 card_no = 'card' + str(gpu_no)
                 rdma_dev = gpu_nic_dict[node][card_no]['rdma_dev']
-                cmd = f'numactl --physcpubind={gpu_numa_dict[node][card_no]["local_cpulist"]} --localalloc {app_path}/{lat_test} -d {rdma_dev} --use_rocm={gpu_no} -x {gid_index} --report_gbits -F -p {port_no} -R -s {msg_size} > /tmp/ib_perf_{inst_count}_logs &  2>&1'
+                cmd = f'numactl --physcpubind={gpu_numa_dict[node][card_no]["local_cpulist"]} --localalloc {app_path}/{lat_test} -d {rdma_dev} --use_rocm={gpu_no} -x {gid_index} --report_gbits -F -p {port_no} -s {msg_size} > /tmp/ib_perf_{inst_count}_logs &  2>&1'
                 cmd_dict[node].append( f'echo "{cmd}" >> /tmp/ib_cmds_file.txt' )
                 inst_count = inst_count + 1
                 port_no = port_no + 1
@@ -230,7 +230,7 @@ def run_ib_perf_lat_test( phdl, lat_test, gpu_numa_dict, gpu_nic_dict, bck_nic_d
             for gpu_no in range(0,8):
                 card_no = 'card' + str(gpu_no)
                 rdma_dev = gpu_nic_dict[node][card_no]['rdma_dev']
-                cmd = f'numactl --physcpubind={gpu_numa_dict[node][card_no]["local_cpulist"]} --localalloc {app_path}/{lat_test} -d {rdma_dev} --use_rocm={gpu_no} -x {gid_index} --report_gbits -F -p {port_no} -R -s {msg_size} {server_addr} > /tmp/ib_perf_{inst_count}_logs &  2>&1'
+                cmd = f'numactl --physcpubind={gpu_numa_dict[node][card_no]["local_cpulist"]} --localalloc {app_path}/{lat_test} -d {rdma_dev} --use_rocm={gpu_no} -x {gid_index} --report_gbits -F -p {port_no} -s {msg_size} {server_addr} > /tmp/ib_perf_{inst_count}_logs &  2>&1'
                 cmd_dict[node].append( f'echo "{cmd}" >> /tmp/ib_cmds_file.txt' )
                 inst_count = inst_count + 1
                 port_no = port_no + 1

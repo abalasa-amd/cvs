@@ -738,13 +738,54 @@ def get_linux_perf_tuning_dict( phdl ):
 
 
 
+def get_lshw_backend_nic_dict( phdl ):
+    lshw_bck_nic_dict = {}
+    lshw_dict = get_lshw_network_dict( phdl )
+    rdma_nic_dict = get_backend_rdma_nic_dict( phdl )
+    for node in rdma_nic_dict.keys():
+        lshw_bck_nic_dict[node] = {}
+        for rdma_dev in rdma_nic_dict[node].keys():
+            eth_dev = rdma_nic_dict[node][rdma_dev]['eth_device']
+            lshw_bck_nic_dict[node][eth_dev] = {}
+            lshw_bck_nic_dict[node][eth_dev]['pci_bus'] = lshw_dict[node][eth_dev]['pci_bus']
+            lshw_bck_nic_dict[node][eth_dev]['description'] = lshw_dict[node][eth_dev]['description']
+            lshw_bck_nic_dict[node][eth_dev]['rdma_dev'] = rdma_dev
+    return lshw_bck_nic_dict
+
+
+
+
+def get_nearest_bus_no(target_hex: str, candidates: list[str]) -> str:
+    """
+    Return the nearest matching hex value (as one of the candidate strings).
+    - Inputs are hex strings like '0x1f', '1F', '-0x10' (case-insensitive).
+    - Tie-breaker: picks the smaller numeric value.
+    """
+    if not candidates:
+        raise ValueError("candidates must be non-empty")
+    t = int(target_hex, 16)
+    return min(
+        candidates,
+        key=lambda s: (abs(int(s, 16) - t), int(s, 16))
+    )
+
+
 
 def get_gpu_nic_mapping_dict( phdl,):
 
-    gpu_pcie_dict = rocm_plib.get_gpu_pcie_bus_dict( phdl )
-    lshw_dict = get_lshw_network_dict( phdl )
-    rdma_nic_dict = get_active_rdma_nic_dict( phdl )
     gpu_nic_dict = {}
+    gpu_pcie_dict = rocm_plib.get_gpu_pcie_bus_dict( phdl )
+    lshw_dict = get_lshw_backend_nic_dict( phdl )
+
+    nic_bus_dict = {}
+    for node in lshw_dict.keys():
+        nic_bus_dict[node] = []
+        for eth_dev in lshw_dict[node].keys():
+            nic_pci = lshw_dict[node][eth_dev]['pci_bus']
+            match = re.search( '[0-9a-f]+\:([0-9a-f]+)\:[0-9a-f]+\.[0-9a-f]', nic_pci, re.I )
+            nic_bus_no = match.group(1)
+            nic_bus_dict[node].append(nic_bus_no)
+
     for node in gpu_pcie_dict.keys():
         gpu_nic_dict[node] = {}
         for card in gpu_pcie_dict[node].keys():
@@ -753,16 +794,24 @@ def get_gpu_nic_mapping_dict( phdl,):
             gpu_nic_dict[node][card]['gpu_bdf'] = gpu_bdf
             match = re.search( '[0-9a-f]+\:([0-9a-f]+)\:[0-9a-f]+\.[0-9a-f]', gpu_bdf, re.I )
             bus_no = match.group(1)
+
+            #find nearest nic bus no.
+            nic_bus_list = nic_bus_dict[node]
+            print(f'nic_bus_list = {nic_bus_list}')
+            print(f'bus_no = {bus_no}')
+
+            nearest_nic_bus_no = get_nearest_bus_no( bus_no, nic_bus_list )
+
+            print(f'nic_bus_list = {nic_bus_list}')
+            print(f'nearest_nic_bus_no = {nearest_nic_bus_no}')
             for eth_dev in lshw_dict[node].keys():
-                nic_pci = lshw_dict[node][eth_dev]['pci_bus']
-                match = re.search( '[0-9a-f]+\:([0-9a-f]+)\:[0-9a-f]+\.[0-9a-f]', nic_pci, re.I )
-                nic_bus_no = match.group(1)
-                if hex( int(bus_no, 16) + 1 ) == hex(int(nic_bus_no,16 )):
+                match = re.search( '[0-9a-f]+\:([0-9a-f]+)\:[0-9a-f]+\.[0-9a-f]', \
+                        lshw_dict[node][eth_dev]['pci_bus'], re.I )
+                lshw_bus_no = match.group(1)
+                if hex(int(nearest_nic_bus_no, 16)) == hex(int(lshw_bus_no,16 )):
                     gpu_nic_dict[node][card]['eth_dev'] = eth_dev
-                    for rdma_dev in rdma_nic_dict[node].keys():
-                        if rdma_nic_dict[node][rdma_dev]['eth_device'] == eth_dev:
-                            gpu_nic_dict[node][card]['rdma_dev'] = rdma_dev
-                            gpu_nic_dict[node][card]['nic_bdf'] = nic_pci
+                    gpu_nic_dict[node][card]['rdma_dev'] = lshw_dict[node][eth_dev]['rdma_dev']
+                    gpu_nic_dict[node][card]['nic_bdf'] = lshw_dict[node][eth_dev]['pci_bus']
                     continue
     print(gpu_nic_dict)
     return gpu_nic_dict

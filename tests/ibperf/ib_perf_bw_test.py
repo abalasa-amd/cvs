@@ -305,12 +305,15 @@ def test_ib_lat_perf( phdl, lat_test, config_dict ):
             if rdma_nic_dict[node][rdma_dev]['eth_device'] in bck_nic_dict_lshw[node]:
                 bck_nic_dict[node][rdma_dev] = rdma_nic_dict[node][rdma_dev]
 
+    print(f'%%%%%% bck_nic_dict %%%%% {bck_nic_dict}')
+    print(f'%%%%%% gpu_nic_dict %%%%% {gpu_nic_dict}')
+    print(f'%%%%%% gpu_numa_dict %%%%% {gpu_numa_dict}')
 
     for msg_size in config_dict['msg_size_list']:
         ib_lat_dict[lat_test][msg_size] = {}
         # Log a message to Dmesg to create a timestamp record
         start_time = phdl.exec('date +"%a %b %e %H:%M"')
-        phdl.exec( f'Starting Test {lat_test} for {msg_size} | sudo tee /dev/kmsg' )
+        phdl.exec( f'sudo echo "Starting Test {lat_test} for {msg_size} | sudo tee /dev/kmsg"' )
         ib_lat_dict[lat_test][msg_size] = ibperf_lib.run_ib_perf_lat_test( phdl, lat_test, gpu_numa_dict, \
               gpu_nic_dict, bck_nic_dict, f'{config_dict["install_dir"]}/perftest/bin', \
               msg_size, config_dict['gid_index'], int(config_dict['port_no']) )
@@ -328,7 +331,7 @@ def test_ib_lat_perf( phdl, lat_test, config_dict ):
 
 
 
-def test_build_ib_bw_perf_results( phdl,  ):
+def test_build_ib_bw_perf_chart( phdl,  ):
 
     globals.error_list = []
     ibperf_lib.generate_ibperf_bw_chart( ib_bw_dict )
@@ -336,7 +339,7 @@ def test_build_ib_bw_perf_results( phdl,  ):
 
 
 
-def test_build_ib_lat_perf_results( phdl,  ):
+def test_build_ib_lat_perf_chart( phdl,  ):
 
     globals.error_list = []
     ibperf_lib.generate_ibperf_lat_chart( ib_lat_dict, excel_file='ib_lat_perf.xlsx' )
