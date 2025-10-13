@@ -23,7 +23,13 @@ training_err_dict = {
     'cache_err': 'Unable to save MockGPTDataset indexes because path_to_cache is None',
     'NCCL ERROR': 'NCCL ERROR|NCCL timeout|local work queue catastrophic error',
     'GPU HW ERROR': 'HW Exception by GPU|GPU Hang|Uncorrectable error|GPU Reset',
-    'AssertionError': 'AssertionError'
+    'AssertionError': 'AssertionError',
+    'Connection Err': 'XlaRuntimeError|DEADLINE_EXCEEDED|Leader can be deadlocked',
+    'rocm Err': 'FAILED_PRECONDITION: No visible GPU devices|failed call to hipInit: HIP_ERROR_NoDevice|librocm reported version is: NOT_FOUND',
+    'python err': 'ModuleNotFoundError: No module named|Fatal Python error:',
+    'tensorflow': 'tensorflow.CoordinationServiceError|tensorflow.BarrierError|CoordinationServiceError',
+    'resource': 'RESOURCE_EXHAUSTED: Out of memory|failed: RESOURCE_EXHAUSTED'
+
 }
 
 err_counters_pattern = 'err|retransmit|drop|discard|naks|invalid|oflow|out_of_buffer|reset|fail'
@@ -126,7 +132,7 @@ class JaxTrainingJob():
             self.distributed_training  = False
 
 
-        self.training_steps        = self.tc_dict['training_steps']
+        self.training_steps        = int(self.tc_dict['training_steps'])
         self.nnodes                = self.tc_dict['nnodes']
         self.nic_type              = self.tc_dict['nic_type']
         self.nccl_ib_hca_list      = self.tc_dict['nccl_ib_hca_list']
@@ -313,6 +319,9 @@ class JaxTrainingJob():
             cmd = f'''docker exec {self.container_name} /bin/bash -c  "echo  '
                       export NNODES={int(self.nnodes)}
                       export NODE_RANK={i}
+                      export JAX_COORDINATOR_ADDRESS={self.coordinator_ip}
+                      export JAX_COORDINATOR_IP={self.coordinator_ip}
+                      export JAX_COORDINATOR_PORT=12345
                       export HSA_FORCE_FINE_GRAIN_PCIE=1
                       export GPU_MAX_HW_QUEUES={self.tc_dict['gpu_max_hw_queues']}
                       export HIP_FORCE_DEV_KERNARG=1
@@ -337,6 +346,7 @@ class JaxTrainingJob():
                       export NVTE_CK_V3_BF16_CVT={self.tc_dict['nvte_ck_v3_bf16_cvt']}' >> /workspace/maxtext/maxtext_env.sh"'''
             formatted_cmd = textwrap_for_yml(cmd)
             cmd_list.append(formatted_cmd)
+        print(cmd_list)
         self.phdl.exec_cmd_list(cmd_list)
 
         cmd_list = []
@@ -351,7 +361,7 @@ class JaxTrainingJob():
             # Take a reference config yml like llama2_70b
             cmd = f'''docker exec {self.container_name} /bin/bash -c "echo '
                       mkdir -p {self.tc_dict['log_dir']}/jax-logs/out-node{i}
-                      cd /workspace/maxtext; python /workspace/maxtext/MaxText/train.py MaxText/configs/llama2_70b_gpu_bs7.yml base_output_directory={self.tc_dict['log_dir']} 2>&1 | tee >(grep -v 'external/xla/xla/') > {self.tc_dict['log_dir']}/jax-logs/out-node{i}/training.log' > /workspace/maxtext/training_wrapper_script.sh"'''
+                      export PYTHONPATH=$PYTHONPATH:/workspace/maxtext/; cd /workspace/maxtext; python /workspace/maxtext/MaxText/train.py MaxText/configs/llama2_70b_gpu_bs7.yml base_output_directory={self.tc_dict['log_dir']} 2>&1 | tee >(grep -v 'external/xla/xla/') > {self.tc_dict['log_dir']}/jax-logs/out-node{i}/training.log' > /workspace/maxtext/training_wrapper_script.sh"'''
             formatted_cmd = textwrap_for_yml(cmd)
             cmd_list.append(formatted_cmd)
         self.phdl.exec_cmd_list(cmd_list)
