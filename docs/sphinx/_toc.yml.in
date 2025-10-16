@@ -1,0 +1,37 @@
+defaults:
+  numbered: False
+  maxdepth: 6
+root: index
+
+subtrees:
+- entries:
+  - file: what-is-cvs.rst
+    title: What is Cluster Validation Suite?
+
+- caption: Install
+  entries:
+  - file: install/cvs-install
+    title: Cluster Validation Suite installation
+
+- caption: How to
+  entries:
+  - file: how-to/run-cvs-tests
+    title: Run tests
+
+- caption: Reference
+  entries:
+  - file: reference/configuration-files/configure-config
+    title: Test configuration files
+    subtrees:
+    - entries:
+      - file: reference/configuration-files/platform
+        title: Platform
+      - file: reference/configuration-files/health
+        title: Health
+      - file: reference/configuration-files/rccl
+        title: RCCL
+
+   
+- caption: About
+  entries:
+  - file: license.md
