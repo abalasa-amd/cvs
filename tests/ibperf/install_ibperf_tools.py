@@ -198,124 +198,32 @@ def vpc_node_list(cluster_dict):
 
 
 
-# Start of test cases.
-
-@pytest.mark.parametrize( "bw_test", [ "ib_write_bw", "ib_read_bw", "ib_send_bw" ] )
-
-
-def test_ib_bw_perf( phdl, bw_test, config_dict ):
-
-    # Get IB_backend_nics for each node
-    # Get the NIC to GPU mapping dict
-    # Generate the command list for all nodes
-    # Run the commands
-    # Get the bandwidth numbers as a dict for each node and NIC/GPU for every msg size
-
+def test_install_ib_perf(phdl, shdl, config_dict ):
+    # We install on the first node using shdl handle
+    # install standard rdma packages
     globals.error_list = []
-    ib_bw_dict[bw_test] = {}
 
-    gpu_nic_dict = linux_utils.get_gpu_nic_mapping_dict(phdl)
-    gpu_numa_dict = linux_utils.get_gpu_numa_dict( phdl )
+    if re.search( 'true', config_dict['install_perf_package'], re.I ):
+        shdl.exec( f'mkdir -p {config_dict["install_dir"]}')
+        phdl.exec( 'sudo apt update -y', timeout=200 )
+        phdl.exec( 'sudo apt install -y git build-essential autoconf automake libtool pkg-config', timeout=200 )
+        phdl.exec( 'sudo apt install -y libibverbs-dev librdmacm-dev ibverbs-providers rdma-core', timeout=200 )
+        phdl.exec( 'sudo apt install -y libibumad-dev' )
+        phdl.exec( 'sudo apt install -y libpci-dev' )
+        phdl.exec( 'sudo apt install -y numactl' )
+        shdl.exec( f'cd {config_dict["install_dir"]}; git clone https://github.com/linux-rdma/perftest' )
+        shdl.exec( f'cd {config_dict["install_dir"]}/perftest; ./autogen.sh', timeout=100 )
+        shdl.exec( f'cd {config_dict["install_dir"]}/perftest; ./configure --prefix={config_dict['install_dir']}/perftest --with-rocm={config_dict["rocm_dir"]} --enable-rocm', timeout=200 )
+        shdl.exec( f'cd {config_dict["install_dir"]}/perftest; make', timeout=100 )
+        shdl.exec( f'cd {config_dict["install_dir"]}/perftest; make install', timeout=100 )
 
-    print(gpu_nic_dict)
-    bck_nic_dict_lshw = linux_utils.get_backend_nic_dict( phdl )
-    rdma_nic_dict = linux_utils.get_active_rdma_nic_dict( phdl )
-
-    bck_nic_dict = {}
-    for node in rdma_nic_dict.keys():
-        bck_nic_dict[node] = {}
-        for rdma_dev in rdma_nic_dict[node].keys():
-            print(bck_nic_dict_lshw[node])
-            if rdma_nic_dict[node][rdma_dev]['eth_device'] in bck_nic_dict_lshw[node]:
-                bck_nic_dict[node][rdma_dev] = rdma_nic_dict[node][rdma_dev]
-
-
-    for msg_size in config_dict['msg_size_list']:
-        ib_bw_dict[bw_test][msg_size] = {}
-        for qp_count in config_dict['qp_count_list']:
-            # Log a message to Dmesg to create a timestamp record
-            start_time = phdl.exec('date +"%a %b %e %H:%M"')
-            phdl.exec( f'Starting Test {bw_test} for {msg_size} and QP count {qp_count} | sudo tee /dev/kmsg' )
-            ib_bw_dict[bw_test][msg_size][qp_count] = ibperf_lib.run_ib_perf_bw_test( phdl, bw_test, gpu_numa_dict, \
-                    gpu_nic_dict, bck_nic_dict, f'{config_dict["install_dir"]}/perftest/bin', \
-                    msg_size, config_dict['gid_index'], qp_count, int(config_dict['port_no']), \
-                    int(config_dict['duration']) )
-            end_time = phdl.exec('date +"%a %b %e %H:%M"')
-            verify_dmesg_for_errors( phdl, start_time, end_time, till_end_flag=True )
-            if re.search( 'True', config_dict['verify_bw'], re.I ):
-                ibperf_lib.verify_expected_bw( bw_test, msg_size, qp_count, ib_bw_dict[bw_test][msg_size][qp_count], \
-                        config_dict['expected_results'])
-
- 
-    print(ib_bw_dict)
+        # Verify if the installation went fine ..
+        out_dict = phdl.exec( f'{config_dict["install_dir"]}/perftest/ib_write_bw -h | grep -i rocm --color=never' )
+        for node in out_dict.keys():
+            if not re.search( 'GPUDirect RDMA', out_dict[node], re.I ):
+                fail_test('IB Perf package installation on node {node} failed, ib_write_bw not showing expected use_rocm output')
     update_test_result()
 
-
-
-
-
-
-@pytest.mark.parametrize( "lat_test", [ "ib_write_lat", "ib_read_lat", "ib_send_lat" ] )
-
-
-def test_ib_lat_perf( phdl, lat_test, config_dict ):
-
-    globals.error_list = []
-    ib_lat_dict[lat_test] = {}
-
-    gpu_nic_dict = linux_utils.get_gpu_nic_mapping_dict(phdl)
-    gpu_numa_dict = linux_utils.get_gpu_numa_dict( phdl )
-
-    bck_nic_dict_lshw = linux_utils.get_backend_nic_dict( phdl )
-    rdma_nic_dict = linux_utils.get_active_rdma_nic_dict( phdl )
-    
-    bck_nic_dict = {}
-    for node in rdma_nic_dict.keys():
-        bck_nic_dict[node] = {}
-        for rdma_dev in rdma_nic_dict[node].keys():
-            print(bck_nic_dict_lshw[node])
-            if rdma_nic_dict[node][rdma_dev]['eth_device'] in bck_nic_dict_lshw[node]:
-                bck_nic_dict[node][rdma_dev] = rdma_nic_dict[node][rdma_dev]
-
-    print(f'%%%%%% bck_nic_dict %%%%% {bck_nic_dict}')
-    print(f'%%%%%% gpu_nic_dict %%%%% {gpu_nic_dict}')
-    print(f'%%%%%% gpu_numa_dict %%%%% {gpu_numa_dict}')
-
-    for msg_size in config_dict['msg_size_list']:
-        ib_lat_dict[lat_test][msg_size] = {}
-        # Log a message to Dmesg to create a timestamp record
-        start_time = phdl.exec('date +"%a %b %e %H:%M"')
-        phdl.exec( f'sudo echo "Starting Test {lat_test} for {msg_size} | sudo tee /dev/kmsg"' )
-        ib_lat_dict[lat_test][msg_size] = ibperf_lib.run_ib_perf_lat_test( phdl, lat_test, gpu_numa_dict, \
-              gpu_nic_dict, bck_nic_dict, f'{config_dict["install_dir"]}/perftest/bin', \
-              msg_size, config_dict['gid_index'], int(config_dict['port_no']) )
-        end_time = phdl.exec('date +"%a %b %e %H:%M"')
-        verify_dmesg_for_errors( phdl, start_time, end_time, till_end_flag=True )
-        if re.search( 'True', config_dict['verify_bw'], re.I ):
-            ibperf_lib.verify_expected_lat( lat_test, msg_size, ib_lat_dict[lat_test][msg_size], \
-                 config_dict['expected_results'])
-
-
-    print(ib_lat_dict)
-    update_test_result()
-
-
-
-
-
-def test_build_ib_bw_perf_chart( phdl,  ):
-
-    globals.error_list = []
-    ibperf_lib.generate_ibperf_bw_chart( ib_bw_dict )
-    update_test_result()
-
-
-
-def test_build_ib_lat_perf_chart( phdl,  ):
-
-    globals.error_list = []
-    ibperf_lib.generate_ibperf_lat_chart( ib_lat_dict, excel_file='ib_lat_perf.xlsx' )
-    update_test_result()
 
 
 
