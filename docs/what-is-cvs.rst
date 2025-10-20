@@ -15,8 +15,8 @@ Here are the tests available in the CVS:
 -	**Network tests**: Perform ping checks and multi-node ROCm Communication Collectives Library (RCCL) validations for different collectives.
 - **InfiniBand (IB Perf)**: These tests are low-level network performance benchmarks that validate the raw communication capabilities of InfiniBand adapters and interconnects. These tests measure the fundamental building blocks that RCCL and other high-level libraries depend on.
 
-CVS uses the PyTest open source framework to run the tests and generate reports. It can be launched from a head node or any Linux management station which has connectivity to the cluster nodes via SSH. 
-The single node tests are run in parallel (cluster wide) using the parallel-SSH open source Python modules to optimize their running time. 
+CVS uses the PyTest open-source framework to run the tests and generate reports. You can launch CVS from a head node or any Linux management station that has connectivity to the cluster nodes via SSH. 
+The single node tests run cluster-wide in parallel using the open-source parallel-SSH Python modules to optimize their running time.  
 
 .. note::
 

@@ -6,7 +6,7 @@
 Cluster Validation Suite (CVS) installation
 *******************************************
 
-Before you can use CVS, you must clone the CVS GitHub repo and set your environment. 
+Before you can use CVS, you must clone the CVS GitHub repository and set your environment. 
 Then, you need to configure the JSON cluster file and the script test configuration files according to your use case.
 
 System requirements
