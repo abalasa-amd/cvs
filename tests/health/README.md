@@ -5,20 +5,19 @@ Following are the currently supported test suites
 1. AGFHC
 2. Babelstream
 3. rocBLAS
-4. rocHPL
-5. transferbench
-6. RVS (ROCmValidationSuite)
+4. transferbench
+5. RVS (ROCmValidationSuite)
 
 
 # How to run the tests
 
-These are PYtest scripts and can be run in the following fashion (for the details on arguments and their purpose, please refer the main README under the CVS parent folder
+These are Pytest scripts and can be run in the following fashion (for the details on arguments and their purpose, please refer the main README under the CVS parent folder
 
 ```
-(myenv) [venksrin@ubuntu-host1]~/cvs:(main)$
-(myenv) [venksrin@ubuntu-host1]~/cvs:(main)$pwd
-/home/venksrin/cvs
-(myenv) [venksrin@ubuntu-host1]~/cvs:(main)$pytest -vvv -log-file=/tmp/agfhc_test.log -s ./tests/health/agfhc_cvs.py --cluster_file ./input/cluster.json --config_file ./input/health/mi300_config.json --html=/var/www/html/cvs/agfhc_health_report.html --capture=tee-sys --self-contained-html
+(myenv) [user@host]~/cvs:(main)$
+(myenv) [user@host]~/cvs:(main)$pwd
+/home/user/cvs
+(myenv) [user@host]~/cvs:(main)$pytest -vvv -log-file=/tmp/agfhc_test.log -s ./tests/health/agfhc_cvs.py --cluster_file ./input/cluster.json --config_file ./input/health/mi300_config.json --html=/var/www/html/cvs/agfhc_health_report.html --capture=tee-sys --self-contained-html
 ```
 
 
