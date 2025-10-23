@@ -105,6 +105,8 @@ Here's a code snippet of the ``cluster.json`` file for reference:
     "backend_nw_dict":
     {
     },
+  
+  }
 
 Set up your tests
 =================

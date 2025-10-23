@@ -41,7 +41,9 @@ Here's a code snippet of the ``host_config.json``` file for reference:
            "TA_RAS": "1B.36.02.14",
            "TA_XGMI": "20.00.00.14",
            "PM": "07.85.11.01"
- }       
+        }
+     }
+  }       
 
 Parameters
 ==========
