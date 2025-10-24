@@ -172,10 +172,10 @@ TransferBench
      - Description
    * - ``path``
      - ``/opt/amd/transferbench``
-     - Path where Transferbench is installed
+     - Path where TransferBench is installed
    * - ``example_tests_path``
      - ``/root/cache/INSTALL/TransferBench/examples``
-     - Path where Transferbench examples are installed
+     - Path where TransferBench examples are installed
    * - ``git_install_path``
      - ``/root/cache/INSTALL/``
      - Path where the Git repo is installed
@@ -187,7 +187,7 @@ TransferBench
      - Set the flag to install nfs
    * - ``bytes_to_transfer``
      - 268435456
-     - Amount of data to transfer in bytes (256 MB) ̶  this is the payload size for bandwidth tests
+     - Amount of data to transfer in bytes (256 MB); this is the payload size for bandwidth tests
    * - ``gpu_to_gpu_a2a_rtotal``
      - 320.0
      - All-to-all communication total bandwidth in GB/s across all GPUs 
@@ -237,7 +237,7 @@ TransferBench
      - 48.6
      - Additional benchmark result
   
-RocBLAS
+rocBLAS
 -------
 
 .. list-table::
@@ -249,7 +249,7 @@ RocBLAS
      - Description
    * - ``path``
      - ``/root/cache/INSTALL/rocBLAS/build/release/clients/staging``
-     - Path to run rocblas test
+     - Path to run rocBLAS tests
    * - ``git_install_path``
      - ``/root/cache/INSTALL``
      - Path where rocBLAS is installed
@@ -258,19 +258,19 @@ RocBLAS
      - URL for Git repo
    * - ``rocm_version``
      - 7.0.0
-     - ROCm Version
+     - ROCm version
    * - ``nfs_install``
      - True
      - Set the flag to install nfs
    * - ``fp32_gflops``
      - 94100
-     - 32 bit floating point computational performance benchmarks
+     - 32-bit floating point computational performance benchmarks
    * - ``bf16_gflops``
      - 130600
-     - 16 bit floating point computational performance benchmarks
+     - 16-bit floating point computational performance benchmarks
    * - ``int8_gflops``
      - 162700
-     - 8 bit floating point computational performance benchmarks
+     - 8-bit floating point computational performance benchmarks
 
 rocHPL
 ------
@@ -316,10 +316,10 @@ BabelStream
      - Description
    * - ``path``
      - ``/root/cache/INSTALL/BabelStream/build``
-     - Path to run babelstream test
+     - Path to run BabelStream test
    * - ``git_install_path``
      - ``/root/cache/INSTALL``
-     - Path where babelstream is installed
+     - Path where BabelStream is installed
    * - ``git_url``
      - `https://github.com/UoB-HPC/BabelStream.git <https://github.com/UoB-HPC/BabelStream.git>`_
      - URL for Git repo
@@ -366,7 +366,7 @@ ROCm Validation Suite (RVS)
      - Set the flag to install nfs
    * - ``config_path_mi300x``
      - ``/opt/rocm/share/rocm-validation-suite/conf/MI300X``
-     - Path for MI300X config 
+     - Path for Instinct MI300X configuration 
    * - ``config_path_default``
      - ``/opt/rocm/share/rocm-validation-suite/conf``
      -  Default path for RVS
@@ -375,10 +375,10 @@ ROCm Validation Suite (RVS)
      - Test name
    * - ``config_file``
      - ``gst_single.conf``
-     - Test config file
+     - Test configuration file
    * - ``description``
      - GPU Stress Test - Single GPU validation
-     - Test Description
+     - Test description
    * - ``timeout``
      - 1800
      - Timeout in seconds
@@ -390,17 +390,17 @@ ROCm Validation Suite (RVS)
      -  Test name
    * - ``config_file``
      - ``iet_single.conf``
-     - Test config file
+     - Test configuration file
    * - ``description``
      - Input EDPp Test - Single GPU validation
      - Test description
    * - ``config_file``
      - ``iet_single.conf``
-     - Test config file
+     - Test configuration file
    * - ``name``
      - ``pebb_single``
      -  Test name
    * - ``config_file``
      - ``pebb_single.conf``
-     - Test config file
+     - Test configuration file
  

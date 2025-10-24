@@ -180,7 +180,7 @@ Here's an exhaustive list of the available parameters in the RCCL configuration 
      - Directory where mpi is located
    * - ``rocm_path_var``
      - ``/opt/rocm-6.4.2/``
-     - Path to ROCm installed
+     - Path to ROCm installation
    * - ``rccl_path_var``
      - ``/opt/rccl-tests/``
      - Directory where RCCL tests are located
@@ -205,8 +205,8 @@ Here's an exhaustive list of the available parameters in the RCCL configuration 
      - RCCL tests list
    * - ``rccl_algo``
      - Values
-        * "ring"
-        * "tree" 
+        * ``ring``
+        * ``tree`` 
      - Communication algorithms
    * - ``rccl_protocol``
      - Simple
@@ -304,13 +304,13 @@ Here's an exhaustive list of the available parameters in the RCCL configuration 
      - Check for latency spikes
    * - ``debug``
      - ERROR
-     - To set the debug level
+     - Set the debug level
    * - ``rccl_result_file``
      - ``/tmp/rccl_result_file.json``
      - Path where RCCL results are captured
    * - ``_comments_results``
      - 
-     - Expected results are for the 2 node cluster and vary based on cluster size
+     - Expected results are for the two-node cluster and vary based on cluster size
    * - ``all_reduce_perf``
      - 
      - Global reduction: sum/max/min across all GPUs
