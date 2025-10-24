@@ -70,19 +70,6 @@ Here's a code snippet of the ``mi300_health_config.json`` file for reference:
             "int8_gflops": "162700"
         }
       },
-      "rochpl":
-      {
-        "path": "/root/cache/INSTALL/rocHPL",
-        "git_install_path": "/root/cache/INSTALL",
-        "git_url": "https://github.com/ROCm/rocHPL.git",
-        "nfs_install": "True",
-        "results":
-        {
-            "fp32_gflops": "94100",
-            "bf16_gflops": "130600",
-            "int8_gflops": "162700"
-        }
-      },
       "babelstream":
       {
         "path": "/root/cache/INSTALL/BabelStream/build",
@@ -271,38 +258,6 @@ rocBLAS
    * - ``int8_gflops``
      - 162700
      - 8-bit floating point computational performance benchmarks
-
-rocHPL
-------
-
-.. list-table::
-   :widths: 15 10 30
-   :header-rows: 1
-
-   * - Configuration parameters
-     - Default values
-     - Description
-   * - ``path``
-     - ``/root/cache/INSTALL/rocHPL``
-     - Path to run the rocHPL test
-   * - ``git_install_path``
-     - ``/root/cache/INSTALL``
-     - Path where rocHPL is installed
-   * - ``git_url``
-     - `https://github.com/ROCm/rocHPL.com <https://github.com/ROCm/rocHPL.com>`_
-     - URL for Git repo
-   * - ``nfs_install``
-     - True
-     - Set the flag to install nfs
-   * - ``fp32_gflops``
-     - 94100
-     - 32 bit floating point computational performance benchmarks
-   * - ``bf16_gflops``
-     - 130600
-     - 16 bit floating point computational performance benchmarks
-   * - ``int8_gflops``
-     - 162700
-     - 8 bit floating point computational performance benchmarks
 
 BabelStream
 -----------

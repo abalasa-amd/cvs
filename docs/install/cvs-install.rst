@@ -37,7 +37,7 @@ It's recommended to run CVS from a dedicated runner machine to avoid loss of dat
 
    .. code:: bash
 
-     adc@def:~/ git clone https://github.com/ROCm/cvs
+     git clone https://github.com/ROCm/cvs
 
    The CVS GitHub repository is organized in these directories:
 
@@ -50,17 +50,17 @@ It's recommended to run CVS from a dedicated runner machine to avoid loss of dat
 
    .. code:: bash
 
-     adc@def:~/cd cvs
+     cd cvs
 
 3. Set the environment:
 
    .. code:: bash
 
-     adc@def:~/cvs $  python3 -m venv myenv
+     cvs $  python3 -m venv myenv
 
-     adc@def:~/cvs $  source myenv/bin/activate
+     cvs $  source myenv/bin/activate
 
-     adc@def:~/cvs $  pip3 install -r requirements.txt  
+     cvs $  pip3 install -r requirements.txt  
 
 
 Configure the CVS cluster file
@@ -146,7 +146,7 @@ In the ``cvs/input/config_file/health/mi300_health_config.json`` file, edit the 
    - ``example_tests_path`` 
    - ``git_install_path`` 
  
--  Under ``rocblas``, ``rochpl``, and ``babelstream``: 
+-  Under ``rocblas`` and ``babelstream``: 
   
    - ``path`` 
    - ``git_install_path``

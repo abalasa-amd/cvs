@@ -51,7 +51,7 @@ Here's the test script:
 
 .. code:: bash
 
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/platform/host_configs_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/platform/host_config.json --html=/var/www/html/cvs/rochpl.html --capture=tee-sys --self-contained-html
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/platform/host_configs_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/platform/host_config.json --html=/var/www/html/cvs/host.html --capture=tee-sys --self-contained-html
 
 
 Burn-in health tests
@@ -66,7 +66,6 @@ Here are the available tests:
 - BabelStream
 - TransferBench
 - rocBLAS
-- rocHPL 
 - ROCm Validation Suite (RVS)
 
 Here are the test cases for those tests:
@@ -132,13 +131,6 @@ TransferBench
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/health/transferbench_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/transferbench.html --capture=tee-sys --self-contained-html
 
-rocHPL
-~~~~~~
-
-.. code:: bash
-
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/health/rochpl_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/rochpl.html --capture=tee-sys --self-contained-html
-
 RVS
 ~~~
 
@@ -179,7 +171,10 @@ Here's the test script:
 InfiniBand (IB Perf) test script
 --------------------------------
 
-IB Perf test scripts check cable connections, verify adapter configuration, ensure sufficient GPU memory, and check switch configurations.
+IB perf and latency tests are tools used to measure network performance. 
+Perf tests measure throughput (bandwidth) and latency tests measure delay. 
+Perf tests, such as ``ib_write_bw``, evaluate the maximum data transfer rate under different message sizes. 
+Latency tests, such as ``ib_send_lat``, measure the time it takes for a message to travel between two nodes, often reporting results like minimum, median, and maximum latency.
 
 Here are the IB Perf test cases:
 
