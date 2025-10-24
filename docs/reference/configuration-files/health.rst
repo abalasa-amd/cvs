@@ -114,6 +114,7 @@ Here's a code snippet of the ``mi300_health_config.json`` file for reference:
                   "description": "PCI Express Bandwidth Benchmark - Single GPU",
                   "timeout": 1800,
               }
+      }
   }
 
 
