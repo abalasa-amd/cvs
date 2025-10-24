@@ -54,19 +54,19 @@ Here's the test script:
   pytest -vvv --log-file=/tmp/test.log -s ./tests/platform/host_configs_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/platform/host_config.json --html=/var/www/html/cvs/rochpl.html --capture=tee-sys --self-contained-html
 
 
-Burn in health tests
+Burn-in health tests
 --------------------
 
 The burn-in health tests are single node diagnostic tests which validate the hardware and firmware version's functionality and performance. 
-For the performance validations, it uses the reference bandwidth or latency numbers provided as part of the input ``config_file`` for the relevant test. 
+For the performance validations, they use the reference bandwidth or latency numbers provided as part of the input ``config_file`` for the relevant test. 
 
 Here are the available tests:
 
 - AGFHC (AMD GPU Field Health Check)
 - BabelStream
 - TransferBench
-- RocBLAS
-- RocHPL 
+- rocBLAS
+- rocHPL 
 - ROCm Validation Suite (RVS)
 
 Here are the test cases for those tests:
@@ -114,7 +114,7 @@ Babelstream
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/health/babelstream_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/babelstream.html --capture=tee-sys --self-contained-html
 
-Rocblas
+rocBLAS
 ~~~~~~~
 
 .. code:: bash
@@ -123,7 +123,7 @@ Rocblas
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/health/rocblas_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/rocblas.html --capture=tee-sys --self-contained-html
 
-Transferbench
+TransferBench
 ~~~~~~~~~~~~~
 
 .. code:: bash

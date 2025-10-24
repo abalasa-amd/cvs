@@ -6,7 +6,7 @@
 Cluster Validation Suite (CVS) installation
 *******************************************
 
-Before you can use CVS, you must clone the CVS GitHub repository and set your environment. 
+Before you can use CVS, you must clone the `CVS GitHub repository <https://github.com/ROCm/cvs>`_ and set your environment. 
 Then, you need to configure the JSON cluster file and the script test configuration files according to your use case.
 
 System requirements
@@ -44,7 +44,7 @@ It's recommended to run CVS from a dedicated runner machine to avoid loss of dat
    -	``tests``: This folder has the PyTest scripts which internally call the library functions under the ``./lib`` directory. They're in native Python and can be invoked from any Python scripts for reusability. The ``tests`` directory has a subfolder based on the nature of the tests like health, RCCL, training, and more.
    -	``lib``: This is a collection of Python modules with utility functions that can be reused in other Python scripts.
    -	``input``: This is a collection of the input JSON files that are provided to the PyTest scripts using the two arguments ``--cluster_file`` and the ``--config_file``. The ``--cluster_file`` is a JSON file which captures all the aspects of the cluster test bed, such as the IP address/hostnames, username, keyfile, and more. 
-   -	``utils``: This is a collection of standalone scripts which can be run natively without PyTest; they offer different utility functions.
+   -	``utils``: This is a collection of standalone scripts which can be run natively without PyTest. They offer different utility functions.
 
 2. Navigate to the extracted directory and run the installation script:
 
@@ -116,7 +116,7 @@ The test configuration files are in the ``cvs/input/config_file`` directory of t
 
 .. tip::
 
-  See `Test configuration files <../reference/configuration-files/configure-config>`_ for code snippets and parameters of each configuration file.
+  See :doc:`Test configuration files <../reference/configuration-files/configure-config>`_ for code snippets and parameters of each configuration file.
 
 Follow these instructions for each test you'd like to conduct.
 

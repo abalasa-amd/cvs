@@ -59,13 +59,13 @@ Here's an exhaustive list of the available parameters in the Platform configurat
      - Version of OS
    * - ``kernel_version``
      - ``6.8.0-60-generic``
-     - Version of Kernel
+     - Version of kernel
    * - ``rocm_version``
      - 6.4.1
-     - ROCm Version   
+     - ROCm version   
    * - ``bios_version``
      - ``20171212``
-     - BIOS Version
+     - BIOS version
    * - ``pci_realloc``
      - Off
      - PCI reallocation
@@ -77,7 +77,7 @@ Here's an exhaustive list of the available parameters in the Platform configurat
      - Number of GPUs
    * - ``gpu_pcie_speed``
      - 32
-     - PCIe Speed
+     - PCIe speed
    * - ``gpu_pcie_width``
      - 16
      - Width of PCIe
