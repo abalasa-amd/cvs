@@ -31,6 +31,7 @@ def get_ib_bw_pps(phdl, msg_size, cmd ):
 
     # Collect the BW, PPS numbers 
     for i in range(1,10):
+        print(f'starting iteration {i} to collect numbers')
         out_dict = phdl.exec(cmd)
         for node in out_dict.keys():
             res_dict[node] = {}
@@ -66,6 +67,7 @@ def get_ib_lat_numb(phdl, msg_size, cmd ):
 
     # Collect the BW, PPS numbers 
     for i in range(1,4):
+        print(f'starting iteration {i} to collect numbers')
         out_dict = phdl.exec(cmd)
         for node in out_dict.keys():
             pattern = "{}[\t\s]+[0-9]+[\t\s]+([0-9\.]+)[\t\s]+([0-9\.]+)[\t\s]+([0-9\.]+)[\t\s]+([0-9\.]+)[\t\s]+([0-9\.]+)[\t\s]+([0-9\.]+)[\t\s]+([0-9\.]+)".format(msg_size)
@@ -137,6 +139,7 @@ def run_ib_perf_bw_test( phdl, bw_test, gpu_numa_dict, gpu_nic_dict, bck_nic_dic
             cmd = 'echo "sleep 1" >> /tmp/ib_cmds_file.txt'
             cmd_dict[node].append(cmd)
             inst_count=0
+            port_no = app_port
             for gpu_no in range(0,8):
                 card_no = 'card' + str(gpu_no)
                 rdma_dev = gpu_nic_dict[node][card_no]['rdma_dev']
@@ -190,6 +193,8 @@ def run_ib_perf_bw_test( phdl, bw_test, gpu_numa_dict, gpu_nic_dict, bck_nic_dic
         except Exception as e:
            print('FAILED to get BW, PPS numbers for size - {} qp_count {}'.format(msg_size, qp_count))
 
+    print('%%%%%%%%%% BW result_dict %%%%%%%%%%')
+    print(result_dict)
     return result_dict
 
 
@@ -216,6 +221,7 @@ def run_ib_perf_lat_test( phdl, lat_test, gpu_numa_dict, gpu_nic_dict, bck_nic_d
             cmd = 'echo "sleep 1" >> /tmp/ib_cmds_file.txt'
             cmd_dict[node].append(cmd)
             inst_count=0
+            port_no = app_port
             for gpu_no in range(0,8):
                 card_no = 'card' + str(gpu_no)
                 rdma_dev = gpu_nic_dict[node][card_no]['rdma_dev']
@@ -277,6 +283,8 @@ def run_ib_perf_lat_test( phdl, lat_test, gpu_numa_dict, gpu_nic_dict, bck_nic_d
         except Exception as e:
            print('FAILED to get latency numbers for size - {}'.format(msg_size,))
 
+    print('%%%%%%%%%% LAT result_dict %%%%%%%%%%')
+    print(result_dict)
     return result_dict
 
 
@@ -398,7 +406,7 @@ def generate_ibperf_bw_chart( res_dict, excel_file='ib_bw_pps_perf.xlsx' ):
                         node_list.append(node)
 
 
-    for app_name in ['ib_write_bw']:
+    for app_name in app_list:
         data = []
         for qp_count in qp_count_list:                         
             sheet_name = app_name + "_qp_" + str(qp_count)
@@ -811,118 +819,122 @@ def generate_ibperf_lat_chart( res_dict, excel_file='ib_lat_perf.xlsx' ):
 
 
 
-            print(f'%%%%% d_avg_tmin_list = {d_avg_tmin_list}')
-            print(f'%%%%% d_avg_tmax_list = {d_avg_tmax_list}')
-            print(f'%%%%% d_avg_tavg_list = {d_avg_tavg_list}')
-            split_tmin_list = split_list_into_n_chunks( d_avg_tmin_list, len(node_list) )
-            split_tmax_list = split_list_into_n_chunks( d_avg_tmax_list, len(node_list) )
-            split_tavg_list = split_list_into_n_chunks( d_avg_tavg_list, len(node_list) )
-            split_tstdev_list = split_list_into_n_chunks( d_avg_tstdev_list, len(node_list) )
-            split_t99pct_list = split_list_into_n_chunks( d_avg_t99pct_list, len(node_list) )
+        print(f'%%%%% d_avg_tmin_list = {d_avg_tmin_list}')
+        print(f'%%%%% d_avg_tmax_list = {d_avg_tmax_list}')
+        print(f'%%%%% d_avg_tavg_list = {d_avg_tavg_list}')
+        print(f'%%%%% d_avg_tstdev_list = {d_avg_tstdev_list}')
+        print(f'%%%%% d_avg_t99pct_list = {d_avg_t99pct_list}')
+        split_tmin_list = split_list_into_n_chunks( d_avg_tmin_list, len(node_list) )
+        split_tmax_list = split_list_into_n_chunks( d_avg_tmax_list, len(node_list) )
+        split_tavg_list = split_list_into_n_chunks( d_avg_tavg_list, len(node_list) )
+        split_tstdev_list = split_list_into_n_chunks( d_avg_tstdev_list, len(node_list) )
+        split_t99pct_list = split_list_into_n_chunks( d_avg_t99pct_list, len(node_list) )
 
 
 
-            split_tmin_gpu0_list = split_list_into_n_chunks( d_tmin_gpu_0_list, len(node_list) )
-            split_tmin_gpu1_list = split_list_into_n_chunks( d_tmin_gpu_1_list, len(node_list) )
-            split_tmin_gpu2_list = split_list_into_n_chunks( d_tmin_gpu_2_list, len(node_list) )
-            split_tmin_gpu3_list = split_list_into_n_chunks( d_tmin_gpu_3_list, len(node_list) )
-            split_tmin_gpu4_list = split_list_into_n_chunks( d_tmin_gpu_4_list, len(node_list) )
-            split_tmin_gpu5_list = split_list_into_n_chunks( d_tmin_gpu_5_list, len(node_list) )
-            split_tmin_gpu6_list = split_list_into_n_chunks( d_tmin_gpu_6_list, len(node_list) )
-            split_tmin_gpu7_list = split_list_into_n_chunks( d_tmin_gpu_7_list, len(node_list) )
+        split_tmin_gpu0_list = split_list_into_n_chunks( d_tmin_gpu_0_list, len(node_list) )
+        split_tmin_gpu1_list = split_list_into_n_chunks( d_tmin_gpu_1_list, len(node_list) )
+        split_tmin_gpu2_list = split_list_into_n_chunks( d_tmin_gpu_2_list, len(node_list) )
+        split_tmin_gpu3_list = split_list_into_n_chunks( d_tmin_gpu_3_list, len(node_list) )
+        split_tmin_gpu4_list = split_list_into_n_chunks( d_tmin_gpu_4_list, len(node_list) )
+        split_tmin_gpu5_list = split_list_into_n_chunks( d_tmin_gpu_5_list, len(node_list) )
+        split_tmin_gpu6_list = split_list_into_n_chunks( d_tmin_gpu_6_list, len(node_list) )
+        split_tmin_gpu7_list = split_list_into_n_chunks( d_tmin_gpu_7_list, len(node_list) )
 
-            split_tmax_gpu0_list = split_list_into_n_chunks( d_tmax_gpu_0_list, len(node_list) )
-            split_tmax_gpu1_list = split_list_into_n_chunks( d_tmax_gpu_1_list, len(node_list) )
-            split_tmax_gpu2_list = split_list_into_n_chunks( d_tmax_gpu_2_list, len(node_list) )
-            split_tmax_gpu3_list = split_list_into_n_chunks( d_tmax_gpu_3_list, len(node_list) )
-            split_tmax_gpu4_list = split_list_into_n_chunks( d_tmax_gpu_4_list, len(node_list) )
-            split_tmax_gpu5_list = split_list_into_n_chunks( d_tmax_gpu_5_list, len(node_list) )
-            split_tmax_gpu6_list = split_list_into_n_chunks( d_tmax_gpu_6_list, len(node_list) )
-            split_tmax_gpu7_list = split_list_into_n_chunks( d_tmax_gpu_7_list, len(node_list) )
+        split_tmax_gpu0_list = split_list_into_n_chunks( d_tmax_gpu_0_list, len(node_list) )
+        split_tmax_gpu1_list = split_list_into_n_chunks( d_tmax_gpu_1_list, len(node_list) )
+        split_tmax_gpu2_list = split_list_into_n_chunks( d_tmax_gpu_2_list, len(node_list) )
+        split_tmax_gpu3_list = split_list_into_n_chunks( d_tmax_gpu_3_list, len(node_list) )
+        split_tmax_gpu4_list = split_list_into_n_chunks( d_tmax_gpu_4_list, len(node_list) )
+        split_tmax_gpu5_list = split_list_into_n_chunks( d_tmax_gpu_5_list, len(node_list) )
+        split_tmax_gpu6_list = split_list_into_n_chunks( d_tmax_gpu_6_list, len(node_list) )
+        split_tmax_gpu7_list = split_list_into_n_chunks( d_tmax_gpu_7_list, len(node_list) )
 
-            split_tavg_gpu0_list = split_list_into_n_chunks( d_tavg_gpu_0_list, len(node_list) )
-            split_tavg_gpu1_list = split_list_into_n_chunks( d_tavg_gpu_1_list, len(node_list) )
-            split_tavg_gpu2_list = split_list_into_n_chunks( d_tavg_gpu_2_list, len(node_list) )
-            split_tavg_gpu3_list = split_list_into_n_chunks( d_tavg_gpu_3_list, len(node_list) )
-            split_tavg_gpu4_list = split_list_into_n_chunks( d_tavg_gpu_4_list, len(node_list) )
-            split_tavg_gpu5_list = split_list_into_n_chunks( d_tavg_gpu_5_list, len(node_list) )
-            split_tavg_gpu6_list = split_list_into_n_chunks( d_tavg_gpu_6_list, len(node_list) )
-            split_tavg_gpu7_list = split_list_into_n_chunks( d_tavg_gpu_7_list, len(node_list) )
-
-
-            split_tstdev_gpu0_list = split_list_into_n_chunks( d_tstdev_gpu_0_list, len(node_list) )
-            split_tstdev_gpu1_list = split_list_into_n_chunks( d_tstdev_gpu_1_list, len(node_list) )
-            split_tstdev_gpu2_list = split_list_into_n_chunks( d_tstdev_gpu_2_list, len(node_list) )
-            split_tstdev_gpu3_list = split_list_into_n_chunks( d_tstdev_gpu_3_list, len(node_list) )
-            split_tstdev_gpu4_list = split_list_into_n_chunks( d_tstdev_gpu_4_list, len(node_list) )
-            split_tstdev_gpu5_list = split_list_into_n_chunks( d_tstdev_gpu_5_list, len(node_list) )
-            split_tstdev_gpu6_list = split_list_into_n_chunks( d_tstdev_gpu_6_list, len(node_list) )
-            split_tstdev_gpu7_list = split_list_into_n_chunks( d_tstdev_gpu_7_list, len(node_list) )
+        split_tavg_gpu0_list = split_list_into_n_chunks( d_tavg_gpu_0_list, len(node_list) )
+        split_tavg_gpu1_list = split_list_into_n_chunks( d_tavg_gpu_1_list, len(node_list) )
+        split_tavg_gpu2_list = split_list_into_n_chunks( d_tavg_gpu_2_list, len(node_list) )
+        split_tavg_gpu3_list = split_list_into_n_chunks( d_tavg_gpu_3_list, len(node_list) )
+        split_tavg_gpu4_list = split_list_into_n_chunks( d_tavg_gpu_4_list, len(node_list) )
+        split_tavg_gpu5_list = split_list_into_n_chunks( d_tavg_gpu_5_list, len(node_list) )
+        split_tavg_gpu6_list = split_list_into_n_chunks( d_tavg_gpu_6_list, len(node_list) )
+        split_tavg_gpu7_list = split_list_into_n_chunks( d_tavg_gpu_7_list, len(node_list) )
 
 
-            split_t99pct_gpu0_list = split_list_into_n_chunks( d_t99pct_gpu_0_list, len(node_list) )
-            split_t99pct_gpu1_list = split_list_into_n_chunks( d_t99pct_gpu_1_list, len(node_list) )
-            split_t99pct_gpu2_list = split_list_into_n_chunks( d_t99pct_gpu_2_list, len(node_list) )
-            split_t99pct_gpu3_list = split_list_into_n_chunks( d_t99pct_gpu_3_list, len(node_list) )
-            split_t99pct_gpu4_list = split_list_into_n_chunks( d_t99pct_gpu_4_list, len(node_list) )
-            split_t99pct_gpu5_list = split_list_into_n_chunks( d_t99pct_gpu_5_list, len(node_list) )
-            split_t99pct_gpu6_list = split_list_into_n_chunks( d_t99pct_gpu_6_list, len(node_list) )
-            split_t99pct_gpu7_list = split_list_into_n_chunks( d_t99pct_gpu_7_list, len(node_list) )
+        split_tstdev_gpu0_list = split_list_into_n_chunks( d_tstdev_gpu_0_list, len(node_list) )
+        split_tstdev_gpu1_list = split_list_into_n_chunks( d_tstdev_gpu_1_list, len(node_list) )
+        split_tstdev_gpu2_list = split_list_into_n_chunks( d_tstdev_gpu_2_list, len(node_list) )
+        split_tstdev_gpu3_list = split_list_into_n_chunks( d_tstdev_gpu_3_list, len(node_list) )
+        split_tstdev_gpu4_list = split_list_into_n_chunks( d_tstdev_gpu_4_list, len(node_list) )
+        split_tstdev_gpu5_list = split_list_into_n_chunks( d_tstdev_gpu_5_list, len(node_list) )
+        split_tstdev_gpu6_list = split_list_into_n_chunks( d_tstdev_gpu_6_list, len(node_list) )
+        split_tstdev_gpu7_list = split_list_into_n_chunks( d_tstdev_gpu_7_list, len(node_list) )
 
 
-            print(split_tmin_list)
-            avg_tmin_data = average_of_lists( split_tmin_list ) 
-            avg_tmax_data = average_of_lists( split_tmax_list ) 
-            avg_tavg_data = average_of_lists( split_tavg_list ) 
-            avg_tstdev_data = average_of_lists( split_tstdev_list ) 
-            avg_t99pct_data = average_of_lists( split_t99pct_list ) 
+        split_t99pct_gpu0_list = split_list_into_n_chunks( d_t99pct_gpu_0_list, len(node_list) )
+        split_t99pct_gpu1_list = split_list_into_n_chunks( d_t99pct_gpu_1_list, len(node_list) )
+        split_t99pct_gpu2_list = split_list_into_n_chunks( d_t99pct_gpu_2_list, len(node_list) )
+        split_t99pct_gpu3_list = split_list_into_n_chunks( d_t99pct_gpu_3_list, len(node_list) )
+        split_t99pct_gpu4_list = split_list_into_n_chunks( d_t99pct_gpu_4_list, len(node_list) )
+        split_t99pct_gpu5_list = split_list_into_n_chunks( d_t99pct_gpu_5_list, len(node_list) )
+        split_t99pct_gpu6_list = split_list_into_n_chunks( d_t99pct_gpu_6_list, len(node_list) )
+        split_t99pct_gpu7_list = split_list_into_n_chunks( d_t99pct_gpu_7_list, len(node_list) )
 
 
-            avg_tmin_gpu0_data = average_of_lists( split_tmin_gpu0_list )
-            avg_tmin_gpu1_data = average_of_lists( split_tmin_gpu1_list )
-            avg_tmin_gpu2_data = average_of_lists( split_tmin_gpu2_list )
-            avg_tmin_gpu3_data = average_of_lists( split_tmin_gpu3_list )
-            avg_tmin_gpu4_data = average_of_lists( split_tmin_gpu4_list )
-            avg_tmin_gpu5_data = average_of_lists( split_tmin_gpu5_list )
-            avg_tmin_gpu6_data = average_of_lists( split_tmin_gpu6_list )
-            avg_tmin_gpu7_data = average_of_lists( split_tmin_gpu7_list )
+        print(split_tmin_list)
+        print(split_tmax_list)
+        print(split_tavg_list)
+        avg_tmin_data = average_of_lists( split_tmin_list ) 
+        avg_tmax_data = average_of_lists( split_tmax_list ) 
+        avg_tavg_data = average_of_lists( split_tavg_list ) 
+        avg_tstdev_data = average_of_lists( split_tstdev_list ) 
+        avg_t99pct_data = average_of_lists( split_t99pct_list ) 
 
 
-            avg_tmax_gpu0_data = average_of_lists( split_tmax_gpu0_list )
-            avg_tmax_gpu1_data = average_of_lists( split_tmax_gpu1_list )
-            avg_tmax_gpu2_data = average_of_lists( split_tmax_gpu2_list )
-            avg_tmax_gpu3_data = average_of_lists( split_tmax_gpu3_list )
-            avg_tmax_gpu4_data = average_of_lists( split_tmax_gpu4_list )
-            avg_tmax_gpu5_data = average_of_lists( split_tmax_gpu5_list )
-            avg_tmax_gpu6_data = average_of_lists( split_tmax_gpu6_list )
-            avg_tmax_gpu7_data = average_of_lists( split_tmax_gpu7_list )
+        avg_tmin_gpu0_data = average_of_lists( split_tmin_gpu0_list )
+        avg_tmin_gpu1_data = average_of_lists( split_tmin_gpu1_list )
+        avg_tmin_gpu2_data = average_of_lists( split_tmin_gpu2_list )
+        avg_tmin_gpu3_data = average_of_lists( split_tmin_gpu3_list )
+        avg_tmin_gpu4_data = average_of_lists( split_tmin_gpu4_list )
+        avg_tmin_gpu5_data = average_of_lists( split_tmin_gpu5_list )
+        avg_tmin_gpu6_data = average_of_lists( split_tmin_gpu6_list )
+        avg_tmin_gpu7_data = average_of_lists( split_tmin_gpu7_list )
 
-            avg_tavg_gpu0_data = average_of_lists( split_tavg_gpu0_list )
-            avg_tavg_gpu1_data = average_of_lists( split_tavg_gpu1_list )
-            avg_tavg_gpu2_data = average_of_lists( split_tavg_gpu2_list )
-            avg_tavg_gpu3_data = average_of_lists( split_tavg_gpu3_list )
-            avg_tavg_gpu4_data = average_of_lists( split_tavg_gpu4_list )
-            avg_tavg_gpu5_data = average_of_lists( split_tavg_gpu5_list )
-            avg_tavg_gpu6_data = average_of_lists( split_tavg_gpu6_list )
-            avg_tavg_gpu7_data = average_of_lists( split_tavg_gpu7_list )
 
-            avg_tstdev_gpu0_data = average_of_lists( split_tstdev_gpu0_list )
-            avg_tstdev_gpu1_data = average_of_lists( split_tstdev_gpu1_list )
-            avg_tstdev_gpu2_data = average_of_lists( split_tstdev_gpu2_list )
-            avg_tstdev_gpu3_data = average_of_lists( split_tstdev_gpu3_list )
-            avg_tstdev_gpu4_data = average_of_lists( split_tstdev_gpu4_list )
-            avg_tstdev_gpu5_data = average_of_lists( split_tstdev_gpu5_list )
-            avg_tstdev_gpu6_data = average_of_lists( split_tstdev_gpu6_list )
-            avg_tstdev_gpu7_data = average_of_lists( split_tstdev_gpu7_list )
+        avg_tmax_gpu0_data = average_of_lists( split_tmax_gpu0_list )
+        avg_tmax_gpu1_data = average_of_lists( split_tmax_gpu1_list )
+        avg_tmax_gpu2_data = average_of_lists( split_tmax_gpu2_list )
+        avg_tmax_gpu3_data = average_of_lists( split_tmax_gpu3_list )
+        avg_tmax_gpu4_data = average_of_lists( split_tmax_gpu4_list )
+        avg_tmax_gpu5_data = average_of_lists( split_tmax_gpu5_list )
+        avg_tmax_gpu6_data = average_of_lists( split_tmax_gpu6_list )
+        avg_tmax_gpu7_data = average_of_lists( split_tmax_gpu7_list )
 
-            avg_t99pct_gpu0_data = average_of_lists( split_t99pct_gpu0_list )
-            avg_t99pct_gpu1_data = average_of_lists( split_t99pct_gpu1_list )
-            avg_t99pct_gpu2_data = average_of_lists( split_t99pct_gpu2_list )
-            avg_t99pct_gpu3_data = average_of_lists( split_t99pct_gpu3_list )
-            avg_t99pct_gpu4_data = average_of_lists( split_t99pct_gpu4_list )
-            avg_t99pct_gpu5_data = average_of_lists( split_t99pct_gpu5_list )
-            avg_t99pct_gpu6_data = average_of_lists( split_t99pct_gpu6_list )
-            avg_t99pct_gpu7_data = average_of_lists( split_t99pct_gpu7_list )
+        avg_tavg_gpu0_data = average_of_lists( split_tavg_gpu0_list )
+        avg_tavg_gpu1_data = average_of_lists( split_tavg_gpu1_list )
+        avg_tavg_gpu2_data = average_of_lists( split_tavg_gpu2_list )
+        avg_tavg_gpu3_data = average_of_lists( split_tavg_gpu3_list )
+        avg_tavg_gpu4_data = average_of_lists( split_tavg_gpu4_list )
+        avg_tavg_gpu5_data = average_of_lists( split_tavg_gpu5_list )
+        avg_tavg_gpu6_data = average_of_lists( split_tavg_gpu6_list )
+        avg_tavg_gpu7_data = average_of_lists( split_tavg_gpu7_list )
+
+        avg_tstdev_gpu0_data = average_of_lists( split_tstdev_gpu0_list )
+        avg_tstdev_gpu1_data = average_of_lists( split_tstdev_gpu1_list )
+        avg_tstdev_gpu2_data = average_of_lists( split_tstdev_gpu2_list )
+        avg_tstdev_gpu3_data = average_of_lists( split_tstdev_gpu3_list )
+        avg_tstdev_gpu4_data = average_of_lists( split_tstdev_gpu4_list )
+        avg_tstdev_gpu5_data = average_of_lists( split_tstdev_gpu5_list )
+        avg_tstdev_gpu6_data = average_of_lists( split_tstdev_gpu6_list )
+        avg_tstdev_gpu7_data = average_of_lists( split_tstdev_gpu7_list )
+
+        avg_t99pct_gpu0_data = average_of_lists( split_t99pct_gpu0_list )
+        avg_t99pct_gpu1_data = average_of_lists( split_t99pct_gpu1_list )
+        avg_t99pct_gpu2_data = average_of_lists( split_t99pct_gpu2_list )
+        avg_t99pct_gpu3_data = average_of_lists( split_t99pct_gpu3_list )
+        avg_t99pct_gpu4_data = average_of_lists( split_t99pct_gpu4_list )
+        avg_t99pct_gpu5_data = average_of_lists( split_t99pct_gpu5_list )
+        avg_t99pct_gpu6_data = average_of_lists( split_t99pct_gpu6_list )
+        avg_t99pct_gpu7_data = average_of_lists( split_t99pct_gpu7_list )
 
 
         #data = [ node_list, d_msg_size_list, d_bw_gpu_0_list, d_bw_gpu_1_list, d_bw_gpu_2_list, d_bw_gpu_3_list, \

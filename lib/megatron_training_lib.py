@@ -90,8 +90,9 @@ import linux_utils
 
 training_err_dict = {
     'cache_err': 'Unable to save MockGPTDataset indexes because path_to_cache is None',
-    'NCCL ERROR': 'NCCL ERROR|NCCL timeout',
-    'GPU HW ERROR': 'HW Exception by GPU|GPU Hang|Uncorrectable error|GPU Reset'
+    'NCCL ERROR': 'NCCL ERROR|NCCL timeout|ncclRemoteError: A call failed possibly due to a network error|NCCL error:',
+    'GPU HW ERROR': 'HW Exception by GPU|GPU Hang|Uncorrectable error|GPU Reset',
+    'torch': 'torch.distributed.elastic.multiprocessing.errors'
 }
 
 err_counters_pattern = 'err|retransmit|drop|discard|naks|invalid|oflow|out_of_buffer|reset|fail'
@@ -193,8 +194,9 @@ class MegatronLlamaTrainingJob():
         tdict.setdefault( 'nccl_ib_gid_index', '3' )
         tdict.setdefault( 'nccl_debug', 'ERROR' )
         tdict.setdefault( 'data_cache_dir', f'{self.home_dir}/cache' )
-        tdict.setdefault( 'log_dir', f'{self.home_dir}/LOG_DIR' )
+        tdict.setdefault( 'log_dir', f'{self.home_dir}/LOGS' )
         tdict.setdefault( 'master_address', '127.0.0.1' )
+        tdict.setdefault( 'verify_network_errors', 'False' )
 
         self.container_image       = tdict['container_image']
         self.container_name        = tdict['container_name']
@@ -214,7 +216,7 @@ class MegatronLlamaTrainingJob():
         self.data_cache_dir        = tdict['data_cache_dir']
         self.log_dir               = tdict['log_dir']
         self.master_address        = tdict['master_address']
-
+        self.verify_network_errors = tdict['verify_network_errors']
 
         # Get the model parameters dict
         print('^^^^')
@@ -341,7 +343,7 @@ class MegatronLlamaTrainingJob():
               f'export TOKENIZER_MODEL={self.tokenizer_model}; ' + \
               f'export LD_LIBRARY_PATH=/usr/local/lib/:/opt/rocm/lib:$LD_LIBRARY_PATH; ' + \
               f'export LOG_DIR={self.log_dir}; ' + \
-              f'export EXP_NAME={self.model_name}; '
+              f'export EXP_NAME="megatron_training"; '
 
 
         #if self.distributed_training is True:
@@ -427,22 +429,27 @@ class MegatronLlamaTrainingJob():
             # Following creates the training script
             out_dict = self.phdl.exec_cmd_list( self.job_cmd_list )
             # Build the docker cmd list to run on each node ..
-            docker_cmd_list = []
-            
+            cmd_list = []
+            for i in range(0, int(self.nnodes)):
+                cmd = f'''docker exec {self.container_name} /bin/bash -c "mkdir -p {self.log_dir}/megatron-logs/out-node{i}"'''
+                cmd_list.append(cmd)
+            self.phdl.exec_cmd_list(cmd_list)
+
+            cmd_list = []
             for i in range(0, int(self.nnodes)):
                 cmd = f'docker exec {self.container_name} /bin/bash -c "nohup \
                       {self.scripts_dir}/distributed_wrapper_script_{i}.sh > \
-                      {self.home_dir}/training_logs 2>&1 &"'
-                docker_cmd_list.append(cmd)
-            out_dict = self.phdl.exec_cmd_list(docker_cmd_list)
+                      {self.log_dir}/megatron-logs/out-node{i}/training.log 2>&1 &"'
+                cmd_list.append(cmd)
+            out_dict = self.phdl.exec_cmd_list(cmd_list)
         else:
             out_dict = self.phdl.exec( f'echo "{self.job_cmd}" > \
                {self.scripts_dir}/single_node_wrapper_script.sh; \
                chmod 777 {self.scripts_dir}/single_node_wrapper_script.sh' )
             out_dict = self.phdl.exec( f'docker exec {self.container_name} \
                /bin/bash -c "nohup {self.home_dir}/single_node_wrapper_script.sh > \
-               {self.home_dir}/training_logs 2>&1 &"' )
-            out_dict = self.phdl.exec( f'sudo chmod 777 {self.home_dir}/training_logs' )
+               {self.log_dir}/megatron-logs/out-node/training.log 2>&1 &"' )
+            out_dict = self.phdl.exec( f'sudo chmod 777 -R {self.log_dir}/megatron-logs' )
         time.sleep(50)
 
 
@@ -475,22 +482,26 @@ class MegatronLlamaTrainingJob():
 
         training_result_dict = {}
 
-        # Identify the last node; assume its logs contain the final/authoritative metrics
+        # Read the training log output from the "last" node (assumed authoritative)
         last_node = self.host_list[len(self.host_list) -1]
+        last_node_num = len(self.host_list) - 1
+        out_dict = self.phdl.exec(f'cat {self.log_dir}/megatron-logs/out-node{last_node_num}/training.log')
 
-        # Read the training logs file on all hosts (phdl.exec returns dict of node -> output)
-        out_dict = self.phdl.exec(f'cat {self.home_dir}/training_logs')
 
         # Select the log content from the last node
         output = out_dict[last_node]
 
+        print('Extracting results from logs')
+        print('#===========================#')
+        print(output)
+        print('#===========================#')
         # Extract throughput per GPU as a list of numbers (strings), if multiple occurrences exist
         training_result_dict['throughput_per_gpu'] = re.findall( \
             'throughput per GPU:\s+([0-9\.]+)', output, re.I)
 
         # Extract tokens per GPU per second (integers as strings)
         training_result_dict['tokens_per_gpu'] = re.findall( \
-            'tokens\/GPU\/s: ([0-9]+)', output, re.I )
+            'tokens\/GPU\/s:\s+([0-9]+)', output, re.I )
 
         # Extract memory usage values (floats as strings)
         training_result_dict['mem_usage'] = re.findall( \
@@ -541,9 +552,10 @@ class MegatronLlamaTrainingJob():
 
         # Identify the node whose log we treat as authoritative (last in the host list)
         last_node = self.host_list[len(self.host_list) -1]
+        last_node_num = len(self.host_list) - 1
 
         # Read training logs across nodes; select the last node's output for scanning
-        out_dict = self.phdl.exec(f'sudo cat {self.home_dir}/training_logs')
+        out_dict = self.phdl.exec(f'sudo cat {self.log_dir}/megatron-logs/out-node{last_node_num}/training.log')
 
         output = out_dict[last_node] 
 
@@ -593,15 +605,18 @@ class MegatronLlamaTrainingJob():
         """
 
         print('Poll for training completion ..')
-        time.sleep(60)
+        time.sleep(80)
         last_node = self.host_list[len(self.host_list) -1]
+
+        last_node = self.host_list[len(self.host_list) -1]
+        last_node_num = len(self.host_list) - 1
 
         for i in range(1,int(iterations)+1):
             print(f'Starting Iteration {i}')
             if not self.scan_for_training_errors():
                 fail_test('Failures seen in training logs, Aborting!!!')
                 return
-            out_dict = self.phdl.exec(f'sudo cat {self.home_dir}/training_logs')
+            out_dict = self.phdl.exec(f'sudo cat {self.log_dir}/megatron-logs/out-node{last_node_num}/training.log')
             output = out_dict[last_node]
             
             if not re.search( 'throughput per GPU:|tokens\/GPU\/s\s+[0-9]+', \
@@ -666,7 +681,14 @@ class MegatronLlamaTrainingJob():
         self.training_end_time = self.phdl.exec('date')
 
 
+        print('#==================================================#')
+        print('\t\tTraining Results')
+        print(self.training_result_dict)
+        print('#==================================================#')
         # Check the parsed training results for invalid numeric values (NaN/Inf)
+        if not self.training_result_dict:
+            fail_test('Failed to populate training results, training_result_dict is empty - please check logs for failures')
+
         for result_key in self.training_result_dict.keys():
             for result_list in self.training_result_dict[result_key]:
                 for result_val in result_list:
@@ -676,35 +698,41 @@ class MegatronLlamaTrainingJob():
 
         # Check if RDMA and Ethtool stats have errors ..
         if self.distributed_training is True:
-            self.rdma_stats_dict_after = linux_utils.get_rdma_stats_dict(self.phdl)
-            self.ethtool_stats_dict_after = linux_utils.get_nic_ethtool_stats_dict(self.phdl)
+            if self.verify_network_errors is True:
+                self.rdma_stats_dict_after = linux_utils.get_rdma_stats_dict(self.phdl)
+                self.ethtool_stats_dict_after = linux_utils.get_nic_ethtool_stats_dict(self.phdl)
 
-            # Compare RDMA error counters; fail if any error counter increased
-            for node in self.rdma_stats_dict_after.keys():
-                for counter_nam in self.rdma_stats_dict_after[node]:
-                    if re.search( f'{err_counters_pattern}', counter_nam, re.I ):
-                        if int(self.rdma_stats_dict_after[node][counter_nam]) >  \
-                              int(self.rdma_stats_dict_before[node][counter_nam]):
-                            fail_test(f'Error counter {counter_nam} has gone up after training on node {node} \
-                              Before = {self.rdma_stats_dict_before[node][counter_nam]}, \
-                              After = {self.rdma_stats_dict_after[node][counter_nam]}')
+                # Compare RDMA error counters; fail if any error counter increased
+                for node in self.rdma_stats_dict_after.keys():
+                    for counter_nam in self.rdma_stats_dict_after[node]:
+                       if re.search( f'{err_counters_pattern}', counter_nam, re.I ):
+                           if int(self.rdma_stats_dict_after[node][counter_nam]) >  \
+                                 int(self.rdma_stats_dict_before[node][counter_nam]):
+                               fail_test(f'Error counter {counter_nam} has gone up after training on node {node} \
+                                 Before = {self.rdma_stats_dict_before[node][counter_nam]}, \
+                                 After = {self.rdma_stats_dict_after[node][counter_nam]}')
 
-            # Compare NIC error counters; fail if any error counter increased
-            for node in self.ethtool_stats_dict_after.keys():
-                for counter_nam in self.ethtool_stats_dict_after[node]:
-                    if re.search( f'{err_counters_pattern}', counter_nam, re.I ):
-                        if int(self.ethtool_stats_dict_after[node][counter_nam]) > \
-                              int(self.ethtool_stats_dict_before[node][counter_nam]):
-                            fail_test(f'Error counter {counter_nam} has gone up after training on node {node} \
-                              Before = {self.ethtool_stats_dict_before[node][counter_nam]}, \
-                              After = {self.ethtool_stats_dict_after[node][counter_nam]}')
+                # Compare NIC error counters; fail if any error counter increased
+                for node in self.ethtool_stats_dict_after.keys():
+                    for counter_nam in self.ethtool_stats_dict_after[node]:
+                        if re.search( f'{err_counters_pattern}', counter_nam, re.I ):
+                            if int(self.ethtool_stats_dict_after[node][counter_nam]) > \
+                                  int(self.ethtool_stats_dict_before[node][counter_nam]):
+                                fail_test(f'Error counter {counter_nam} has gone up after training on node {node} \
+                                  Before = {self.ethtool_stats_dict_before[node][counter_nam]}, \
+                                  After = {self.ethtool_stats_dict_after[node][counter_nam]}')
 
         # Scan Dmesg for errors ..
         verify_dmesg_for_errors( self.phdl, self.training_start_time, self.training_end_time )
 
+        print('^^^^^^^^^^^^^^^^^^^^')
+        print('training_result_dict')
+        print('^^^^^^^^^^^^^^^^^^^^')
+        print(self.training_result_dict)
         # Compare perf expected numbers from input JSON file ..
-        for result_key in self.expected_result_dict.keys():
-            if result_key in self.training_result_dict:
+        for result_key in self.training_result_dict.keys():
+            if result_key in self.expected_result_dict:
+                print(self.training_result_dict[result_key])
                 # check if all nodes have met the expected perf numbers
                 for actual_perf in self.training_result_dict[result_key]:
                     if float(self.expected_result_dict[result_key]) < \

@@ -73,33 +73,33 @@ def get_amd_smi_pcie_metrics_dict( phdl ):
 
 
 def get_gpu_mem_use_dict( phdl ):
-    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --showmemuse --json'))
+    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --loglevel error --showmemuse --json'))
     return d_dict
 
 
 def get_gpu_use_dict( phdl ):
-    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --showuse --json'))
+    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --loglevel error --showuse --json'))
     return d_dict
 
 def get_gpu_metrics_dict( phdl ):
-    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --showmetric --json'))
+    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --loglevel error --showmetric --json'))
     return d_dict
 
 
 def get_gpu_fw_dict( phdl ):
-    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --showfwinfo --json'))
+    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --loglevel error --showfwinfo --json'))
     return d_dict
 
 def get_gpu_pcie_bus_dict( phdl ):
-    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --showbus --json'))
+    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --loglevel error --showbus --json'))
     return d_dict
 
 def get_gpu_model_dict( phdl ):
-    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --showproductname --json'))
+    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --loglevel error --showproductname --json'))
     return d_dict
 
 def get_gpu_temp_dict( phdl ):
-    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --showtemp --json'))
+    d_dict = convert_phdl_json_to_dict( phdl.exec('sudo rocm-smi --loglevel error --showtemp --json'))
     return d_dict
 
 

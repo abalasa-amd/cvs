@@ -281,21 +281,32 @@ def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, 
 
 
     # Use the first cluster node as the head node (source for collected outputs)
+    # The -H {host_params} is obsolete in ompi5.0 and greater, so changing to
+    # --hostfile option
     head_node = cluster_node_list[0]
-    host_params=''
+    #host_params=''
+    #proc_per_node = int(int(no_of_global_ranks)/len(cluster_node_list))
+    #for node in vpc_node_list:
+    #    host_params = f'{host_params}{node}:{proc_per_node},'
+    # Compute processes per node and build the -H host mapping string: host:N,host:N,...
+    #host_params = host_params.rstrip(',')
+    #print(f'RCCL Hosts -H value {host_params}')
+
+    host_file_params=''
     proc_per_node = int(int(no_of_global_ranks)/len(cluster_node_list))
     for node in vpc_node_list:
-        host_params = f'{host_params}{node}:{proc_per_node},'
+        host_file_params = f'{host_file_params}' + f'{node} slots={proc_per_node}\n'
 
+    cmd = 'sudo rm -f /tmp/rccl_hosts_file.txt'
+    shdl.exec(cmd)
 
-    # Compute processes per node and build the -H host mapping string: host:N,host:N,...
-    host_params = host_params.rstrip(',')
-    print(f'RCCL Hosts -H value {host_params}')
+    cmd = f'echo "{host_file_params}" > /tmp/rccl_hosts_file.txt'
+    shdl.exec(cmd)
 
         
     cmd = f'''{MPI_INSTALL_DIR}/mpirun --np {no_of_global_ranks} \
         --allow-run-as-root \
-        -H {host_params} \
+        --hostfile /tmp/rccl_hosts_file.txt \
         -x NCCL_DEBUG={debug_level} \
         --bind-to numa \
         -x NCCL_IB_GID_INDEX={gid_index} \
