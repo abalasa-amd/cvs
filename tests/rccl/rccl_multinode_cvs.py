@@ -310,6 +310,18 @@ def test_collect_networkinfo( phdl ):
 
 
 
+def test_disable_firewall( phdl ):
+    globals.error_list = []
+    phdl.exec('sudo service ufw stop')
+    time.sleep(2)
+    out_dict = phdl.exec('sudo service ufw status')
+    for node in out_dict.keys():
+        if not re.search( 'inactive|dead|stopped|disabled', out_dict[node], re.I ):
+            fail_test(f'Service ufw not disabled properly on node {node}')
+    update_test_result()
+
+
+
 def test_rccl_perf(phdl, shdl, cluster_dict, config_dict, rccl_collective, rccl_algo, \
        rccl_protocol, qp_scale, nccl_pxn_disable ):
 
