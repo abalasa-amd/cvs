@@ -260,9 +260,10 @@ def test_launch_jax_containers(phdl, training_dict ):
 
     
 
-def test_llama_3_1_70b_distributed(phdl, training_dict, model_params_dict, hf_token ):
+def test_llama_3_1_70b_training(phdl, training_dict, model_params_dict, hf_token ):
     """
-    Pytest: Distributed end-to-end JAX training test for Llama 3.1 FP8.
+    Pytest: End-to-end JAX training test for Llama 3.1 FP8.
+    Can be distributed or single node training based on the input json file
 
     Args:
       phdl: Cluster handle used to execute commands on all nodes.
