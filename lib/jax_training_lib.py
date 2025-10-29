@@ -184,8 +184,15 @@ class JaxTrainingJob():
 
 
     def launch_docker_container(self, container_name, image, device_list, volume_dict, env_dict ):
-        docker_lib.launch_docker_container( self.phdl, container_name, image, 
-           device_list, volume_dict, env_dict )
+        if self.distributed_training is True:
+            docker_lib.launch_docker_container( self.phdl, container_name, image, 
+               device_list, volume_dict, env_dict )
+        else:
+            env_dict['JAX_COORDINATOR_IP'] = 'localhost'
+            env_dict['NNODES'] = 1
+            docker_lib.launch_docker_container( self.phdl, container_name, image, 
+               device_list, volume_dict, env_dict )
+
 
 
     def exec_nic_setup_scripts( self, ):
@@ -313,9 +320,36 @@ class JaxTrainingJob():
 
 
         # Need check for Single Node vs Double node ..
-        cmd_list = []
-        for i in range(0,int(self.nnodes)):
-            cmd = f'''docker exec {self.container_name} /bin/bash -c  "echo  '
+        if self.distributed_training is not True:
+            cmd_list = []
+            for i in range(0,int(self.nnodes)):
+                cmd = f'''docker exec {self.container_name} /bin/bash -c  "echo  '
+                      export NNODES=1
+                      export NODE_RANK=0
+                      export JAX_COORDINATOR_ADDRESS='localhost'
+                      export JAX_COORDINATOR_IP='localhost'
+                      export JAX_COORDINATOR_PORT=12345
+                      export HSA_FORCE_FINE_GRAIN_PCIE=1
+                      export GPU_MAX_HW_QUEUES={self.tc_dict['gpu_max_hw_queues']}
+                      export HIP_FORCE_DEV_KERNARG=1
+                      export NVTE_FUSED_ATTN=1
+                      export NVTE_ALLOW_NONDETERMINISTIC_ALGO=1
+                      export XLA_PYTHON_CLIENT_MEM_FRACTION={self.tc_dict['xla_python_client_mem_fraction']}
+                      export XLA_GPU_EXECUTABLE_WARN_STUCK_TIMEOUT={self.tc_dict['xla_gpu_executable_warn_stuck_timeout']}
+                      export LD_LIBRARY_PATH=/opt/rocm/lib:$LD_LIBRARY_PATH
+                      export NCCL_DEBUG={self.tc_dict['nccl_debug']}
+                      export NCCL_IB_DISABLE=1
+                      export NCCL_SHM_DISABLE=0
+                      export NCCL_P2P_DISABLE=0
+                      export HSA_FORCE_FINE_GRAIN_PCIE=1
+                      export NVTE_CK_BWD_V3={self.tc_dict['nvte_ck_bwd_v3']}
+                      export NVTE_CK_V3_BF16_CVT={self.tc_dict['nvte_ck_v3_bf16_cvt']}' >> /workspace/maxtext/maxtext_env.sh"'''
+                formatted_cmd = textwrap_for_yml(cmd)
+                cmd_list.append(formatted_cmd)
+        else:
+            cmd_list = []
+            for i in range(0,int(self.nnodes)):
+                cmd = f'''docker exec {self.container_name} /bin/bash -c  "echo  '
                       export NNODES={int(self.nnodes)}
                       export NODE_RANK={i}
                       export JAX_COORDINATOR_ADDRESS={self.coordinator_ip}
@@ -344,8 +378,8 @@ class JaxTrainingJob():
                       export HSA_FORCE_FINE_GRAIN_PCIE=1
                       export NVTE_CK_BWD_V3={self.tc_dict['nvte_ck_bwd_v3']}
                       export NVTE_CK_V3_BF16_CVT={self.tc_dict['nvte_ck_v3_bf16_cvt']}' >> /workspace/maxtext/maxtext_env.sh"'''
-            formatted_cmd = textwrap_for_yml(cmd)
-            cmd_list.append(formatted_cmd)
+                formatted_cmd = textwrap_for_yml(cmd)
+                cmd_list.append(formatted_cmd)
         print(cmd_list)
         self.phdl.exec_cmd_list(cmd_list)
 
