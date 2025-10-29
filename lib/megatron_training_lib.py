@@ -423,17 +423,16 @@ class MegatronLlamaTrainingJob():
         print('start training job')
         print(self.job_cmd_list)
         print(self.job_cmd)
+        cmd_list = []
+        for i in range(0, int(self.nnodes)):
+            cmd = f'''docker exec {self.container_name} /bin/bash -c "mkdir -p {self.log_dir}/megatron-logs/out-node{i}"'''
+            cmd_list.append(cmd)
+        self.phdl.exec_cmd_list(cmd_list)
         if self.distributed_training:
             # Run any required NIC setup steps inside containers (e.g., Broadcom workaround)
             self.exec_nic_setup_scripts()
             # Following creates the training script
             out_dict = self.phdl.exec_cmd_list( self.job_cmd_list )
-            # Build the docker cmd list to run on each node ..
-            cmd_list = []
-            for i in range(0, int(self.nnodes)):
-                cmd = f'''docker exec {self.container_name} /bin/bash -c "mkdir -p {self.log_dir}/megatron-logs/out-node{i}"'''
-                cmd_list.append(cmd)
-            self.phdl.exec_cmd_list(cmd_list)
 
             cmd_list = []
             for i in range(0, int(self.nnodes)):
@@ -446,10 +445,13 @@ class MegatronLlamaTrainingJob():
             out_dict = self.phdl.exec( f'echo "{self.job_cmd}" > \
                {self.scripts_dir}/single_node_wrapper_script.sh; \
                chmod 777 {self.scripts_dir}/single_node_wrapper_script.sh' )
-            out_dict = self.phdl.exec( f'docker exec {self.container_name} \
-               /bin/bash -c "nohup {self.home_dir}/single_node_wrapper_script.sh > \
-               {self.log_dir}/megatron-logs/out-node/training.log 2>&1 &"' )
-            out_dict = self.phdl.exec( f'sudo chmod 777 -R {self.log_dir}/megatron-logs' )
+            cmd_list = []
+            for i in range(0, int(self.nnodes)):
+                cmd = f'docker exec {self.container_name} /bin/bash -c "nohup \
+                      {self.scripts_dir}/single_node_wrapper_script.sh > \
+                      {self.log_dir}/megatron-logs/out-node{i}/training.log 2>&1 &"'
+                cmd_list.append(cmd)
+            out_dict = self.phdl.exec_cmd_list(cmd_list)
         time.sleep(50)
 
 
