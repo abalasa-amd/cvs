@@ -135,7 +135,7 @@ def check_bus_bw( test_name, output, exp_res_dict ):
 
 
 
-def check_bw_dip( test_name, output, exp_res_dict ):
+def check_bw_dip( test_name, output, ):
     #act_res_dict = json.loads(output.replace( '\n', '').replace( '\r', ''))
     act_res_dict = output
     if re.search( 'alltoall|all_to_all', test_name, re.I ):
@@ -159,7 +159,7 @@ def check_bw_dip( test_name, output, exp_res_dict ):
 
 
 
-def check_lat_dip( test_name, output, exp_res_dict ):
+def check_lat_dip( test_name, output, ):
     #act_res_dict = json.loads(output.replace( '\n', '').replace( '\r', ''))
     act_res_dict = output
     if re.search( 'alltoall|all_to_all', test_name, re.I ):
@@ -189,8 +189,10 @@ def check_lat_dip( test_name, output, exp_res_dict ):
 def convert_to_graph_dict(result_dict):
     graph_dict = {}
     for graph_series_name in result_dict.keys():
+        print(graph_series_name)
         graph_dict[graph_series_name] = {}
         dict_list = result_dict[graph_series_name]
+        print(dict_list)
         for dict_item in dict_list:
             msg_size = dict_item['size']
             graph_dict[graph_series_name][msg_size] = {}
@@ -361,12 +363,262 @@ def rccl_cluster_test( phdl, shdl, test_name, cluster_node_list, vpc_node_list, 
 
     # If requested, verify measured bus bandwidths against provided expected Bandwidth
     if re.search( 'True', verify_bus_bw, re.I ):
-        check_bus_bw( test_name, result_out, exp_results_dict[test_name] )
+        if test_name in exp_results_dict.keys():
+            check_bus_bw( test_name, result_out, exp_results_dict[test_name] )
 
     if re.search( 'True', verify_bw_dip, re.I ):
-        check_bw_dip( test_name, result_out, exp_results_dict[test_name] )
+        check_bw_dip( test_name, result_out, )
 
     if re.search( 'True', verify_lat_dip, re.I ):
-        check_lat_dip( test_name, result_out, exp_results_dict[test_name] )
+        check_lat_dip( test_name, result_out, )
+
+    return result_out
+
+
+
+
+
+
+
+
+# Main RCCL Test library which gets invoked from cvs/test/rccl tests and accepts most of the 
+# standard NCCL environment variables ..
+#
+def rccl_cluster_test_default( phdl, shdl, test_name, cluster_node_list, vpc_node_list, user_name, ib_hca_list, \
+        net_dev_list, oob_port, no_of_global_ranks, rocm_path_var, mpi_dir, mpi_path_var, \
+        rccl_dir, rccl_path_var, rccl_tests_dir, nccl_algo='ring', \
+        nccl_proto='simple', gid_index=1, qp_count=1, \
+        start_msg_size=1024, end_msg_size='16g', \
+        step_function=2, threads_per_gpu=1, warmup_iterations=10, no_of_iterations=1, \
+        check_iteration_count=1, debug_level='INFO', \
+        rccl_result_file='/tmp/rccl_result_output.json', no_of_local_ranks=8, \
+        ib_rx_queue_len=8192, ucx_tls='tcp', hcoll_enable_mcast_all=0, \
+        nccl_cumem_enable=0, nccl_ib_timeout=30, nccl_ib_sl=0, \
+        nccl_ib_tc=41, nccl_ib_split_data_on_qps=0, nccl_pxn_disable=1, \
+        nccl_net_plugin=None, user_password=None, \
+        min_channels=64, max_channels=64, \
+        user_key_file=None, verify_bus_bw=False, \
+        verify_bw_dip=True, verify_lat_dip=True, exp_results_dict=None ):
+
+
+    """
+    Run an RCCL collective test across a cluster via MPI and verify results.
+
+    Arguments:
+      phdl: Parallel ssh handle to run commands on all nodes.
+      shdl: ssh handle to the first node in the cluster.
+      test_name: RCCL test binary name (e.g., all_reduce_perf).
+      cluster_node_list: List of cluster node hostnames/IPs (first is treated as head node).
+      vpc_node_list: List of hostnames/IPs to pass to mpirun -H as hosts - \
+         Make sure passwordless ssh works between them
+      user_name: Username for remote ops (unused here).
+      ib_hca_list: Comma-separated IB HCA devices for NCCL (NCCL_IB_HCA).
+      net_dev_list: UCX network device(s) to use (UCX_NET_DEVICES).
+      oob_port: Interface for MPI TCP OOB (btl_tcp_if_include).
+      no_of_global_ranks: Total MPI ranks to launch across the cluster.
+      rocm_path_var, mpi_dir, mpi_path_var, rccl_dir, rccl_path_var, rccl_tests_dir: Installation paths.
+      nccl_algo, nccl_proto, gid_index, qp_count, ...: NCCL/UCX/MPI tuning parameters.
+      start_msg_size, end_msg_size, step_function: Message size sweep setup.
+      threads_per_gpu, warmup_iterations, check_iteration_count: Test execution tuning.
+      debug_level: NCCL_DEBUG level.
+      rccl_result_file: Path where the RCCL test writes JSON results (-Z json -x file).
+      verify_bus_bw: If 'True' (string), compare bus BW vs expected thresholds.
+      exp_results_dict: Dict of expected results per test for verification.
+
+    Returns:
+      result_out: The raw JSON string read from rccl_result_file on the head node.
+    """
+
+    print(f'Starting RCCL Test ..........................................{test_name}')
+    # Base ROCm path as provided by caller
+    ROCM_PATH=rocm_path_var
+
+    # Resolve tool/library install locations
+    #MPI_PATH=f'{mpi_path}/install/bin'
+    MPI_PATH=f'{mpi_path_var}'
+    MPI_INSTALL_DIR=f'{mpi_dir}'
+    RCCL_INSTALL_DIR=f'{rccl_dir}'
+    RCCL_PATH=f'{rccl_path_var}'
+    RCCL_TESTS_INSTALL_DIR=f'{rccl_tests_dir}'
+
+
+    # Environment variables exported into the mpirun context
+    PATH=f'{MPI_PATH}/bin:{ROCM_PATH}/bin:$PATH'
+    LD_LIBRARY_PATH=f'{RCCL_PATH}:{MPI_PATH}/lib:{ROCM_PATH}/lib:$LD_LIBRARY_PATH'
+
+    print(f'%% VPC Node IPs {vpc_node_list}')
+
+
+    # Use the first cluster node as the head node (source for collected outputs)
+    # The -H {host_params} is obsolete in ompi5.0 and greater, so changing to
+    # --hostfile option
+    head_node = cluster_node_list[0]
+    #host_params=''
+    #proc_per_node = int(int(no_of_global_ranks)/len(cluster_node_list))
+    #for node in vpc_node_list:
+    #    host_params = f'{host_params}{node}:{proc_per_node},'
+    # Compute processes per node and build the -H host mapping string: host:N,host:N,...
+    #host_params = host_params.rstrip(',')
+    #print(f'RCCL Hosts -H value {host_params}')
+
+    host_file_params=''
+    proc_per_node = int(int(no_of_global_ranks)/len(cluster_node_list))
+    for node in vpc_node_list:
+        host_file_params = f'{host_file_params}' + f'{node} slots={proc_per_node}\n'
+
+    cmd = 'sudo rm -f /tmp/rccl_hosts_file.txt'
+    shdl.exec(cmd)
+
+    cmd = f'echo "{host_file_params}" > /tmp/rccl_hosts_file.txt'
+    shdl.exec(cmd)
+
+        
+    cmd = f'''{MPI_INSTALL_DIR}/mpirun --np {no_of_global_ranks} \
+        --allow-run-as-root \
+        --hostfile /tmp/rccl_hosts_file.txt \
+        -x NCCL_DEBUG={debug_level} \
+        --bind-to numa \
+        -x NCCL_IB_GID_INDEX={gid_index} \
+        -x UCX_UNIFIED_MODE=y \
+        -x NCCL_IB_PCI_RELAXED_ORDERING=1 \
+        -x PATH={PATH} \
+        -x LD_LIBRARY_PATH={LD_LIBRARY_PATH} \
+        -x NCCL_IB_HCA={ib_hca_list} \
+        --mca btl ^vader,openib \
+        --mca btl_tcp_if_include {oob_port}\
+        -x UCX_NET_DEVICES={net_dev_list} \
+        -x UCX_TLS={ucx_tls} \
+        -x NCCL_NET_PLUGIN={nccl_net_plugin} \
+        {RCCL_TESTS_INSTALL_DIR}/{test_name} -b {start_msg_size} -e {end_msg_size} -f {step_function} \
+        -g {threads_per_gpu} -c {check_iteration_count} -w {warmup_iterations} \
+        -Z json -x {rccl_result_file}
+        '''
+
+    print('%%%%%%%%%%%%%%%%')
+    print(cmd)
+    print('%%%%%%%%%%%%%%%%')
+    try:
+        out_dict = shdl.exec(cmd, timeout=500)
+        output = out_dict[head_node]
+        #print(output)
+        scan_rccl_logs(output)
+    except Exception as e:
+        log.error(f'Hit Exceptions with rccl cmd {cmd} - exception {e}')
+        fail_test(f'Hit Exceptions with rccl cmd {cmd} - exception {e}')
+
+    # Read the JSON results emitted by the RCCL test binary
+    result_dict_out = shdl.exec(f'cat {rccl_result_file}')
+    result_out = json.loads(result_dict_out[head_node].replace( '\n', '').replace( '\r', ''))
+
+
+    # Collect basic GPU information via rocm-smi
+    smi_out_dict = shdl.exec('rocm-smi -a | head -30')
+    smi_out = smi_out_dict[head_node]
+    model=get_model_from_rocm_smi_output(smi_out)
+
+    # If requested, verify measured bus bandwidths against provided expected Bandwidth
+    if re.search( 'True', verify_bus_bw, re.I ):
+        if test_name in exp_results_dict.keys():
+            check_bus_bw( test_name, result_out, exp_results_dict[test_name] )
+
+    if re.search( 'True', verify_bw_dip, re.I ):
+        check_bw_dip( test_name, result_out, )
+
+    if re.search( 'True', verify_lat_dip, re.I ):
+        check_lat_dip( test_name, result_out, )
+
+    return result_out
+
+
+
+
+
+
+# Single node RCCL
+#
+def rccl_single_node_test( phdl, test_name, cluster_node_list, \
+        rocm_path_var, rccl_dir, rccl_path_var, rccl_tests_dir, \
+        start_msg_size=1024, end_msg_size='16g', \
+        step_function=2, warmup_iterations=10, no_of_iterations=1, \
+        check_iteration_count=1, debug_level='INFO', \
+        rccl_result_file='/tmp/rccl_result_output.json', no_of_local_ranks=8, \
+        verify_bus_bw=False, verify_bw_dip=True, verify_lat_dip=True, exp_results_dict=None ):
+
+    """
+    Run an Single Node RCCL collective test
+
+    Arguments:
+      phdl: Parallel ssh handle to run commands on all nodes.
+      test_name: RCCL test binary name (e.g., all_reduce_perf).
+      cluster_node_list: List of cluster node hostnames/IPs
+      rocm_path_var, rccl_dir, rccl_path_var, rccl_tests_dir: Installation paths.
+      start_msg_size, end_msg_size, step_function: Message size sweep setup.
+      threads_per_gpu, warmup_iterations, check_iteration_count: Test execution tuning.
+      debug_level: NCCL_DEBUG level.
+      rccl_result_file: Path where the RCCL test writes JSON results (-Z json -x file).
+      verify_bus_bw: If 'True' (string), compare bus BW vs expected thresholds.
+      exp_results_dict: Dict of expected results per test for verification.
+
+    Returns:
+      result_out: The raw JSON string read from rccl_result_file on all nodes
+    """
+
+    print(f'Starting RCCL Test ..........................................{test_name}')
+    # Base ROCm path as provided by caller
+    ROCM_PATH=rocm_path_var
+
+    RCCL_INSTALL_DIR=f'{rccl_dir}'
+    RCCL_PATH=f'{rccl_path_var}'
+    RCCL_TESTS_INSTALL_DIR=f'{rccl_tests_dir}'
+
+    head_node = cluster_node_list[0]
+
+    # Environment variables exported into the mpirun context
+    PATH=f'{ROCM_PATH}/bin:$PATH'
+    LD_LIBRARY_PATH=f'{RCCL_PATH}:{ROCM_PATH}/lib:$LD_LIBRARY_PATH'
+
+
+        
+    cmd = f'''export NCCL_DEBUG={debug_level};  \
+           export PATH={PATH}; \
+           export LD_LIBRARY_PATH={LD_LIBRARY_PATH}; \
+           {RCCL_TESTS_INSTALL_DIR}/{test_name} -b {start_msg_size} -e {end_msg_size} -f {step_function} \
+           -g {no_of_local_ranks} -c {check_iteration_count} -w {warmup_iterations} \
+           -Z json -x {rccl_result_file}'''
+
+    print('%%%%%%%%%%%%%%%%')
+    print(cmd)
+    print('%%%%%%%%%%%%%%%%')
+    try:
+        out_dict = phdl.exec(cmd, timeout=500)
+        for node in out_dict.keys():
+            scan_rccl_logs(out_dict[node])
+    except Exception as e:
+        log.error(f'Hit Exceptions with rccl cmd {cmd} - exception {e}')
+        fail_test(f'Hit Exceptions with rccl cmd {cmd} - exception {e}')
+
+    # Read the JSON results emitted by the RCCL test binary
+    result_dict_out = phdl.exec(f'cat {rccl_result_file}')
+    result_out = json.loads(result_dict_out[head_node].replace( '\n', '').replace( '\r', ''))
+
+    # Collect basic GPU information via rocm-smi
+    smi_out_dict = phdl.exec('rocm-smi -a | head -30')
+
+    # If requested, verify measured bus bandwidths against provided expected Bandwidth
+    if re.search( 'True', verify_bus_bw, re.I ):
+        for node in result_dict_out.keys():
+            result_out = json.loads(result_dict_out[node].replace( '\n', '').replace( '\r', ''))
+            if test_name in exp_results_dict.keys():
+                check_bus_bw( test_name, result_out, exp_results_dict[test_name] )
+
+    if re.search( 'True', verify_bw_dip, re.I ):
+        for node in result_dict_out.keys():
+            result_out = json.loads(result_dict_out[node].replace( '\n', '').replace( '\r', ''))
+            check_bw_dip( test_name, result_out, )
+
+    if re.search( 'True', verify_lat_dip, re.I ):
+        for node in result_dict_out.keys():
+            result_out = json.loads(result_dict_out[node].replace( '\n', '').replace( '\r', ''))
+            check_lat_dip( test_name, result_out, )
 
     return result_out
