@@ -1016,6 +1016,58 @@ def add_json_data( filename, json_data ):
 
 
 
+def build_rccl_result_default_table( filename, res_dict ):
+    print('Build HTML RCCL Result default table')
+    with open(filename, 'a') as fp:
+         html_lines='''
+<h2 style="background-color: lightblue">RCCL Results Table</h2>
+<table id="rccltable" class="display cell-border">
+  <thead>
+  <tr>
+  <th>Collective</th>
+  <th>Msg Size</th>
+  <th>Algo BW GB/s</th>
+  <th>Bus BW GB/s</th>
+  <th>Latency us</th>
+  </tr>
+  </thead>'''
+         fp.write(html_lines)
+         for key_nam in res_dict.keys():
+             collective=key_nam
+             last_bw = 0.0
+             last_time = 0
+             for msg_size in res_dict[key_nam].keys():
+                 bus_bw = res_dict[key_nam][msg_size]['bus_bw']
+                 time = res_dict[key_nam][msg_size]['time']
+                 html_lines=f'''
+     <tr>
+     <td>{collective}</td>
+     <td>{msg_size}</td>
+     <td>{res_dict[key_nam][msg_size]['alg_bw']}</td>
+                 '''
+                 fp.write(html_lines)
+                 if float(bus_bw) < float(last_bw):
+                     html_lines = '''<td><span class="label label-danger">''' + str(bus_bw) + '''</td>\n'''
+                 else:
+                     html_lines = '''<td>''' + str(bus_bw) + '''</td>\n'''
+                 fp.write(html_lines)
+                 if float(time) < float(last_time):
+                     html_lines = '''<td><span class="label label-danger">''' + str(time) + '''</td>\n'''
+                 else:
+                     html_lines = '''<td>''' + str(time) + '''</td>\n'''
+                 fp.write(html_lines)
+                 last_bw = bus_bw
+                 last_time = time
+
+         html_lines='''
+         </table>
+         <br><br>
+         '''
+         fp.write(html_lines)
+
+
+
+
 
 
 def build_rccl_result_table( filename, res_dict ):
@@ -2116,26 +2168,64 @@ def build_html_pcie_xgmi_metrics_table( filename, metrics_dict, amd_dict ):
   <td>{}</td>
   <td>{}</td>
   <td>{}</td>
-  <td>{}</td>
-  <td>{}</td>
-  <td>{}</td>
-  <td>{}</td>
-  <td>{}</td>
-  <td>{}</td>
-  <td>{}</td>
-  <td>{}</td>
-  <td>{}</td>
   '''.format(
                  a_dict['pcie']['width'],
                  a_dict['pcie']['speed']['value'],
-                 a_dict['pcie']['bandwidth']['value'],
-                 d_dict[card]['pcie_l0_to_recov_count_acc (Count)'],
+                 a_dict['pcie']['bandwidth']['value'] )
+                 fp.write(html_lines)
+
+                 if int(d_dict[card]['pcie_l0_to_recov_count_acc (Count)']) > 100:
+                     html_lines='''<td><span class="label label-danger">{}</td>'''.format(
+                         d_dict[card]['pcie_l0_to_recov_count_acc (Count)'])
+                 else:
+                     html_lines='''<td>{}</td>'''.format(
+                         d_dict[card]['pcie_l0_to_recov_count_acc (Count)'])
+                 fp.write(html_lines)
+
+                 html_lines='''
+  <td>{}</td>
+  <td>{}</td>'''.format(
                  d_dict[card]['pcie_replay_count_acc (Count)'],
-                 d_dict[card]['pcie_replay_rover_count_acc (Count)'],
-                 d_dict[card]['pcie_nak_sent_count_acc (Count)'],
-                 d_dict[card]['pcie_nak_rcvd_count_acc (Count)'],
-                 d_dict[card]['xgmi_link_width'],
-                 d_dict[card]['xgmi_link_speed (Gbps)'],
+                 d_dict[card]['pcie_replay_rover_count_acc (Count)']
+                 )
+                 fp.write(html_lines)
+
+                 if int( d_dict[card]['pcie_nak_sent_count_acc (Count)'] ) > 5:
+                     html_lines='''<td><span class="label label-danger">{}</td>'''.format(
+                         d_dict[card]['pcie_nak_sent_count_acc (Count)'] )
+                 else:
+                     html_lines='''<td>{}</td>'''.format(
+                         d_dict[card]['pcie_nak_sent_count_acc (Count)'] )
+                 fp.write(html_lines)
+
+                 if int( d_dict[card]['pcie_nak_rcvd_count_acc (Count)'] ) > 5:
+                     html_lines='''<td><span class="label label-danger">{}</td>'''.format(
+                         d_dict[card]['pcie_nak_rcvd_count_acc (Count)'] )
+                 else:
+                     html_lines='''<td>{}</td>'''.format(
+                         d_dict[card]['pcie_nak_rcvd_count_acc (Count)'] )
+                 fp.write(html_lines)
+
+                 if int( d_dict[card]['xgmi_link_width'] ) < 16:
+                     html_lines='''<td><span class="label label-danger">{}</td>'''.format(
+                         d_dict[card]['xgmi_link_width'] )
+                 else:
+                     html_lines='''<td>{}</td>'''.format(
+                         d_dict[card]['xgmi_link_width'] )
+                 fp.write(html_lines)
+
+                 if int( d_dict[card]['xgmi_link_speed (Gbps)'] ) < 32:
+                     html_lines='''<td><span class="label label-danger">{}</td>'''.format(
+                         d_dict[card]['xgmi_link_speed (Gbps)'] )
+                 else:
+                     html_lines='''<td>{}</td>'''.format(
+                         d_dict[card]['xgmi_link_speed (Gbps)'] )
+                 fp.write(html_lines)
+
+                 html_lines='''
+  <td>{}</td>
+  <td>{}</td>
+  '''.format(
                  d_dict[card]['xgmi_link_status (Up/Down)'],
                  d_dict[card]['vram_max_bandwidth (GB/s)'],
                  )
