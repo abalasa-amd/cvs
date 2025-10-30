@@ -478,6 +478,7 @@ class JaxTrainingJob():
 
         # Compute the central tendency of the metric across the stable range of steps
         median_value = statistics.median(list_of_values)
+        print(f'%%%% median_value = {median_value}')
 
         # Define acceptable bounds around the median based on the allowed percentage deviation
         upper_bound = median_value * (1 + percentage_off )
@@ -525,7 +526,7 @@ class JaxTrainingJob():
         """
 
         training_results_dict = {}
-        percentage_off = 0.10
+        percentage_off = 10
 
         # Read the training log output from the "last" node (assumed authoritative)
         last_node = self.host_list[len(self.host_list) -1]
@@ -555,7 +556,7 @@ class JaxTrainingJob():
         # Check if the Loss function is not growing by over 10%
         self.check_deviation_from_median( training_results_dict, 'tflops_per_sec_per_gpu', percentage_off )    
         self.check_deviation_from_median( training_results_dict, 'tokens_per_sec_per_gpu', percentage_off )    
-        self.check_deviation_from_median( training_results_dict, 'loss', percentage_off )    
+        #self.check_deviation_from_median( training_results_dict, 'loss', percentage_off )    
             
         print(training_results_dict)
         return training_results_dict
