@@ -605,6 +605,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``device_list``
      - Values:
       * ``"/dev/dri"``
@@ -656,6 +659,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``tokenizer_model``
      - NousResearch/Meta-Llama-3-405B 
      - HF model identifier used to load tokenizer 
@@ -740,6 +746,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``quantize_kvcache``
      - false
      - KV cache quantization settings 
@@ -775,6 +784,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``xla_gpu_enable_cublaslt``
      - True
      - Use cublasLt optimized routines 
@@ -875,6 +887,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``throughput_per_gpu``
      - 380.0
      - Tflops per sec
@@ -895,6 +910,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``tokenizer_model``
      - NousResearch/Meta-Llama-3-405B 
      - HF model identifier used to load tokenizer 
@@ -1296,6 +1314,7 @@ Parameters
 
 Use the parameters in these tables to configure the training file.
 
+
 ``config``
 ~~~~~~~~~~
 
@@ -1407,6 +1426,7 @@ Use the parameters in these tables to configure the training file.
      - ``/home/{user-id}/LOG_DIR`` 
      - Directory for logs
 
+
 ``container_config``
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -1414,6 +1434,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``device_list``
      - Values:
       * ``"/dev/dri"``
@@ -1457,6 +1480,7 @@ Use the parameters in these tables to configure the training file.
      - 900
      - Timeout for communication heartbeat
 
+
 ``model_params/single_node/llama3.1-405b/mi300``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1464,6 +1488,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``tokenizer_model``
      - NousResearch/Meta-Llama-3-405B 
      - HF model identifier used to load tokenizer 
@@ -1548,6 +1575,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``quantize_kvcache``
      - false
      - KV cache quantization settings 
@@ -1576,6 +1606,7 @@ Use the parameters in these tables to configure the training file.
      - 3
      - Number of initial steps to skip when profiling
 
+
 ``xla_flags``
 ~~~~~~~~~~~~~
 
@@ -1583,6 +1614,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``xla_gpu_enable_cublaslt``
      - True
      - Use cublasLt optimized routines 
@@ -1689,6 +1723,9 @@ Use the parameters in these tables to configure the training file.
    :widths: 15 10 30
    :header-rows: 1
 
+   * - Configuration parameters
+     - Default values
+     - Description
    * - ``throughput_per_gpu``
      - 380.0
      - Tflops per sec
