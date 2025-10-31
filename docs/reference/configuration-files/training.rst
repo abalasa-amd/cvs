@@ -8,8 +8,10 @@ Training configuration (JAX) files
 
 Change the parameters as needed in the two JAX training configuration files: ``2_nodes_mi300x_llama_3_1_70b.json`` and ``4_nodes_mi300x_llama_3_1_405b.json`` for 2 node and 4 node configurations, respectively.
 
-``2_nodes_mi300x_llama_3_1_70b.json``
-=====================================
+2 node configuration
+====================
+
+This is the ``2_nodes_mi300x_llama_3_1_70b.json`` configuration file:
 
 .. code:: json
   
@@ -602,7 +604,7 @@ Use the parameters in these tables to configure the training file.
 ~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
-   :widths: 15 10 30
+   :widths: 10 10 35
    :header-rows: 1
 
    * - Configuration parameters
@@ -656,7 +658,7 @@ Use the parameters in these tables to configure the training file.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
-   :widths: 15 10 30
+   :widths: 15 5 35
    :header-rows: 1
 
    * - Configuration parameters
@@ -907,7 +909,6 @@ Use the parameters in these tables to configure the training file.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
-   :widths: 15 10 30
    :header-rows: 1
 
    * - Configuration parameters
@@ -1007,8 +1008,11 @@ Use the parameters in these tables to configure the training file.
      - 3
      - Number of initial steps to skip when profiling 
 
-``4_nodes_mi300x_llama_3_1_405b.json``
-======================================
+
+4 node configuration
+====================
+
+This is the ``4_nodes_mi300x_llama_3_1_405b.json`` configuration file:
 
 .. code:: json
  
@@ -1431,7 +1435,6 @@ Use the parameters in these tables to configure the training file.
 ~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
-   :widths: 15 10 30
    :header-rows: 1
 
    * - Configuration parameters
