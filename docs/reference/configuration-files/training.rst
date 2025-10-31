@@ -529,25 +529,25 @@ Use the parameters in these tables to configure the training file.
      - NIC hardware type
    * - ``nccl_ib_hca_list``
      - Values:
-       * ``bnxt_re0``
-       * ``bnxt_re1``
-       * ``bnxt_re2``
-       * ``bnxt_re3``
-       * ``bnxt_re4``
-       * ``bnxt_re5``
-       * ``bnxt_re6``
-       * ``bnxt_re7``
+        - ``bnxt_re0``
+        - ``bnxt_re1``
+        - ``bnxt_re2``
+        - ``bnxt_re3``
+        - ``bnxt_re4``
+        - ``bnxt_re5``
+        - ``bnxt_re6``
+        - ``bnxt_re7``
      - Comma-separated list of IB HCAs (host channel adapters) to use for NCCL/RCCL communication. 
    * - ``nccl_ib_hca``
      - Values:
-       * ``bnxt_re0``
-       * ``bnxt_re1``
-       * ``bnxt_re2``
-       * ``bnxt_re3``
-       * ``bnxt_re4``
-       * ``bnxt_re5``
-       * ``bnxt_re6``
-       * ``bnxt_re7``
+        - ``bnxt_re0``
+        - ``bnxt_re1``
+        - ``bnxt_re2``
+        - ``bnxt_re3``
+        - ``bnxt_re4``
+        - ``bnxt_re5``
+        - ``bnxt_re6``
+        - ``bnxt_re7``
      - Comma-separated list of IB HCAs (host channel adapters) to use for NCCL/RCCL communication. 
    * - ``nccl_socket_ifname``
      - ``ens51f1np1`` 
@@ -610,9 +610,9 @@ Use the parameters in these tables to configure the training file.
      - Description
    * - ``device_list``
      - Values:
-      * ``"/dev/dri"``
-      * ``"/dev/kfd"``
-      * ``"/dev/infiniband/rdma_cm"``
+        - ``"/dev/dri"``
+        - ``"/dev/kfd"``
+        - ``"/dev/infiniband/rdma_cm"``
      - Kernel devices exposed into the container
    * - ``volume_dict``
      - N/A
@@ -837,8 +837,8 @@ Use the parameters in these tables to configure the training file.
      - Model architecture sizes 
    * - ``mlp_activations``
      - Values:
-      * ``"silu"``
-      * ``"linear"``
+        - ``"silu"``
+        - ``"linear"``
      - Activation functions used 
    * - ``vocab_size``
      - 128526
@@ -1351,25 +1351,25 @@ Use the parameters in these tables to configure the training file.
      - NIC hardware type
    * - ``nccl_ib_hca_list``
      - Values:
-       * ``bnxt_re0``
-       * ``bnxt_re1``
-       * ``bnxt_re2``
-       * ``bnxt_re3``
-       * ``bnxt_re4``
-       * ``bnxt_re5``
-       * ``bnxt_re6``
-       * ``bnxt_re7``
+        - ``bnxt_re0``
+        - ``bnxt_re1``
+        - ``bnxt_re2``
+        - ``bnxt_re3``
+        - ``bnxt_re4``
+        - ``bnxt_re5``
+        - ``bnxt_re6``
+        - ``bnxt_re7``
      - Comma-separated list of IB HCAs (host channel adapters) to use for NCCL/RCCL communication. 
    * - ``nccl_ib_hca``
      - Values:
-       * ``bnxt_re0``
-       * ``bnxt_re1``
-       * ``bnxt_re2``
-       * ``bnxt_re3``
-       * ``bnxt_re4``
-       * ``bnxt_re5``
-       * ``bnxt_re6``
-       * ``bnxt_re7``
+        - ``bnxt_re0``
+        - ``bnxt_re1``
+        - ``bnxt_re2``
+        - ``bnxt_re3``
+        - ``bnxt_re4``
+        - ``bnxt_re5``
+        - ``bnxt_re6``
+        - ``bnxt_re7``
      - Comma-separated list of IB HCAs (host channel adapters) to use for NCCL/RCCL communication. 
    * - ``nccl_socket_ifname``
      - ``ens51f1np1`` 
@@ -1439,9 +1439,9 @@ Use the parameters in these tables to configure the training file.
      - Description
    * - ``device_list``
      - Values:
-       * ``"/dev/dri"``
-       * ``"/dev/kfd"``
-       * ``"/dev/infiniband/rdma_cm"``
+        - ``"/dev/dri"``
+        - ``"/dev/kfd"``
+        - ``"/dev/infiniband/rdma_cm"``
      - Kernel devices exposed into the container
    * - ``volume_dict``
      - N/A
@@ -1673,8 +1673,8 @@ Use the parameters in these tables to configure the training file.
      - Model architecture sizes 
    * - ``mlp_activations``
      - Values:
-       * ``"silu"``
-       * ``"linear"``
+        - ``"silu"``
+        - ``"linear"``
      - Activation functions used 
    * - ``vocab_size``
      - 128526
