@@ -491,6 +491,8 @@ Change the parameters as needed in the two JAX training configuration files: ``2
 Parameters
 ----------
 
+Use the parameters in these tables to configure the training file.
+
 ``config``
 ~~~~~~~~~~
 
@@ -991,9 +993,8 @@ Parameters
 ======================================
 
 .. code:: json
-
-  { 
-
+ 
+  {
 
     "config": 
 
@@ -1284,19 +1285,16 @@ Parameters
  
 
         } 
-
- 
-
  
 
     } 
 
- 
-
-  } 
+  }
 
 Parameters
 ----------
+
+Use the parameters in these tables to configure the training file.
 
 ``config``
 ~~~~~~~~~~
