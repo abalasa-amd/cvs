@@ -625,7 +625,7 @@ Use the parameters in these tables to configure the training file.
    * - ``/dev/infiniband``
      - ``/dev/infiniband``
      - Exposes InfiniBand device files for RDMA networking 
-   * - ``/usr/local/lib/libbnxt_re-rdmav34.so``
+   * - /usr/local/lib/libbnxt_re-rdmav34.so
      - /usr/lib/x86_64-linux-gnu/libibverbs/libbnxt_re-rdmav34.so.host
      - Provides the ``bnxt_re`` RDMA provider (Broadcom NIC) inside the container 
    * - ``/lib/libibverbs.d``
@@ -646,10 +646,10 @@ Use the parameters in these tables to configure the training file.
    * - ``NNODES``
      - 2 
      - Total number of nodes in the distributed job
-   * - ``JAX_DISTRIBUTED_INITIALIZATION_TIMEOUT_SECONDS``
+   * - JAX_DISTRIBUTED_INITIALIZATION_TIMEOUT_SECONDS
      - 1800
      - How long JAX waits for all nodes to join the distributed setup — longer is safer for large clusters 
-   * - ``JAX_DISTRIBUTED_HEARTBEAT_TIMEOUT_SECONDS``
+   * - JAX_DISTRIBUTED_HEARTBEAT_TIMEOUT_SECONDS
      - 900
      - Timeout for communication heartbeat
 
@@ -719,10 +719,10 @@ Use the parameters in these tables to configure the training file.
      - parquet
      - Paths to training data and tokenizer
    * - ``hf_train_files``
-     - ``/home/{user-id}/maxtext/data/c4/000*.parquet``
+     - /home/{user-id}/maxtext/data/c4/000*.parquet
      - Paths to training data and tokenizer
    * - ``tokenizer_path``
-     - ``/home/{user-id}/maxtext/Meta-Llama-405-B`` 
+     - /home/{user-id}/maxtext/Meta-Llama-405-B 
      - Paths to tokenizer
    * - ``async_checkpointing``
      - false
@@ -1478,10 +1478,10 @@ Use the parameters in these tables to configure the training file.
    * - ``NNODES``
      - 4 
      - Total number of nodes in the distributed job
-   * - ``JAX_DISTRIBUTED_INITIALIZATION_TIMEOUT_SECONDS``
+   * - JAX_DISTRIBUTED_INITIALIZATION_TIMEOUT_SECONDS
      - 1800
      - How long JAX waits for all nodes to join the distributed setup — longer is safer for large clusters 
-   * - ``JAX_DISTRIBUTED_HEARTBEAT_TIMEOUT_SECONDS``
+   * - JAX_DISTRIBUTED_HEARTBEAT_TIMEOUT_SECONDS
      - 900
      - Timeout for communication heartbeat
 
@@ -1625,16 +1625,16 @@ Use the parameters in these tables to configure the training file.
    * - ``xla_gpu_enable_cublaslt``
      - True
      - Use cublasLt optimized routines 
-   * - ``xla_gpu_executable_warn_stuck_timeout``
+   * - xla_gpu_executable_warn_stuck_timeout
      - 90
      - Warn if GPU kernel runs too long 
-   * - ``xla_gpu_executable_terminate_timeout``
+   * - xla_gpu_executable_terminate_timeout
      - 300
      - Kill job if kernel stuck too long 
-   * - ``xla_gpu_first_collective_call_warn_stuck_timeout_seconds``
+   * - xla_gpu_first_collective_call_warn_stuck_timeout_seconds
      - 300
      - Warn if first collective operation hangs 
-   * - ``xla_gpu_first_collective_call_terminate_timeout_seconds``
+   * - xla_gpu_first_collective_call_terminate_timeout_seconds
      - 1200 
      - Kill if first collective never finishes 
    * - ``xla_gpu_graph_level``
@@ -1643,19 +1643,19 @@ Use the parameters in these tables to configure the training file.
    * - ``xla_gpu_autotune_level``
      - 4 
      - Autotune aggressiveness 
-   * - ``xla_gpu_enable_reduce_scatter_combine_by_dim``
+   * - xla_gpu_enable_reduce_scatter_combine_by_dim
      - false
      - Combine reduce-scatter by dim 
-   * - ``xla_gpu_reduce_scatter_combine_threshold_bytes``
+   * - xla_gpu_reduce_scatter_combine_threshold_bytes
      - 8589934592 
      - Byte threshold to combine
-   * - ``xla_gpu_all_reduce_combine_threshold_bytes``
+   * - xla_gpu_all_reduce_combine_threshold_bytes
      - 8589934592
      - Combine threshold for all-reduce 
-   * - ``xla_gpu_all_gather_combine_threshold_bytes``
+   * - xla_gpu_all_gather_combine_threshold_bytes
      - 137438953472 
      - Threshold for all-gather 
-   * - ``xla_gpu_enable_all_gather_combine_by_dim``
+   * - xla_gpu_enable_all_gather_combine_by_dim
      - FALSE
      - Enable all-gather combine by dimension 
    * - ``base_emb_dim``
