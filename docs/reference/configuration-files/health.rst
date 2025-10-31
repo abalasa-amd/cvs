@@ -53,35 +53,6 @@ Here's a code snippet of the ``mi300_health_config.json`` file for reference:
 
         }
       },
-      "rocblas":
-      {
-        "path": "/root/cache/INSTALL/rocBLAS/build/release/clients/staging",
-        "git_install_path": "/root/cache/INSTALL",
-        "git_url": "https://github.com/ROCm/rocBLAS.git",
-        "rocm_version": "7.0.0",
-        "nfs_install": "True",
-        "results":
-        {
-            "fp32_gflops": "94100",
-            "bf16_gflops": "130600",
-            "int8_gflops": "162700"
-        }
-      },
-      "babelstream":
-      {
-        "path": "/root/cache/INSTALL/BabelStream/build",
-        "git_install_path": "/root/cache/INSTALL",
-        "git_url": "https://github.com/UoB-HPC/BabelStream.git",
-        "nfs_install": "True",
-        "results":
-        {
-            "copy": "4177285",
-            "mul": "4067069",
-            "add": "3920853",
-            "triad": "3885301",
-            "dot": "3660781"
-        }
-      },
       "rvs":
       {
           "path": "/opt/rocm/bin",
@@ -90,30 +61,91 @@ Here's a code snippet of the ``mi300_health_config.json`` file for reference:
           "nfs_install": "True",
           "config_path_mi300x": "/opt/rocm/share/rocm-validation-suite/conf/MI300X",
           "config_path_default": "/opt/rocm/share/rocm-validation-suite/conf",
-          "tests": 
-              {
-                  "name": "gst_single",
-                  "config_file": "gst_single.conf",
-                  "description": "GPU Stress Test - Single GPU validation",
-                  "timeout": 1800,
-                  "expected_pass": true
-              },
-              {
-                  "name": "iet_single",
-                  "config_file": "iet_single.conf",
-                  "description": "Input EDPp Test - Single GPU validation",
-                  "timeout": 1800,
-                  "expected_pass": true
-              },
-              {
-                  "name": "pebb_single",
-                  "config_file": "pebb_single.conf",
-                  "description": "PCI Express Bandwidth Benchmark - Single GPU",
-                  "timeout": 1800,
-              }
-      }
-  }
-
+          "tests": [
+           {
+               "name": "gpup_single",
+               "config_file": "gpup_single.conf",
+               "description": "GPU Properties Test",
+               "timeout": 1800,
+               "expected_pass": true,
+               "fail_regex_pattern": "FAIL|ERROR"
+           },
+           {
+               "name": "mem_test",
+               "config_file": "mem.conf",
+               "description": "Memory Test",
+               "timeout": 6000,
+               "expected_pass": true,
+               "fail_regex_pattern": "FAIL|\\[ERROR\\s*\\]"
+           },
+           {
+               "name": "gst_single",
+               "config_file": "gst_single.conf",
+               "description": "GPU Stress Test",
+               "timeout": 6000,
+               "expected_pass": true,
+               "fail_regex_pattern": "met:\\s*FALSE"
+           },
+           {
+               "name": "iet_single",
+               "config_file": "iet_single.conf",
+               "description": "Input EDPp Test",
+               "timeout": 1800,
+               "expected_pass": true,
+               "fail_regex_pattern": "pass:\\s*FALSE"
+           },
+           {
+               "name": "pebb_single",
+               "config_file": "pebb_single.conf",
+               "description": "PCI Express Bandwidth Benchmark",
+               "timeout": 1800,
+               "expected_pass": true,
+               "fail_regex_pattern": "\\[ERROR\\s*\\]"
+           },
+           {
+               "name": "pbqt_single",
+               "config_file": "pbqt_single.conf",
+               "description": "P2P Benchmark and Qualification Tool",
+               "timeout": 1800,
+               "expected_pass": true,
+               "fail_regex_pattern": "FAIL|ERROR:"
+           },
+           {
+               "name": "peqt_single",
+               "config_file": "peqt_single.conf",
+               "description": "PCI Express Qualification Tool",
+               "timeout": 1800,
+               "expected_pass": true,
+               "fail_regex_pattern": "peqt false"
+           },
+           {
+               "name": "rcqt_single",
+               "config_file": "rcqt_single.conf",
+               "description": "ROCm Configuration Qualification Tool",
+               "timeout": 1800,
+               "expected_pass": true,
+               "fail_regex_pattern": " not installed and no information is available"
+           },
+           {
+               "name": "tst_single",
+               "config_file": "tst_single.conf",
+               "description": "Thermal Stress Test",
+               "timeout": 1800,
+               "expected_pass": true,
+               "fail_regex_pattern": "pass: FLASE"
+           },
+           {
+               "name": "babel_stream",
+               "config_file": "babel.conf",
+               "description": "BABEL Benchmark Test",
+               "timeout": 6000,
+               "expected_pass": true,
+               "fail_regex_pattern": "\\[ERROR\\s*\\]"
+           }
+          ]
+   }
+ 
+}
 
 Parameters
 ==========
@@ -222,79 +254,6 @@ TransferBench
    * - ``test6``
      - 48.6
      - Additional benchmark result
-  
-rocBLAS
--------
-
-.. list-table::
-   :widths: 15 10 30
-   :header-rows: 1
-
-   * - Configuration parameters
-     - Default values
-     - Description
-   * - ``path``
-     - ``/root/cache/INSTALL/rocBLAS/build/release/clients/staging``
-     - Path to run rocBLAS tests
-   * - ``git_install_path``
-     - ``/root/cache/INSTALL``
-     - Path where rocBLAS is installed
-   * - ``git_url``
-     - `https://github.com/ROCm/rocBLAS.git <https://github.com/ROCm/rocBLAS.git>`_
-     - URL for Git repo
-   * - ``rocm_version``
-     - 7.0.0
-     - ROCm version
-   * - ``nfs_install``
-     - True
-     - Set the flag to install nfs
-   * - ``fp32_gflops``
-     - 94100
-     - 32-bit floating point computational performance benchmarks
-   * - ``bf16_gflops``
-     - 130600
-     - 16-bit floating point computational performance benchmarks
-   * - ``int8_gflops``
-     - 162700
-     - 8-bit floating point computational performance benchmarks
-
-BabelStream
------------
-
-.. list-table::
-   :widths: 15 10 30
-   :header-rows: 1
-
-   * - Configuration parameters
-     - Default values
-     - Description
-   * - ``path``
-     - ``/root/cache/INSTALL/BabelStream/build``
-     - Path to run BabelStream test
-   * - ``git_install_path``
-     - ``/root/cache/INSTALL``
-     - Path where BabelStream is installed
-   * - ``git_url``
-     - `https://github.com/UoB-HPC/BabelStream.git <https://github.com/UoB-HPC/BabelStream.git>`_
-     - URL for Git repo
-   * - ``nfs_install``
-     - True
-     - Set the flag to install nfs
-   * - ``copy``
-     - 4177285
-     - Memory copy operation
-   * - ``mul``
-     - 4067069
-     -  Multiplication operation
-   * - ``add``
-     - 3920853
-     - Addition operation
-   * - ``triad``
-     - 3885301
-     - Triad operation
-   * - ``dot``
-     - 3660781
-     - Dot product
 
 ROCm Validation Suite (RVS)
 ---------------------------

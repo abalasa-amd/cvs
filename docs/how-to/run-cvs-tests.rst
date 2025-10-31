@@ -63,9 +63,7 @@ For the performance validation, they use the reference bandwidth or latency numb
 Here are the available tests:
 
 - AGFHC (AMD GPU Field Health Check)
-- BabelStream
 - `TransferBench <https://rocm.docs.amd.com/projects/TransferBench/en/latest/index.html>`_
-- `rocBLAS <https://rocm.docs.amd.com/projects/rocBLAS/en/latest/index.html>`_
 - `ROCm Validation Suite (RVS) <https://rocm.docs.amd.com/projects/ROCmValidationSuite/en/latest/index.html>`_
 
 Here are the test cases for those tests:
@@ -104,15 +102,6 @@ AGFHC
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/health/agfhc_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/agfhc.html --capture=tee-sys --self-contained-html
 
-Babelstream
-~~~~~~~~~~~
-
-.. code:: bash
-
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/health/install/install_babelstream.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/babelstream.html --capture=tee-sys --self-contained-html
-
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/health/babelstream_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/babelstream.html --capture=tee-sys --self-contained-html
-
 TransferBench
 ~~~~~~~~~~~~~
 
@@ -122,14 +111,6 @@ TransferBench
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/health/transferbench_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/transferbench.html --capture=tee-sys --self-contained-html
 
-rocBLAS
-~~~~~~~
-
-.. code:: bash
-
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/health/install/install_rocblas.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/rocblas.html --capture=tee-sys --self-contained-html
-
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/health/rocblas_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/rocblas.html --capture=tee-sys --self-contained-html
 
 RVS
 ~~~
@@ -168,6 +149,23 @@ Here's the test script:
   pytest -vvv --log-file=/tmp/test.log -s ./tests/rccl/rccl_multinode_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/rccl/rccl_config.json --html=/var/www/html/cvs/rccl.html --capture=tee-sys --self-contained-html
 
 
+JAX training test script
+------------------------
+
+These are the JAX training test scripts:
+
+- ``test_llama_3_1_70b_distributed`` 
+- ``test_launch_jax_containers`` 
+- ``test_cleanup_stale_containers`` 
+- ``test_disable_firewall`` 
+
+Here's the test script:
+
+.. code:: bash
+
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/jax_llama_training.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax_training_config.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html 
+
+
 InfiniBand (IB Perf) test script
 --------------------------------
 
@@ -176,7 +174,7 @@ Perf tests measure throughput (bandwidth), and latency tests measure delay.
 Perf tests, such as ``ib_write_bw``, evaluate the maximum data transfer rate under different message sizes. 
 Latency tests, such as ``ib_send_lat``, measure the time it takes for a message to travel between two nodes and often report results like minimum, median, and maximum latency.
 
-Here are the IB Perf test cases:
+These are the IB Perf test cases:
 
 - ``test_install_ib_perf``
 - ``test_ib_bw_perf``
@@ -188,7 +186,9 @@ Here's the test script:
 
 .. code:: bash
 
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/ ibperf/ib_perf_bw_test.py--cluster_file input/cluster_file/cluster.json  --config_file input/config_file/rccl/rccl_config.json --html=/var/www/html/cvs/ib.html --capture=tee-sys --self-contained-html
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/ibperf/install_ibperf_tools.py --cluster_file input/cluster_file/cluster.json --config_file input/config_file/ibperf/ibperf_config.json --html=/var/www/html/cvs/ib.html --capture=tee-sys --self-contained-html
+ 
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/ibperf/ib_perf_bw_test.py --cluster_file input/cluster_file/cluster.json --config_file input/config_file/ibperf/ibperf_config.json --html=/var/www/html/cvs/ib.html --capture=tee-sys --self-contained-html
 
 Test results
 ============

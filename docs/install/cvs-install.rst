@@ -145,12 +145,11 @@ In the ``cvs/input/config_file/health/mi300_health_config.json`` file, edit the 
 
    - ``example_tests_path`` 
    - ``git_install_path`` 
- 
--  Under ``rocblas`` and ``babelstream``: 
-  
-   - ``path`` 
-   - ``git_install_path``
 
+- Under ``rvs``:
+
+   - ``git_install_path`` 
+ 
 ROCm Communication Collectives Library (RCCL)
 ---------------------------------------------
 
@@ -163,7 +162,16 @@ In the ``cvs/input/config_file/rccl/rccl_config.json`` file, change the director
 - ``rccl_path_var``
 - ``rocm_path_var``
 
+Training configuration (JAX)
+----------------------------
+
+In the two training configuration files, change the directory path to your desired location in the ``git_install_path`` variable.
+
+Change any other parameters in the configuration files as needed.
+
 InfiniBand (IB Perf)
 --------------------
 
 Change the parameters in the configuration file as needed.
+
+

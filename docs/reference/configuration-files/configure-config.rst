@@ -16,4 +16,5 @@ The following list provides a link to code snippets and the parameters for each 
 - :doc:`Platform </reference/configuration-files/platform>`
 - :doc:`Health </reference/configuration-files/health>`
 - :doc:`RCCL </reference/configuration-files/rccl>`
+- :doc:`Training (JAX) </reference/configuration-files/training>`
 - :doc:`InfiniBand (IB Perf) </reference/configuration-files/ib>`
