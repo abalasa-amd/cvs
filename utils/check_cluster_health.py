@@ -34,19 +34,40 @@ def general_health_checks( phdl, ):
     health_dict = {}
     print('Verify General Health Checks')
     # Check PCIe Bus and Width
-    health_dict['gpu_pcie_link'] = verify_lib.verify_gpu_pcie_bus_width( phdl )
+    try:
+        health_dict['gpu_pcie_link'] = verify_lib.verify_gpu_pcie_bus_width( phdl )
+    except Exception as e:
+        print(f'ERROR running verify_gpu_pcie_bus_width, due to exception {e}')
     # Check Dmesg for errors
-    health_dict['dmesg_scan'] = verify_lib.full_dmesg_scan( phdl )
+    try:
+        health_dict['dmesg_scan'] = verify_lib.full_dmesg_scan( phdl )
+    except Exception as e:
+        print(f'ERROR running full_dmesg_scan, due to exception {e}')
     # Check Dmesg for AMD GPU driver errors
-    health_dict['driver_errors'] = verify_lib.verify_driver_errors( phdl )
+    try:
+        health_dict['driver_errors'] = verify_lib.verify_driver_errors( phdl )
+    except Exception as e:
+        print(f'ERROR running verify_driver_errors, due to exception {e}')
     # journlctl scan
-    health_dict['journlctl_scan'] = verify_lib.full_journalctl_scan( phdl )
+    try:
+        health_dict['journlctl_scan'] = verify_lib.full_journalctl_scan( phdl )
+    except Exception as e:
+        print(f'ERROR running full_journalctl_scan, due to exception {e}')
     # Check for any link flap evidence
-    health_dict['nic_link_flap'] = verify_lib.verify_nic_link_flap( phdl )
+    try:
+        health_dict['nic_link_flap'] = verify_lib.verify_nic_link_flap( phdl )
+    except Exception as e:
+        print(f'ERROR running verify_nic_link_flap, due to exception {e}')
     # Check for GPU PCIe errors from amd-smi commands
-    health_dict['gpu_pcie_errors'] = verify_lib.verify_gpu_pcie_errors( phdl )
+    try:
+        health_dict['gpu_pcie_errors'] = verify_lib.verify_gpu_pcie_errors( phdl )
+    except Exception as e:
+        print(f'ERROR running verify_gpu_pcie_errors, due to exception {e}')
     # Verify PCIe status from Host OS side ..
-    health_dict['host_pcie'] = verify_lib.verify_host_lspci( phdl)
+    try:
+        health_dict['host_pcie'] = verify_lib.verify_host_lspci( phdl)
+    except Exception as e:
+        print(f'ERROR running verify_host_lspci, due to exception {e}')
     return health_dict
 
 
@@ -59,57 +80,166 @@ def build_html_report( phdl, html_file, gen_health_dict, \
 
 
     # stats collection
-    lshw_dict = linux_utils.get_lshw_network_dict(phdl)
-    rdma_nic_dict = linux_utils.get_rdma_nic_dict( phdl )
-    ip_dict = linux_utils.get_ip_addr_dict( phdl )
+    try:
+        lshw_dict = linux_utils.get_lshw_network_dict(phdl)
+    except Exception as e:
+        print(f'ERROR running get_lshw_network_dict, due to exception {e}')
+    try:
+        rdma_nic_dict = linux_utils.get_rdma_nic_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_rdma_nic_dict, due to exception {e}')
 
-    model_dict = rocm_plib.get_gpu_model_dict( phdl )
-    fw_dict = rocm_plib.get_gpu_fw_dict( phdl )
-    use_dict = rocm_plib.get_gpu_use_dict( phdl )
-    mem_dict = rocm_plib.get_gpu_mem_use_dict( phdl )
-    metrics_dict = rocm_plib.get_gpu_metrics_dict( phdl )
-    amd_dict = rocm_plib.get_amd_smi_metric_dict( phdl )
+    try:
+        ip_dict = linux_utils.get_ip_addr_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_ip_addr_dict, due to exception {e}')
 
-    lldp_dict = linux_utils.get_lldp_dict( phdl )
 
-    rdma_stats_dict = linux_utils.get_rdma_stats_dict( phdl )
-    ethtool_stats_dict = linux_utils.get_nic_ethtool_stats_dict( phdl )
+    try:
+        model_dict = rocm_plib.get_gpu_model_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_gpu_model_dict, due to exception {e}')
+
+    try:
+        fw_dict = rocm_plib.get_gpu_fw_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_gpu_fw_dict, due to exception {e}')
+
+    try:
+        use_dict = rocm_plib.get_gpu_use_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_gpu_use_dict, due to exception {e}')
+
+    try:
+        mem_dict = rocm_plib.get_gpu_mem_use_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_gpu_mem_use_dict, due to exception {e}')
+
+    try:
+        metrics_dict = rocm_plib.get_gpu_metrics_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_gpu_mem_metrics_dict, due to exception {e}')
+
+    try:
+        amd_dict = rocm_plib.get_amd_smi_metric_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_amd_smi_metric_dict, due to exception {e}')
+
+    try:
+        lldp_dict = linux_utils.get_lldp_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_lldp_dict, due to exception {e}')
+
+    try:
+        rdma_stats_dict = linux_utils.get_rdma_stats_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_rdma_stats_dict, due to exception {e}')
+
+    try:     
+        ethtool_stats_dict = linux_utils.get_nic_ethtool_stats_dict( phdl )
+    except Exception as e:
+        print(f'ERROR running get_nic_ethtool_stats_dict, due to exception {e}')
 
     # Html headers
     html_lib.build_html_page_header(html_file)
 
 
     # LLDP Table
-    html_lib.build_lldp_table( html_file, lldp_dict )
+    try:     
+        html_lib.build_lldp_table( html_file, lldp_dict )
+    except Exception as e:
+        print(f'ERROR running build_lldp_table, due to exception {e}')
 
     # GPU Info tables
-    html_lib.build_html_cluster_product_table( html_file, model_dict, fw_dict )
-    html_lib.build_html_gpu_utilization_table( html_file, use_dict )
-    html_lib.build_html_mem_utilization_table( html_file, mem_dict, amd_dict )
-    html_lib.build_html_pcie_xgmi_metrics_table( html_file, metrics_dict, amd_dict )
-    html_lib.build_html_error_table( html_file, metrics_dict, amd_dict )
+    try:
+        html_lib.build_html_cluster_product_table( html_file, model_dict, fw_dict )
+    except Exception as e:
+        print(f'ERROR running build_html_cluster_product_table, due to exception {e}')
+
+    try:
+        html_lib.build_html_gpu_utilization_table( html_file, use_dict )
+    except Exception as e:
+        print(f'ERROR running build_html_gpu_utilization_table, due to exception {e}')
+
+
+    try:
+        html_lib.build_html_mem_utilization_table( html_file, mem_dict, amd_dict )
+    except Exception as e:
+        print(f'ERROR running build_html_mem_utilization_table, due to exception {e}')
+
+    try:
+        html_lib.build_html_pcie_xgmi_metrics_table( html_file, metrics_dict, amd_dict )
+    except Exception as e:
+        print(f'ERROR running build_html_pcie_xgmi_metrics_table, due to exception {e}')
+
+
+    try:
+        html_lib.build_html_error_table( html_file, metrics_dict, amd_dict )
+    except Exception as e:
+        print(f'ERROR running build_html_error_table, due to exception {e}')
 
     # NIC Info tables
-    html_lib.build_html_nic_table( html_file, rdma_nic_dict, lshw_dict, ip_dict )
-    html_lib.build_rdma_stats_table( html_file, rdma_stats_dict )
-    html_lib.build_ethtool_stats_table( html_file, ethtool_stats_dict)
+    try:
+        html_lib.build_html_nic_table( html_file, rdma_nic_dict, lshw_dict, ip_dict )
+    except Exception as e:
+        print(f'ERROR running build_html_nic_table, due to exception {e}')
+
+    try:
+        html_lib.build_rdma_stats_table( html_file, rdma_stats_dict )
+    except Exception as e:
+        print(f'ERROR running build_rdma_stats_table, due to exception {e}')
+
+    try:
+        html_lib.build_ethtool_stats_table( html_file, ethtool_stats_dict)
+    except Exception as e:
+        print(f'ERROR running build_ethtool_stats_table, due to exception {e}')
 
 
     # Historic Info Tables
-    html_lib.build_err_log_table( html_file, gen_health_dict['dmesg_scan'], \
+    try:
+        html_lib.build_err_log_table( html_file, gen_health_dict['dmesg_scan'], \
             'Dmesg Error Table', 'dmesgerrtable', 'dmesgerrid' )
-    html_lib.build_err_log_table( html_file, gen_health_dict['driver_errors'], \
+    except Exception as e:
+        print(f'ERROR running build_err_log_table for dmesg, due to exception {e}')
+
+    try:
+        html_lib.build_err_log_table( html_file, gen_health_dict['driver_errors'], \
             'GPU Driver Error Table', 'gpudrivererrtable', 'gpudrivererrid' )
-    html_lib.build_err_log_table( html_file, gen_health_dict['journlctl_scan'], \
+    except Exception as e:
+        print(f'ERROR running build_err_log_table, due to exception {e}')
+
+    try:
+        html_lib.build_err_log_table( html_file, gen_health_dict['journlctl_scan'], \
             'Journlctl Error Table', 'journlctlerrtable', 'journlctlerrid' )
-    html_lib.build_err_log_table( html_file, gen_health_dict['gpu_pcie_errors'], \
+    except Exception as e:
+        print(f'ERROR running build_err_log_table, due to exception {e}')
+
+
+    try:
+        html_lib.build_err_log_table( html_file, gen_health_dict['gpu_pcie_errors'], \
             'GPU PCIE Errors Table', 'gpupcieerrtable', 'gpupcieerrid' )
-    html_lib.build_err_log_table( html_file, gen_health_dict['gpu_pcie_link'], \
+    except Exception as e:
+        print(f'ERROR running build_err_log_table, due to exception {e}')
+
+    try:
+        html_lib.build_err_log_table( html_file, gen_health_dict['gpu_pcie_link'], \
             'GPU PCIE Link Status Errors', 'gpupcielinktable', 'gpupcielinkid' )
-    html_lib.build_err_log_table( html_file, gen_health_dict['host_pcie'], \
+    except Exception as e:
+        print(f'ERROR running build_err_log_table, due to exception {e}')
+
+
+    try:
+        html_lib.build_err_log_table( html_file, gen_health_dict['host_pcie'], \
             'Host Side PCIE Status Errors', 'hostpcielinktable', 'hostpcielinkid' )
-    html_lib.build_err_log_table( html_file, gen_health_dict['nic_link_flap'], \
+    except Exception as e:
+        print(f'ERROR running build_err_log_table, due to exception {e}')
+
+
+    try:
+        html_lib.build_err_log_table( html_file, gen_health_dict['nic_link_flap'], \
             'NIC Link Flap Logs Table', 'niclinkflaptable', 'niclinkflapid' )
+    except Exception as e:
+        print(f'ERROR running build_err_log_table, due to exception {e}')
 
 
 
