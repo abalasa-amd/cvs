@@ -23,7 +23,7 @@ training_err_dict = {
     'cache_err': 'Unable to save MockGPTDataset indexes because path_to_cache is None',
     'NCCL ERROR': 'NCCL ERROR|NCCL timeout|local work queue catastrophic error',
     'GPU HW ERROR': 'HW Exception by GPU|GPU Hang|Uncorrectable error|GPU Reset',
-    'AssertionError': 'AssertionError|ValueError:',
+    'AssertionError': 'AssertionError|ValueError:|JaxStackTrace|During handling of the above exception|triggered the following exception',
     'rocm Err': 'FAILED_PRECONDITION: No visible GPU devices|failed call to hipInit: HIP_ERROR_NoDevice|librocm reported version is: NOT_FOUND',
     'python err': 'ModuleNotFoundError: No module named|Fatal Python error:',
     'tensorflow': 'tensorflow.CoordinationServiceError|tensorflow.BarrierError|CoordinationServiceError',
