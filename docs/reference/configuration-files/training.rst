@@ -607,7 +607,7 @@ Use the parameters in these tables to configure the training file.
     <br />
 
 .. list-table::
-   :widths: 2 3 5
+   :widths: 3 3 5
    :header-rows: 1
 
    * - Configuration parameters
@@ -628,7 +628,7 @@ Use the parameters in these tables to configure the training file.
    * - ``/dev/infiniband``
      - ``/dev/infiniband``
      - Exposes InfiniBand device files for RDMA networking 
-   * - /usr/local/lib/libbnxt_re-rdmav34.so
+   * - ``/usr/local/lib/`` |br| ``libbnxt_re-rdmav34.so``
      - ``/usr/lib/x86_64-linux`` |br| ``-gnu/libibverbs/libbnxt`` |br| ``_re-rdmav34.so.host``
      - Provides the ``bnxt_re`` RDMA provider (Broadcom NIC) inside the container 
    * - ``/lib/libibverbs.d``
@@ -722,10 +722,10 @@ Use the parameters in these tables to configure the training file.
      - parquet
      - Paths to training data and tokenizer
    * - ``hf_train_files``
-     - /home/{user-id}/maxtext/data/c4/000*.parquet
+     - ``/home/{user-id}/maxtext`` |br| ``/data/c4/000*.parquet``
      - Paths to training data and tokenizer
    * - ``tokenizer_path``
-     - /home/{user-id}/maxtext/Meta-Llama-405-B 
+     - ``/home/{user-id}/maxtext`` |br| ``/Meta-Llama-405-B ``
      - Paths to tokenizer
    * - ``async_checkpointing``
      - false
@@ -801,19 +801,19 @@ Use the parameters in these tables to configure the training file.
    * - ``xla_gpu_autotune_level``
      - 4
      - Autotune aggressiveness
-   * - ``xla_gpu_enable_reduce_scatter_combine_by_dim``
+   * - ``xla_gpu_enable_reduce`` |br| ``_scatter_combine_by_dim``
      - false
      - Combine reduce-scatter by dim 
-   * - ``xla_gpu_reduce_scatter_combine_threshold_bytes``
+   * - ``xla_gpu_reduce_scatter`` |br| ``_combine_threshold_bytes``
      - 8589934592 
      - Byte threshold to combine
-   * - ``xla_gpu_all_reduce_combine_threshold_bytes``
+   * - ``xla_gpu_all_reduce_`` |br| ``combine_threshold_bytes``
      - 8589934592
      - Combine threshold for all-reduce 
-   * - ``xla_gpu_all_gather_combine_threshold_bytes``
+   * - ``xla_gpu_all_gather_`` |br| ``combine_threshold_bytes``
      - 137438953472 
      - Threshold for all-gather 
-   * - ``xla_gpu_enable_all_gather_combine_by_dim``
+   * - ``xla_gpu_enable_all_`` |br| ``gather_combine_by_dim``
      - FALSE
      - Enable all-gather combine by dimension 
    * - ``base_emb_dim``
@@ -964,10 +964,10 @@ Use the parameters in these tables to configure the training file.
      - parquet 
      - Paths to data  
    * - ``hf_train_files``
-     - ``/home/{user-id}/maxtext/data/c4/000*.parquet``
+     - ``/home/{user-id}/maxtext`` |br| ``/data/c4/000*.parquet``
      - Paths to training data  
    * - ``tokenizer_path``
-     - ``/home/{user-id}/maxtext/Meta-Llama-405-B`` 
+     - ``/home/{user-id}/maxtext`` |br| ``/Meta-Llama-405-B`` 
      - Paths to tokenizer 
    * - ``async_checkpointing``
      - false
@@ -1008,7 +1008,7 @@ Use the parameters in these tables to configure the training file.
    * - ``max_target_length``
      - 8192
      - Sequence length for generation/training
-   * - ``skip_first_n_steps_for_profiler``
+   * - ``skip_first_n_`` |br| ``steps_for_profiler``
      - 3
      - Number of initial steps to skip when profiling 
 
@@ -1460,8 +1460,8 @@ Use the parameters in these tables to configure the training file.
    * - ``/dev/infiniband``
      - ``/dev/infiniband``
      - Exposes InfiniBand device files for RDMA networking 
-   * - ``/usr/local/lib/libbnxt_re-rdmav34.so``
-     - /usr/lib/x86_64-linux-gnu/libibverbs/libbnxt_re-rdmav34.so.host
+   * - ``/usr/local/lib/`` |br| ``libbnxt_re-rdmav34.so``
+     - ``/usr/lib/x86_64`` |br| ``-linux-gnu/libib`` |br| ``verbs/libbnxt_re`` |br| ``-rdmav34.so.host``
      - Provides the ``bnxt_re`` RDMA provider (Broadcom NIC) inside the container 
    * - ``/lib/libibverbs.d``
      - ``/lib/libibverbs.d``
@@ -1481,10 +1481,10 @@ Use the parameters in these tables to configure the training file.
    * - ``NNODES``
      - 4 
      - Total number of nodes in the distributed job
-   * - JAX_DISTRIBUTED_INITIALIZATION_TIMEOUT_SECONDS
+   * - ``JAX_DISTRIBUTED_INI`` |br| ``TIALIZATION_TIM`` |br| ``EOUT_SECONDS``
      - 1800
      - How long JAX waits for all nodes to join the distributed setup — longer is safer for large clusters 
-   * - JAX_DISTRIBUTED_HEARTBEAT_TIMEOUT_SECONDS
+   * - JAX_DISTRIBUTED_HEA`` |br| ``RTBEAT_TIME`` |br| ``OUT_SECONDS``
      - 900
      - Timeout for communication heartbeat
 
@@ -1554,10 +1554,10 @@ Use the parameters in these tables to configure the training file.
      - parquet
      - Paths to training data and tokenizer
    * - ``hf_train_files``
-     - /home/{user-id}/maxtext/data/c4/000*.parquet
+     - ``/home/{user-id}/max`` |br| ``text/data/c4/000*.parquet``
      - Paths to training data and tokenizer
    * - ``tokenizer_path``
-     - /home/{user-id}/maxtext/Meta-Llama-405-B 
+     - ``/home/{user-id}/max`` |br| ``text/Meta-Llama-405-B ``
      - Paths to tokenizer
    * - ``async_checkpointing``
      - false
@@ -1625,19 +1625,19 @@ Use the parameters in these tables to configure the training file.
    * - Configuration parameters
      - Default values
      - Description
-   * - ``xla_gpu_enable_cublaslt``
+   * - ``xla_gpu_enab`` |br| ``le_cublaslt``
      - True
      - Use cublasLt optimized routines 
-   * - xla_gpu_executable_warn_stuck_timeout
+   * - ``xla_gpu_exec`` |br| ``utable_warn_`` |br| ``stuck_timeout``
      - 90
      - Warn if GPU kernel runs too long 
-   * - xla_gpu_executable_terminate_timeout
+   * - ``xla_gpu_exe`` |br| ``cutable_term`` |br| ``inate_timeout``
      - 300
      - Kill job if kernel stuck too long 
-   * - xla_gpu_first_collective_call_warn_stuck_timeout_seconds
+   * - ``xla_gpu_first`` |br| ``_collective_call`` |br| ``_warn_stuck_time`` |br| ``out_seconds``
      - 300
      - Warn if first collective operation hangs 
-   * - xla_gpu_first_collective_call_terminate_timeout_seconds
+   * - ``xla_gpu_first`` |br| ``_collective_call`` |br| ``_terminate_time`` |br| ``out_seconds``
      - 1200 
      - Kill if first collective never finishes 
    * - ``xla_gpu_graph_level``
@@ -1646,19 +1646,19 @@ Use the parameters in these tables to configure the training file.
    * - ``xla_gpu_autotune_level``
      - 4 
      - Autotune aggressiveness 
-   * - xla_gpu_enable_reduce_scatter_combine_by_dim
+   * - ``xla_gpu_enable`` |br| ``_reduce_scatter`` |br| ``_combine_by_dim``
      - false
      - Combine reduce-scatter by dim 
-   * - xla_gpu_reduce_scatter_combine_threshold_bytes
+   * - ``xla_gpu_reduce`` |br| ``_scatter_combine`` |br| ``_threshold_bytes``
      - 8589934592 
      - Byte threshold to combine
-   * - xla_gpu_all_reduce_combine_threshold_bytes
+   * - ``xla_gpu_all_`` |br| ``reduce_combine`` |br| ``_threshold_bytes``
      - 8589934592
      - Combine threshold for all-reduce 
-   * - xla_gpu_all_gather_combine_threshold_bytes
+   * - ``xla_gpu_all_`` |br| ``gather_combine`` |br| ``_threshold_bytes``
      - 137438953472 
      - Threshold for all-gather 
-   * - xla_gpu_enable_all_gather_combine_by_dim
+   * - ``xla_gpu_enable`` |br| ``_all_gather_combine`` |br| ``_by_dim``
      - FALSE
      - Enable all-gather combine by dimension 
    * - ``base_emb_dim``
@@ -1670,7 +1670,7 @@ Use the parameters in these tables to configure the training file.
    * - ``base_num_kv_heads``
      - 8
      - Model architecture sizes 
-   * - ``base_num_decoder_layers1``
+   * - ``base_num_deco`` |br| ``der_layers1``
      - 126
      - Model architecture sizes 
    * - ``base_mlp_dim``
@@ -1690,10 +1690,10 @@ Use the parameters in these tables to configure the training file.
    * - ``enable_dropout``
      - False
      - Whether dropout is enabled for training
-   * - ``logits_via_embedding``
+   * - ``logits_via_`` |br| ``embedding``
      - False
      - 
-   * - ``normalization_layer_epsilon``
+   * - ``normalization`` |br| ``_layer_epsilon``
      - 1.0e-5 
      - Numeric epsilon for layernorm stability 
    * - ``rope_max_timescale``
