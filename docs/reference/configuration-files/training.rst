@@ -725,7 +725,7 @@ Use the parameters in these tables to configure the training file.
      - ``/home/{user-id}/maxtext`` |br| ``/data/c4/000*.parquet``
      - Paths to training data and tokenizer
    * - ``tokenizer_path``
-     - ``/home/{user-id}/maxtext`` |br| ``/Meta-Llama-405-B ``
+     - ``/home/{user-id}/maxtext`` |br| ``/Meta-Llama-405-B``
      - Paths to tokenizer
    * - ``async_checkpointing``
      - false
@@ -1484,7 +1484,7 @@ Use the parameters in these tables to configure the training file.
    * - ``JAX_DISTRIBUTED_INI`` |br| ``TIALIZATION_TIM`` |br| ``EOUT_SECONDS``
      - 1800
      - How long JAX waits for all nodes to join the distributed setup — longer is safer for large clusters 
-   * - JAX_DISTRIBUTED_HEA`` |br| ``RTBEAT_TIME`` |br| ``OUT_SECONDS``
+   * - ``JAX_DISTRIBUTED_HEA`` |br| ``RTBEAT_TIME`` |br| ``OUT_SECONDS``
      - 900
      - Timeout for communication heartbeat
 
@@ -1557,7 +1557,7 @@ Use the parameters in these tables to configure the training file.
      - ``/home/{user-id}/max`` |br| ``text/data/c4/000*.parquet``
      - Paths to training data and tokenizer
    * - ``tokenizer_path``
-     - ``/home/{user-id}/max`` |br| ``text/Meta-Llama-405-B ``
+     - ``/home/{user-id}/max`` |br| ``text/Meta-Llama-405-B``
      - Paths to tokenizer
    * - ``async_checkpointing``
      - false
