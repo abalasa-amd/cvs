@@ -522,7 +522,7 @@ Use the parameters in these tables to configure the training file.
      - Number of nodes in the distributed job 
    * - ``coordinator_ip``
      - ``10.2.96.21`` 
-     - IP address of the coordinator (master) node used for rendezvous  
+     - IP address of the coordinator (master) node used for rendezvous
    * - ``training_steps``
      - 10
      - Number of training steps to run
