@@ -73,40 +73,42 @@ The cluster file is a JSON file containing the cluster's IP addresses. You must 
 
 Here's a code snippet of the ``cluster.json`` file for reference:
 
-.. code:: json
+.. dropdown:: ``cluster.json``
 
-  {
-    "_comment": "change to your user-id and your private key and your node IPs. The Public IPs of the nodes will be the keys of the node_dict",
-    "username": "username",
-    "priv_key_file": "/home/abc/.ssh/id_rsa",
-    "head_node_dict":
-    {
-        "mgmt_ip": "10.10.10.1"
-    },
-    "node_dict":
-    {
-        "10.10.10.1":
-        {
-            "bmc_ip": "NA",
-            "vpc_ip": "10.10.10.1"
-        },
-        "10.10.10.2":
-        {
-            "bmc_ip": "NA",
-            "vpc_ip": "10.10.10.2"
-        }
+  .. code:: json
 
-    },
-
-    "bmc_mapping_dict":
     {
-    },
+      "_comment": "change to your user-id and your private key and your node IPs. The Public IPs of the nodes will be the keys of the node_dict",
+      "username": "username",
+      "priv_key_file": "/home/abc/.ssh/id_rsa",
+      "head_node_dict":
+      {
+          "mgmt_ip": "10.10.10.1"
+      },
+      "node_dict":
+      {
+          "10.10.10.1":
+          {
+              "bmc_ip": "NA",
+              "vpc_ip": "10.10.10.1"
+          },
+          "10.10.10.2":
+          {
+              "bmc_ip": "NA",
+              "vpc_ip": "10.10.10.2"
+          }
 
-    "backend_nw_dict":
-    {
-    },
-  
-  }
+      },
+
+      "bmc_mapping_dict":
+      {
+      },
+
+      "backend_nw_dict":
+      {
+      },
+    
+    }
 
 Set up your tests
 =================
