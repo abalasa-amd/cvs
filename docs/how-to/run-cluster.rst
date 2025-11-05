@@ -8,7 +8,7 @@ Monitor the health of GPU clusters
 
 Monitor the health of your cluster with a standalone Python utility script that generates an overall health report by collecting logs and metrics of the GPU nodes.
 
-The Cluster Health Checker utility script identifies any hardware failure/degradation signatures like RAS errors, PCIe/XGMI errors, network drop / error counters. 
+The Cluster Health Checker utility script identifies any hardware failure/degradation signatures like RAS errors, PCIe/XGMI errors, or network drop / error counters. 
 It can also identify software failures by searching for failuring signatures in the ``demsg`` and ``journlctl`` logs.
 
 The script also acts as a triaging tool to troubleshoot any performance issues that may be related to the AI infrastructure. 

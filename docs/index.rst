@@ -7,7 +7,7 @@ Cluster Validation Suite (CVS) documentation
 ********************************************
 
 CVS is a collection of test scripts that validate AMD AI clusters. 
-Use CVS to verify cluster health, GPU/CPU node health, host OS configuration, and NIC (network interface card) validation.
+Use CVS to verify GPU cluster health, GPU/CPU node health, host OS configuration, and NIC (network interface card) validation.
 
 The component public repository is located at `https://github.com/ROCm/cvs <https://github.com/ROCm/cvs>`_.
 
@@ -24,6 +24,7 @@ The component public repository is located at `https://github.com/ROCm/cvs <http
   .. grid-item-card:: How to
 
     * :doc:`Run tests <how-to/run-cvs-tests>`
+    * :doc:`Monitor the health of GPU clusters <how-to/run-cluster>`
 
   .. grid-item-card:: Reference
 
