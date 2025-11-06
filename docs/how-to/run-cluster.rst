@@ -7,13 +7,14 @@ Monitor the health of GPU clusters
 **********************************
 
 Monitor the health of your cluster with the Cluster Health Checker utility script (``check_cluster_health.py`` in the ``utils`` folder of the CVS GitHub repo), a standalone Python utility script that generates an overall health report by collecting logs and metrics of the GPU nodes.
+
 The script doesn't require any agent/plugin/exporters to be installed or any controller virtual machines. It can provide deep visibilty against any cluster (such as a slurm cluster or Kubernetes cluster).
 
 The script identifies any hardware failure/degradation signatures like RAS errors, PCIe/XGMI errors, or network drop / error counters using the `AMD SMI Python library <https://rocm.docs.amd.com/projects/amdsmi/en/latest/reference/amdsmi-py-api.html>`_. 
 It can also identify software failures by searching for failing signatures in the ``demsg`` and ``journlctl`` logs.
 
 The script also acts as a triaging tool to troubleshoot any performance issues that may be related to the AI infrastructure. 
-You can take a snapshot of all counters (GPU/NIC) while your training/inference workloads are in progress, 
+You can use the script to take a snapshot of all counters (GPU/NIC) while your training/inference workloads are in progress, 
 then compare the counters and identify any increment of unexpected counters across all nodes in the cluster to find issues.
 
 Generate a health report
@@ -60,19 +61,48 @@ Open the generated health report to view snapshotted information on your cluster
 - GPU information
 - NIC information
 - Historic error logs
-- Snapshot differences
+- Snapshot differences for triaging
 
 It looks for any potential errors, then graphs them in tables separated by categories such as PCIe errors, RDMA statistics, network congestion errors, GPU errors, or GPU cable issues. 
 Detected anomalies are highlighted in red:
 
 .. image:: ../images/rdma.png
 
+The delta between snapshotted values are also highlighted in red, depending on the category:
+
 .. image:: ../images/pcie.png
+
+These values are captured using these ROCm AMD SMI commands:
+
+.. code:: python
+
+  sudo rocm-smi -a --json
+  sudo amd-smi partition --json
+  sudo amd-smi process --json
+  sudo amd-smi metric --json
+  sudo amd-smi firmware --json
+  sudo amd-smi metric --ecc --json
+  sudo amd-smi metric --pcie --json
+  sudo rocm-smi --loglevel error --showmemuse --json
+  sudo rocm-smi --loglevel error --showuse --json
+  sudo rocm-smi --loglevel error --showmetric --json
+  sudo rocm-smi --loglevel error --showfwinfo --json
+  sudo rocm-smi --loglevel error --showbus --json
+  sudo rocm-smi --loglevel error --showproductname --json
+  sudo rocm-smi --loglevel error --showtemp —json
+  ethtool -S <iface>
+  rdma link
+  rdma statististic
+
+.. tip::
+
+  See the `AMD SMI Python API reference <https://rocm.docs.amd.com/projects/amdsmi/en/latest/reference/amdsmi-py-api.html>`_ for more information on these metrics and their definitions.
 
 The report also displays potential kernel error in the ``dmesg`` and ``journlctl`` logs:
 
 .. image:: ../images/journlctl.png
 
+Use the logs in the health report to diagnose and triage node errors in your GPU clusters.
 
 
 
