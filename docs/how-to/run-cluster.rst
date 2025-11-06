@@ -72,7 +72,13 @@ The delta between snapshotted values are also highlighted in red, depending on t
 
 .. image:: ../images/pcie.png
 
-These values are captured using these ROCm AMD SMI commands:
+The report also displays potential kernel errors in the ``dmesg`` and ``journlctl`` logs:
+
+.. image:: ../images/journlctl.png
+
+Use the logs in the health report to diagnose and triage node errors in your GPU clusters.
+
+These values in these reports are captured using these ROCm AMD SMI commands:
 
 .. code:: python
 
@@ -98,11 +104,9 @@ These values are captured using these ROCm AMD SMI commands:
 
   See the `AMD SMI Python API reference <https://rocm.docs.amd.com/projects/amdsmi/en/latest/reference/amdsmi-py-api.html>`_ for more information on these metrics and their definitions.
 
-The report also displays potential kernel error in the ``dmesg`` and ``journlctl`` logs:
 
-.. image:: ../images/journlctl.png
 
-Use the logs in the health report to diagnose and triage node errors in your GPU clusters.
+
 
 
 
