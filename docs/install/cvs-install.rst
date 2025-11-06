@@ -19,13 +19,19 @@ CVS supports these GPUs:
 
 CVS supports these Linux distributions:
 
-- Ubuntu 24.04.3
+.. list-table::
+   :widths: 3 3 5
+   :header-rows: 1
 
-  - Kernel: 6.8 [GA], 6.14 [HWE]
-
-- Ubuntu 22.04.5
-
-  - Kernel: 5.15 [GA], 6.8 [HWE]
+   * - Operating system
+     - Kernel
+     - ROCm version
+   * - Ubuntu 24.04.3
+     - 6.8 [GA], 6.14 [HWE]
+     - 7.0.2
+   * - Ubuntu 22.04.5
+     - Kernel: 5.15 [GA], 6.8 [HWE]
+     - 7.0.2
 
 Install CVS
 ===========
