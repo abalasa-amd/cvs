@@ -98,9 +98,11 @@ AGFHC
 
 .. code:: bash
 
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/health/install/install_agfhc.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/agfhc.html --capture=tee-sys --self-contained-html
-
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/health/agfhc_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/agfhc.html --capture=tee-sys --self-contained-html
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/health/install/install_agfhc.py --cluster_file input/cluster_file/cluster.json --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/agfhc.html --capture=tee-sys --self-contained-html
+  
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/health/agfhc_cvs.py --cluster_file input/cluster_file/cluster.json --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/agfhc.html --capture=tee-sys --self-contained-html
+  
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/health/csp_qual_agfhc.py --cluster_file input/cluster_file/cluster.json --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/agfhc.html --capture=tee-sys --self-contained-html
 
 TransferBench
 ~~~~~~~~~~~~~

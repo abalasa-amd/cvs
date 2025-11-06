@@ -6,11 +6,11 @@
 Monitor the health of GPU clusters
 **********************************
 
-Monitor the health of your cluster with the Cluster Health Checker utility script (``check_cluster_health.py`` in the ``utils`` folder of the CVS GitHub repo), a standalone Python utility script that generates an overall health report by collecting logs and metrics of the GPU nodes.
+Monitor the health of your cluster with the Cluster Health Checker utility script (``check_cluster_health.py`` in the ``utils`` folder of the CVS GitHub repo), a standalone Python utility script that generates an overall health report by collecting logs and metrics of the GPU nodes cluster-wide.
 
-The script doesn't require any agent/plugin/exporters to be installed or any controller virtual machines. It can provide deep visibilty against any cluster (such as a slurm cluster or Kubernetes cluster).
+The script doesn't require any agent/plugin/exporters to be installed or any controller virtual machines.
 
-The script identifies any hardware failure/degradation signatures like RAS errors, PCIe/XGMI errors, or network drop / error counters using the `AMD SMI Python library <https://rocm.docs.amd.com/projects/amdsmi/en/latest/install/install.html>`_. 
+The script identifies any hardware failure/degradation signatures like RAS errors, PCIe/XGMI errors, or network drop / error counters using `AMD SMI <https://rocm.docs.amd.com/projects/amdsmi/en/latest/install/install.html>`_. 
 It can also identify software failures by searching for failing signatures in the ``demsg`` and ``journlctl`` logs.
 
 The script also acts as a triaging tool to troubleshoot any performance issues that may be related to the AI infrastructure. 
@@ -57,7 +57,6 @@ Review the health report
 
 Open the generated health report to view snapshotted information on your cluster such as the:
 
-- Cluster summary
 - GPU information
 - NIC information
 - Historic error logs
@@ -96,13 +95,13 @@ These values in these reports are captured using these ROCm AMD SMI commands:
   sudo rocm-smi --loglevel error --showbus --json
   sudo rocm-smi --loglevel error --showproductname --json
   sudo rocm-smi --loglevel error --showtemp —json
-  ethtool -S <iface>
-  rdma link
-  rdma statististic
+  sudo ethtool -S <iface>
+  sudo rdma link
+  sudo rdma statististic
 
 .. tip::
 
-  See the `AMD SMI Python API reference <https://rocm.docs.amd.com/projects/amdsmi/en/latest/reference/amdsmi-py-api.html>`_ for more information on these metrics and their definitions.
+  See the `AMD SMI Commands reference <https://rocm.docs.amd.com/projects/amdsmi/en/latest/how-to/amdsmi-cli-tool.html#commands>`_ for more information on how the Cluster Health Checker script captures these metrics and their definitions.
 
 
 
