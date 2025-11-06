@@ -20,12 +20,12 @@ CVS supports these GPUs:
 CVS supports these Linux distributions:
 
 .. list-table::
-   :widths: 3 3 5
+   :widths: 3 5 3
    :header-rows: 1
 
    * - Operating system
      - Kernel
-     - ROCm version
+     - ROCm version (tested on)
    * - Ubuntu 24.04.3
      - 6.8 [GA], 6.14 [HWE]
      - 7.0.2
