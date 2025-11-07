@@ -119,8 +119,8 @@ class MegatronLlamaTrainingJob():
         tdict.setdefault( 'nic_type', 'thor2' )
         tdict.setdefault( 'nccl_ib_hca_list', 'bnxt_re0,bnxt_re1,bnxt_re2,bnxt_re3,bnxt_re4,bnxt_re5,bnxt_re6,bnxt_re7')
         tdict.setdefault( 'nccl_ib_hca', 'bnxt_re0,bnxt_re1,bnxt_re2,bnxt_re3,bnxt_re4,bnxt_re5,bnxt_re6,bnxt_re7')
-        tdict.setdefault( 'nccl_socket_ifname', 'ens51f1np1' )
-        tdict.setdefault( 'gloo_socket_ifname', 'ens51f1np1' )
+        tdict.setdefault( 'nccl_socket_ifname', 'ensf1np1' )
+        tdict.setdefault( 'gloo_socket_ifname', 'ensf1np1' )
         tdict.setdefault( 'nccl_ib_gid_index', '3' )
         tdict.setdefault( 'nccl_debug', 'ERROR' )
         tdict.setdefault( 'data_cache_dir', f'{self.home_dir}/cache' )
@@ -273,9 +273,9 @@ class MegatronLlamaTrainingJob():
               f'export EXP_NAME="megatron_training"; '
 
 
-        #if self.distributed_training is True:
-        # Add the backend network related environment variables ..
-        cmd = cmd + f'export NCCL_IB_HCA_LIST={self.nccl_ib_hca_list}; ' + \
+        if self.distributed_training is True:
+            # Add the backend network related environment variables ..
+            cmd = cmd + f'export NCCL_IB_HCA_LIST={self.nccl_ib_hca_list}; ' + \
                   f'export NCCL_IB_HCA={self.nccl_ib_hca_list}; ' + \
                   f'export NCCL_SOCKET_IFNAME={self.nccl_socket_ifname}; ' + \
                   f'export GLOO_SOCKET_IFNAME={self.gloo_socket_ifname}; ' + \
