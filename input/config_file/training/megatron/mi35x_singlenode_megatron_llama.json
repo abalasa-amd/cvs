@@ -35,7 +35,7 @@
              {
                  "mi350":
                  {
-                     "tokenizer_model": "NousResearch/Meta-Llama-3-70B",
+                     "tokenizer_model": "NousResearch/Meta-Llama-3-8B",
                      "model_size": "8",
                      "batch_size": "128",
                      "micro_batch_size": "4",
@@ -52,7 +52,7 @@
                  },
                  "mi355":
                  {
-                     "tokenizer_model": "NousResearch/Meta-Llama-3-70B",
+                     "tokenizer_model": "NousResearch/Meta-Llama-3-8B",
                      "model_size": "8",
                      "batch_size": "128",
                      "micro_batch_size": "4",
