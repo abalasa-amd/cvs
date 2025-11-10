@@ -277,7 +277,11 @@ def _resolve_placeholders_in_dict(target_dict, replacements, context_name=""):
             return value
 
         # Check for unresolved <changeme> pattern BEFORE replacement
-        if re.search(r'<changeme>', value, re.IGNORECASE):
+        has_changeme = (
+            '<changeme>' in value.lower() or
+            '<changeme>' in path.lower()
+        )
+        if has_changeme:
             error_msg = f"\n{'='*70}\n"
             error_msg += f"ERROR: Unresolved placeholder found in {context_name}!\n"
             error_msg += f"{'='*70}\n\n"
