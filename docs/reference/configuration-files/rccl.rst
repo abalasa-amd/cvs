@@ -9,6 +9,9 @@ ROCm Communication Collectives Library (RCCL) test configuration file
 These RCCL tests are comprehensive benchmarks that validate distributed GPU communication performance across AMD GPU clusters. 
 These tests ensure optimal performance for AI training, HPC workloads, and distributed computing.
 
+``rccl_config.json``
+====================
+
 Here's a code snippet of the ``rccl_config.json`` file for reference:
 
 .. dropdown:: ``rccl_config.json``
@@ -148,9 +151,9 @@ Here's a code snippet of the ``rccl_config.json`` file for reference:
     }
 
 Parameters
-==========
+----------
 
-Here's an exhaustive list of the available parameters in the RCCL configuration file:
+Here's an exhaustive list of the available parameters in the ``rccl_config.json`` RCCL configuration file:
 
 .. list-table::
    :widths: 3 3 5
@@ -307,7 +310,7 @@ Here's an exhaustive list of the available parameters in the RCCL configuration 
    * - ``verify_lat_dip``
      - True
      - Check for latency spikes
-   * - ``debug``
+   * - ``debug_level``
      - ERROR
      - Set the debug level
    * - ``rccl_result_file``
@@ -317,35 +320,262 @@ Here's an exhaustive list of the available parameters in the RCCL configuration 
      - N/A
      - Expected results are for the two-node cluster and vary based on cluster size
    * - ``all_reduce_perf``
-     - N/A
+     - ``bus_bw``:
+        * "8589934592": "330.00"
+        * "17179869184": "350.00"
      - Global reduction: sum/max/min across all GPUs
    * - ``all_gather_perf``
-     - N/A
+     - ``bus_bw``:
+        * "8589934592": "330.00"
+        * "17179869184": "350.00"
      - All GPUs receive the complete combined dataset from all ranks
    * - ``gather_perf``
-     - N/A
+     - ``bus_bw``:
+        * "8589934592": "330.00"
+        * "17179869184": "350.00"
      - Collect data from all ranks to one root rank
    * - ``scatter_perf``
-     - N/A
+     - ``bus_bw``:
+        * "8589934592": "330.00"
+        * "17179869184": "350.00"
      - Distribute data from one rank to all ranks
    * - ``reduce_perf``
-     - N/A
+     - ``bus_bw``:
+        * "8589934592": "300.0"
+        * "17179869184": "310.00"
      - Reduce operation 
    * - ``reduce_scatter_perf``
-     - N/A
+     - ``bus_bw``:
+        * "8589934592": "340.0"
+        * "17179869184": "360.00"
      - Reduce operation followed by scatter
    * - ``alltoall_perf``
-     - N/A
+     - ``bus_bw``:
+        * "8589934592": "45.00"
+        * "17179869184": "50.00"
      - Every rank sends unique data to every other rank
    * - ``alltoallv_perf``
-     - N/A
+     - ``bus_bw``:
+        * "8589934592": "45.00"
+        * "17179869184": "50.00"
      - Variable-size all-to-all exchange
    * - ``sendrecv_perf``
-     - N/A
+     - ``bus_bw``:
+        * "8589934592": "47.00"
+        * "17179869184": "48.00"
      - Point-to-point communication between rank pairs
    * - ``broadcast_perf``
-     - N/A
+     - ``bus_bw``:
+        * "8589934592": "310.00"
+        * "17179869184": "312.00"
      - One-to-all communication
-   * - ``bus_bw``
+
+``single_node_mi355_rccl.json``
+===============================
+
+Here's a code snippet of the ``single_node_mi355_rccl.json`` file for reference:
+
+.. dropdown:: ``single_node_mi355_rccl.json``
+
+  .. code:: json
+
+    {
+
+      "rccl":
+      {
+        "no_of_local_ranks": "8",
+        "rccl_dir": "/opt/rccl-tests/",
+        "rccl_tests_dir": "/opt/rccl-tests/build",
+        "rocm_path_var": "/opt/rocm-6.4.2/",
+        "rccl_path_var": "/opt/rccl-tests/",
+        "env_source_script": "/root/env_source_file.sh",
+        "rccl_collective": [ "all_reduce_perf", "all_gather_perf", "scatter_perf", "gather_perf", "reduce_scatter_perf", "sendrecv_perf", "alltoall_perf", "alltoallv_perf", "reduce_scatter_perf", "broadcast_perf" ],
+        "start_msg_size": "1024",
+        "end_msg_size": "16g",
+        "step_function": "2",
+        "warmup_iterations": "10",
+        "no_of_iterations": "1",
+        "check_iteration_count": "1",
+        "verify_bus_bw": "False",
+        "verify_bw_dip": "True",
+        "verify_lat_dip": "True",
+        "debug_level": "ERROR",
+        "rccl_result_file": "/tmp/rccl_result_file.json",
+        "_comments_results": "expected results below are for 2 node cluster, will vary based on cluster size",
+        "results":
+        {
+            "all_reduce_perf":
+            {
+                "bus_bw":
+                {
+                    "8589934592": "390.00",
+                    "17179869184": "393.00"
+                }
+            },
+            "all_gather_perf":
+            {
+                "bus_bw":
+                {
+                    "8589934592": "380.00",
+                    "17179869184": "383.00"
+                }
+            },
+            "gather_perf":
+            {
+                "bus_bw":
+                {
+                    "8589934592": "430.00",
+                    "17179869184": "430.00"
+                }
+            },
+            "reduce_scatter_perf":
+            {
+                "bus_bw":
+                {
+                    "8589934592": "400.0",
+                    "17179869184": "400.00"
+                }
+            },
+            "alltoall_perf":
+            {
+                "bus_bw":
+                {
+                    "8589934592": "340.00",
+                    "17179869184": "345.00"
+                }
+            },
+            "alltoallv_perf":
+            {
+                "bus_bw":
+                {
+                    "8589934592": "340.00",
+                    "17179869184": "345.00"
+                }
+            },
+            "broadcast_perf":
+            {
+                "bus_bw":
+                {
+                    "8589934592": "370.00",
+                    "17179869184": "370.00"
+                }
+            }
+          }
+      }
+  
+  }
+
+Parameters
+----------
+
+Here's an exhaustive list of the available parameters in the ``single_node_mi355_rccl.json`` RCCL configuration file:
+
+.. list-table::
+   :widths: 3 3 5
+   :header-rows: 1
+
+   * - Configuration parameters
+     - Default values
+     - Description
+   * - ``no_of_local_ranks``
+     - 8
+     - MPI ranks running on each individual node  
+   * - ``rccl_dir``
+     - ``/opt/rccl-tests/``
+     - Directory where RCCL is installed
+   * - ``rccl_tests_dir``
+     - ``/opt/rccl-tests/build``
+     - Directory where RCCL tests are installed
+   * - ``rocm_path_var``
+     - ``/opt/rocm-6.4.2/``
+     - Path to ROCm installation
+   * - ``rccl_path_var``
+     - ``/opt/rccl-tests/``
+     - Directory where RCCL tests are located
+   * - ``env_source_script``
+     - ``/root/env_source_file.sh``
+     - Path to environment setup script
+   * - ``rccl_collective``
+     - Values:
+        * ``all_reduce_perf``
+        * ``all_gather_perf``
+        * ``scatter_perf``
+        * ``gather_perf``
+        * ``reduce_scatter_perf``
+        * ``sendrecv_perf``
+        * ``alltoall_perf``
+        * ``alltoallv_perf``
+        * ``reduce_scatter_perf``
+        * ``broadcast_perf``
+     - RCCL tests list
+   * - ``start_msg_size``
+     - 1024
+     - Start with 1KB messages
+   * - ``end_msg_size``
+     - 16g
+     - End with 16GB messages
+   * - ``step_function``
+     - 2
+     - Double message size each step
+   * - ``warmup_iterations``
+     - 10
+     - Warmup runs
+   * - ``no_of_iterations``
+     - 1
+     - Number of iterations to run the RCCL tests
+   * - ``check_iteration_count``
+     - 1
+     - Verification iteration
+   * - ``verify_bus_bw``
+     - False
+     - Verify bus bandwidth
+   * - ``verify_bw_dip``
+     - True
+     - Check for bandwidth drops
+   * - ``verify_lat_dip``
+     - True
+     - Check for latency spikes
+   * - ``debug_level``
+     - ERROR
+     - Set the debug level
+   * - ``rccl_result_file``
+     - ``/tmp/rccl_result_file.json``
+     - Path where RCCL results are captured
+   * - ``_comments_results``
      - N/A
-     - Bus bandwidth
+     - Expected results are for the two-node cluster and vary based on cluster size
+   * - ``all_reduce_perf``
+     - ``bus_bw``:
+        * "8589934592": "390.00"
+        * "17179869184": "393.00"
+     - Global reduction: sum/max/min across all GPUs
+   * - ``all_gather_perf``
+     - ``bus_bw``:
+        * "8589934592": "380.00"
+        * "17179869184": "383.00"
+     - All GPUs receive the complete combined dataset from all ranks
+   * - ``gather_perf``
+     - ``bus_bw``:
+        * "8589934592": "430.00"
+        * "17179869184": "430.00"
+     - Collect data from all ranks to one root rank
+   * - ``reduce_scatter_perf``
+     - ``bus_bw``:
+        * "8589934592": "400.0"
+        * "17179869184": "400.00"
+     - Reduce operation followed by scatter
+   * - ``alltoall_perf``
+     - ``bus_bw``:
+        * "8589934592": "340.00"
+        * "17179869184": "345.00"
+     - Every rank sends unique data to every other rank
+   * - ``alltoallv_perf``
+     - ``bus_bw``:
+        * "8589934592": "340.00"
+        * "17179869184": "345.00"
+     - Variable-size all-to-all exchange
+   * - ``broadcast_perf``
+     - ``bus_bw``:
+        * "8589934592": "370.00"
+        * "17179869184": "370.00"
+     - One-to-all communication
