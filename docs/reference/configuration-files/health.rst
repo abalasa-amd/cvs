@@ -169,8 +169,7 @@ Here's a code snippet of the ``mi300_health_config.json`` file for reference:
             }
         ]
     }
- 
-}
+ }
 
 Parameters
 ==========

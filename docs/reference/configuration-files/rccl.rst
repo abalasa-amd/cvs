@@ -317,7 +317,7 @@ Here's an exhaustive list of the available parameters in the ``rccl_config.json`
      - ``/tmp/rccl_result_file.json``
      - Path where RCCL results are captured
    * - ``_comments_results``
-     - N/A
+     - ``Expected results are for the two-node cluster and vary based on cluster size``
      - Expected results are for the two-node cluster and vary based on cluster size
    * - ``all_reduce_perf``
      - ``bus_bw``:
@@ -542,7 +542,7 @@ Here's an exhaustive list of the available parameters in the ``single_node_mi355
      - ``/tmp/rccl_result_file.json``
      - Path where RCCL results are captured
    * - ``_comments_results``
-     - N/A
+     - ``Expected results are for the two-node cluster and vary based on cluster size``
      - Expected results are for the two-node cluster and vary based on cluster size
    * - ``all_reduce_perf``
      - ``bus_bw``:
