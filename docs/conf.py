@@ -6,13 +6,13 @@
 
 import re
 
-'''
-html_theme is usually unchanged (rocm_docs_theme).
-flavor defines the site header display, select the flavor for the corresponding portals
-flavor options: rocm, rocm-docs-home, rocm-blogs, rocm-ds, instinct, ai-developer-hub, local, generic
-'''
+# Required settings
 html_theme = "rocm_docs_theme"
-html_theme_options = {"flavor": "rocm-docs-home"}
+html_theme_options = {
+    "flavor": "instinct",
+    "link_main_doc": True,
+    # Add any additional theme options here
+}
 
 '''
 docs_header_version is used to manually configure the version in the header. If

@@ -54,8 +54,8 @@ Here's the test script:
   pytest -vvv --log-file=/tmp/test.log -s ./tests/platform/host_configs_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/platform/host_config.json --html=/var/www/html/cvs/host.html --capture=tee-sys --self-contained-html
 
 
-Burn-in health tests
---------------------
+Burn-in health test scripts
+---------------------------
 
 The burn-in health tests are single-node diagnostic tests that validate the hardware and firmware versions' functionality and performance. 
 For the performance validation, they use the reference bandwidth or latency numbers provided as part of the input ``config_file`` for the relevant test. 
@@ -87,6 +87,8 @@ These are the test cases for AGFHC:
 - ``test_agfhc_all_perf``
 - ``test_agfhc_all_lvl5``
 
+Here's the test script:
+
 .. code:: bash
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/health/install/install_agfhc.py --cluster_file input/cluster_file/cluster.json --config_file input/config_file/health/mi300_health_config.json --html=/var/www/html/cvs/agfhc.html --capture=tee-sys --self-contained-html
@@ -107,6 +109,8 @@ These are the test cases for TransferBench:
 - ``test_transfer_bench_a2asweep``
 - ``test_transfer_bench_scaling``
 - ``test_transfer_bench_schmoo``
+
+Here's the test script:
 
 .. code:: bash
 
@@ -188,8 +192,8 @@ Here's the test script:
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/jax_llama_training.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax_training_config.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html 
 
-Megatron training test script
------------------------------
+Megatron training test scripts
+------------------------------
 
 Megatron training enables scaling transformer models from millions to trillions of parameters by efficiently utilizing hundreds or thousands of GPUs across multiple nodes.
 
