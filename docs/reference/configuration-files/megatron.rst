@@ -20,6 +20,10 @@ Change the parameters as needed in the Megatron training configuration files: ``
 
 Further, you can configure the ``mi35x_singlenode_megatron_llama.json`` file to run Megatron on a single node MI35x.
 
+.. note::
+
+  Parameters with the "<changeme>" value must have that value modified to your specifications.
+
 Single node configuration
 =========================
 
@@ -31,119 +35,119 @@ This is the ``mi3xx_singlenode_megatron_llama.json`` configuration file:
     
   {
   
-    "config":
-    {
-        "container_image": "rocm/megatron-lm:v25.5_py310",
-        "container_name": "megatron_llama3.1_310",
-        "_example_nnodes": "4",
-        "nnodes": "<changeme>-no of nodes to run singlenode training",
-        "master_address": "<changeme>",
-          "_example_training_iterations": "30",
-        "training_iterations": "<changeme>",
-        "hf_token_file": "/home/{user-id}/.hf_token",
-        "shm_size": "128G",
-        "_comments_data_cache_dir": "This path should be accessible from all nodes like a common FS like NFS for distributed training",
-        "data_cache_dir": "/home/{user-id}/cache",
-        "mock_data": "True",
-        "log_dir": "/home/{user-id}/LOG_DIR",
-        "dataset_source": 
-        {
-        },
-        "container_config":
-        {
-            "device_list": [ "/dev/dri", "/dev/kfd" ],
-            "volume_dict":
+  "config":
+  {
+      "container_image": "rocm/megatron-lm:v25.5_py310",
+      "container_name": "megatron_llama3.1_310",
+      "_example_nnodes": "4",
+      "nnodes": "<changeme>-no of nodes to run singlenode training",
+      "master_address": "<changeme>",
+        "_example_training_iterations": "30",
+      "training_iterations": "<changeme>",
+      "hf_token_file": "/home/{user-id}/.hf_token",
+      "shm_size": "128G",
+      "_comments_data_cache_dir": "This path should be accessible from all nodes like a common FS like NFS for distributed training",
+      "data_cache_dir": "/home/{user-id}/cache",
+      "mock_data": "True",
+      "log_dir": "/home/{user-id}/LOG_DIR",
+      "dataset_source": 
+      {
+      },
+      "container_config":
+      {
+          "device_list": [ "/dev/dri", "/dev/kfd" ],
+          "volume_dict":
+          {
+          "/home/{user-id}": "/home/{user-id}"
+          }
+      }
+  },
+  "model_params":
+  {
+      "single_node":
+      {
+            "llama3_1_8b":
             {
-            "/home/{user-id}": "/home/{user-id}"
+                "mi300x":
+                {
+                    "tokenizer_model": "NousResearch/Meta-Llama-3-8B",
+                    "model_size": "8",
+                    "batch_size": "128",
+                    "micro_batch_size": "2",
+                    "precision": "TE_FP8",
+                    "sequence_length": "8192",
+                    "tensor_parallelism": "1",
+                    "pipeline_parallelism": "1",
+                    "recompute": "0",
+                    "fsdp": "0",
+                    "result_dict":
+                    {
+                        "throughput_per_gpu": "380.0",
+                        "tokens_per_gpu": "6500.0",
+                        "elapsed_time_per_iteration": "12000.0"
+                    }
+                },
+                "mi325":
+                {
+                    "tokenizer_model": "NousResearch/Meta-Llama-3-8B",
+                    "model_size": "8",
+                    "batch_size": "128",
+                    "micro_batch_size": "2",
+                    "precision": "TE_FP8",
+                    "sequence_length": "8192",
+                    "tensor_parallelism": "1",
+                    "pipeline_parallelism": "1",
+                    "recompute": "0",
+                    "fsdp": "0",
+                    "result_dict":
+                    {
+                        "throughput_per_gpu": "380.0",
+                        "tokens_per_gpu": "6500.0",
+                        "elapsed_time_per_iteration": "12000.0"
+                    }
+                }
+            },
+            "llama3_1_70b":
+            {
+                "mi300x":
+                {
+                    "tokenizer_model": "NousResearch/Meta-Llama-3-70B",
+                    "model_size": "70",
+                    "batch_size": "128",
+                    "micro_batch_size": "1",
+                    "precision": "TE_FP8",
+                    "sequence_length": "8192",
+                    "tensor_parallelism": "8",
+                    "pipeline_parallelism": "1",
+                    "recompute": "0",
+                    "fsdp": "0",
+                    "result_dict":
+                    {
+                        "throughput_per_gpu": "500.0",
+                        "tokens_per_gpu": "1000.0"
+                    }
+                },
+                "mi325":
+                {
+                    "tokenizer_model": "NousResearch/Meta-Llama-3-70B",
+                    "model_size": "70",
+                    "batch_size": "128",
+                    "micro_batch_size": "1",
+                    "precision": "TE_FP8",
+                    "sequence_length": "8192",
+                    "tensor_parallelism": "8",
+                    "pipeline_parallelism": "1",
+                    "recompute": "0",
+                    "fsdp": "0",
+                    "result_dict":
+                    {
+                        "throughput_per_gpu": "520.0",
+                        "tokens_per_gpu": "1100.0"
+                    }
+                }
             }
-        }
-    },
-    "model_params":
-    {
-        "single_node":
-        {
-              "llama3_1_8b":
-              {
-                  "mi300x":
-                  {
-                      "tokenizer_model": "NousResearch/Meta-Llama-3-8B",
-                      "model_size": "8",
-                      "batch_size": "128",
-                      "micro_batch_size": "2",
-                      "precision": "TE_FP8",
-                      "sequence_length": "8192",
-                      "tensor_parallelism": "1",
-                      "pipeline_parallelism": "1",
-                      "recompute": "0",
-                      "fsdp": "0",
-                      "result_dict":
-                      {
-                          "throughput_per_gpu": "380.0",
-                          "tokens_per_gpu": "6500.0",
-                          "elapsed_time_per_iteration": "12000.0"
-                      }
-                  },
-                  "mi325":
-                  {
-                      "tokenizer_model": "NousResearch/Meta-Llama-3-8B",
-                      "model_size": "8",
-                      "batch_size": "128",
-                      "micro_batch_size": "2",
-                      "precision": "TE_FP8",
-                      "sequence_length": "8192",
-                      "tensor_parallelism": "1",
-                      "pipeline_parallelism": "1",
-                      "recompute": "0",
-                      "fsdp": "0",
-                      "result_dict":
-                      {
-                          "throughput_per_gpu": "380.0",
-                          "tokens_per_gpu": "6500.0",
-                          "elapsed_time_per_iteration": "12000.0"
-                      }
-                  }
-              },
-              "llama3_1_70b":
-              {
-                  "mi300x":
-                  {
-                      "tokenizer_model": "NousResearch/Meta-Llama-3-70B",
-                      "model_size": "70",
-                      "batch_size": "128",
-                      "micro_batch_size": "1",
-                      "precision": "TE_FP8",
-                      "sequence_length": "8192",
-                      "tensor_parallelism": "8",
-                      "pipeline_parallelism": "1",
-                      "recompute": "0",
-                      "fsdp": "0",
-                      "result_dict":
-                      {
-                          "throughput_per_gpu": "500.0",
-                          "tokens_per_gpu": "1000.0"
-                      }
-                  },
-                  "mi325":
-                  {
-                      "tokenizer_model": "NousResearch/Meta-Llama-3-70B",
-                      "model_size": "70",
-                      "batch_size": "128",
-                      "micro_batch_size": "1",
-                      "precision": "TE_FP8",
-                      "sequence_length": "8192",
-                      "tensor_parallelism": "8",
-                      "pipeline_parallelism": "1",
-                      "recompute": "0",
-                      "fsdp": "0",
-                      "result_dict":
-                      {
-                          "throughput_per_gpu": "520.0",
-                          "tokens_per_gpu": "1100.0"
-                      }
-                  }
-              }
-        }
-  
+      }
+
     }
   
   }
@@ -181,13 +185,13 @@ Use the parameters in these tables to configure the training file.
      - "<changeme>-no of nodes to run singlenode training"
      - Number of nodes in the distributed job 
    * - ``master_address``
-     - "<changeme>""
+     - <changeme>
      - IP of the master/coordinator node
    * - ``_example_training_iterations``
      - 30
      - Example of number of training iterations/steps to run in this test
    * - ``training_iterations``
-     - "<changeme>"" 
+     - <changeme>
      - Number of training iterations/steps to run in this test
    * - ``hf_token_file``
      - ``/home/{user-id}/.hf_token``
@@ -642,25 +646,25 @@ Use the parameters in these tables to configure the training file.
      - 4
      - Example of number of cluster nodes participating in the job 
    * - ``Nnodes``
-     - "<changeme>"
+     - <changeme>
      - Number of cluster nodes participating in the distributed job 
    * - ``_example_master_address``
      - "X.X.X.X"
      - Example IP of the master/coordinator node
    * - ``master_address``
-     - "<changeme>"
+     - <changeme>
      - IP of the master/coordinator node
    * - ``_example_training_iterations``
      - 30
      - Example of number of training iterations/steps to run in this test
    * - ``training_iterations``
-     - "<changeme>"" 
+     - <changeme> 
      - Number of training iterations/steps to run in this test
    * - ``_example_nic_type``
      - ``ainic|thor2|cx7``
      - Example of NIC hardware type
    * - ``nic_type``
-     - "<changeme>"
+     - <changeme>
      - NIC hardware type
    * - ``_example_nccl_ib_hca_list``
      - Values:
@@ -674,22 +678,22 @@ Use the parameters in these tables to configure the training file.
         - ``bnxt_re7``
      - Example of a comma-separated list of InfiniBand HCA device names to use for NCCL/communication (multi-rail support)
    * - ``nccl_ib_hca_list``
-     - "<changeme>"
+     - <changeme>
      - Comma-separated list of InfiniBand HCA device names to use for NCCL/communication (multi-rail support)
    * - ``_example_nccl_socket_ifname``
      - ``ens51f1np1``
      - Example of a network interface name used by NCCL Network interface name used by NCCL / control channels
    * - ``nccl_socket_ifname``
-     - "<changeme>"
+     - <changeme>
      - Network interface name used by NCCL Network interface name used by NCCL / control channels
    * - ``_example_gloo_socket_ifname``
      - ``ens51f1np1`` 
      - Example of a network interface name used by Gloo control channels
    * - ``gloo_socket_ifname``
-     - "<changeme>"
+     - <changeme>
      - Network interface name used by Gloo control channels
    * - ``nccl_ib_gid_index``
-     - "<changeme>"
+     - <changeme>
      - GID index used for IB addressing (selects which GID)
    * - ``_example_nccl_ib_gid_index``
      - 3
@@ -1133,13 +1137,13 @@ Use the parameters in these tables to configure the training file.
      - "<changeme>-no of nodes to run singlenode training"
      - Number of nodes in the distributed job 
    * - ``master_address``
-     - "<changeme>"
+     - <changeme>
      - IP of the master/coordinator node
    * - ``_example_training_iterations``
      - 30
      - Example of number of training iterations/steps to run in this test
    * - ``training_iterations``
-     - "<changeme>"
+     - <changeme>
      - Number of training iterations/steps to run in this test
    * - ``hf_token_file``
      - ``/home/{user-id}/.hf_token``

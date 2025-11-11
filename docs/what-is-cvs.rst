@@ -16,7 +16,7 @@ Here are the tests available in the CVS:
 - **Distributed training tests**: Run and validate Llama 3.1 70B and 405B model distributed trainings across a multi-node cluster with the `JAX <https://rocm.docs.amd.com/en/latest/compatibility/ml-compatibility/jax-compatibility.html>`_ and `Megatron <https://rocm.docs.amd.com/en/latest/compatibility/ml-compatibility/stanford-megatron-lm-compatibility.html>`_ frameworks. 
   
   - The JAX training file uses PyTest and parallel SSH to prepare the environment, launch containers, and run/verify a short distributed training job.
-  - Megatron 
+  - Megatron training enables scaling transformer models from millions to trillions of parameters by efficiently utilizing hundreds or thousands of GPUs across multiple nodes.
 
 - **InfiniBand (IB Perf)**: These tests are low-level network performance benchmarks that validate the raw communication capabilities of InfiniBand adapters and interconnects. These tests measure the fundamental building blocks on which RCCL and other high-level libraries depend.
 

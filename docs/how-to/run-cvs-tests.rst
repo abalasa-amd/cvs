@@ -185,9 +185,54 @@ The Megatron tests check:
 - **Performance targets**: Throughput and memory usage within expected ranges
 - **Result verification**: Expected tokens/sec and TFLOPS metrics
 
+- ``test_disable_firewall``
+- ``test_cleanup_stale_containers``
+- ``test_launch_megatron_containers``
+- ``test_llama_3_1_fp8_single_node``
 
+Use these scripts to run the Megatron tests.
 
+Single Node 8b MI3xx
+~~~~~~~~~~~~~~~~~~~~
 
+.. code:: bash
+
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi3xx_singlenode_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+
+Single Node 8b MI35x
+~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/ mi35x_singlenode_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+
+Single Node 70b MI3xx
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi3xx_singlenode_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+
+Single Node 70b MI35x
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi35x_singlenode_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+
+Distributed 8b
+~~~~~~~~~~~~~~
+
+.. code:: bash
+
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/distributed_llama3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/ mi3xx_distributed_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+
+Distributed 70b
+~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/distributed_llama3_1_70b.py--cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/ mi3xx_distributed_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
 
 InfiniBand (IB Perf) test script
 --------------------------------

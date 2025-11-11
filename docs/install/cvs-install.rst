@@ -174,15 +174,11 @@ In the ``cvs/input/config_file/rccl/rccl_config.json`` file, change the director
 - ``rccl_path_var``
 - ``rocm_path_var``
 
-JAX training configuration files
+JAX / Megatron training configuration files
 --------------------------------
 
-In the two training configuration files, change the directory path to your desired location in the ``git_install_path`` variable.
-
-Change any parameters in the configuration file relevant to your testing requirements.
-
-Megatron training configuration files
--------------------------------------
+Parameters with the "<changeme>" value must have that value modified to your specifications.
+Change any other parameters in the configuration file relevant to your testing requirements. 
 
 InfiniBand (IB Perf)
 --------------------
