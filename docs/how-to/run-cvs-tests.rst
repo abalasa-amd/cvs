@@ -176,13 +176,13 @@ Megatron training enables scaling transformer models from millions to trillions 
 
 The Megatron tests check:
 
-- **Container orchestration**: Docker setup with ROCm/RDMA.
-- **Multi-node communication**: NCCL/RCCL initialization.
-- **Model convergence**: Loss decreases and no NaN/Inf values.
+- **Container orchestration**: Docker setup with ROCm/RDMA
+- **Multi-node communication**: NCCL/RCCL initialization
+- **Model convergence**: Loss decreases and no NaN/Inf values
 - **Performance targets**: Throughput and memory usage within expected ranges
 - **Result verification**: Expected tokens/sec and TFLOPS metrics
 
-These are the Negatron training test cases:
+Here are the Megatron training test cases:
 
 - ``test_disable_firewall``
 - ``test_cleanup_stale_containers``
