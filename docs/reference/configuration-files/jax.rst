@@ -1,9 +1,9 @@
 .. meta::
-  :description: Configure the variables in the Training configuration files
+  :description: Configure the variables in the JAX training configuration files
   :keywords: training, ROCm, install, cvs, JAX,
 
 **********************************
-Training configuration (JAX) files
+JAX training configuration files
 **********************************
 
 The JAX training tests perform end-to-end orchestration and validation of a distributed JAX training run (Llama 3.1) across a multi-node cluster using Docker containers, 

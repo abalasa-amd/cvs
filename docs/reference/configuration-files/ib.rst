@@ -120,18 +120,20 @@ Here's an exhaustive list of the available parameters in the IB Perf configurati
 
 The ``expected_results`` section also contains the ``ib_write_bw`` parameter. It describes the bandwith expectation, and it has these default values in the JSON file:
 
-.. code:: json
+.. dropdown:: ib_write_bw
 
-  "8192":
-                  {
-          "8": "180.0",
-          "16": "200.0"
-                  },
-            "8388608":
-                  {
-          "8": "280.0",
-          "16": "300.0"
-                  }
+  .. code:: json
+
+    "8192":
+                    {
+            "8": "180.0",
+            "16": "200.0"
+                    },
+              "8388608":
+                    {
+            "8": "280.0",
+            "16": "300.0"
+                    }
 
 
 

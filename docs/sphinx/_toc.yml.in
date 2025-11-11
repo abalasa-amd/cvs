@@ -32,8 +32,10 @@ subtrees:
         title: Health
       - file: reference/configuration-files/rccl
         title: RCCL
-      - file: reference/configuration-files/training
-        title: Training
+      - file: reference/configuration-files/jax
+        title: JAX
+      - file: reference/configuration-files/megatron
+        title: Megatron
       - file: reference/configuration-files/ib
         title: IB Perf
 

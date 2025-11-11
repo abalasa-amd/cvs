@@ -84,35 +84,39 @@ Here's a code snippet of the ``cluster.json`` file for reference:
   .. code:: json
 
     {
-      "_comment": "change to your user-id and your private key and your node IPs. The Public IPs of the nodes will be the keys of the node_dict",
-      "username": "username",
-      "priv_key_file": "/home/abc/.ssh/id_rsa",
-      "head_node_dict":
-      {
-          "mgmt_ip": "10.10.10.1"
-      },
-      "node_dict":
-      {
-          "10.10.10.1":
-          {
-              "bmc_ip": "NA",
-              "vpc_ip": "10.10.10.1"
-          },
-          "10.10.10.2":
-          {
-              "bmc_ip": "NA",
-              "vpc_ip": "10.10.10.2"
-          }
-
-      },
-
-      "bmc_mapping_dict":
-      {
-      },
-
-      "backend_nw_dict":
-      {
-      },
+        "_user_comment": " user-id will be resolved to current username in runtime. You can also change to your user-id here.",
+        "username": "{user-id}",
+    
+        "_key_comment": " Change <priv_key_file> to your private key if it is different.",
+        "priv_key_file": "/home/{user-id}/.ssh/id_rsa",
+    
+        "_node_comment": " Change to your node IPs. The Public IPs of the nodes will be the keys of the node_dict",
+        "_vpc_comment": "If your cluster has a dedicated VPC IP that is reachable from other nodes in the cluster, set it to that (or) else set the same as the main host IP/Name",
+    
+        "head_node_dict":
+        {
+            "mgmt_ip": "{xx.xx.xx.xx|hostname}"
+        },
+        "node_dict":
+        {
+            "{xx.xx.xx.xx|hostname}":
+            {
+                "bmc_ip": "NA",
+                "vpc_ip": "{xx.xx.xx.xx|hostname}"
+            },
+            "{xx.xx.xx.xx|hostname}":
+            {
+                "bmc_ip": "NA",
+                "vpc_ip": "{xx.xx.xx.xx|hostname}"
+            },
+            "{xx.xx.xx.xx|hostname}":
+            {
+                "bmc_ip": "NA",
+                "vpc_ip": "{xx.xx.xx.xx|hostname}"
+            }
+    
+        }
+    
     
     }
 
@@ -170,12 +174,15 @@ In the ``cvs/input/config_file/rccl/rccl_config.json`` file, change the director
 - ``rccl_path_var``
 - ``rocm_path_var``
 
-Training configuration (JAX)
-----------------------------
+JAX training configuration files
+--------------------------------
 
 In the two training configuration files, change the directory path to your desired location in the ``git_install_path`` variable.
 
 Change any parameters in the configuration file relevant to your testing requirements.
+
+Megatron training configuration files
+-------------------------------------
 
 InfiniBand (IB Perf)
 --------------------

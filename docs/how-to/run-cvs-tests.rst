@@ -172,6 +172,22 @@ Here's the test script:
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/jax_llama_training.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax_training_config.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html 
 
+Megatron training test script
+-----------------------------
+
+Megatron training enables scaling transformer models from millions to trillions of parameters by efficiently utilizing hundreds or thousands of GPUs across multiple nodes.
+
+The Megatron tests check:
+
+- **Container orchestration**: Docker setup with ROCm/RDMA.
+- **Multi-node communication**: NCCL/RCCL initialization.
+- **Model convergence**: Loss decreases and no NaN/Inf values.
+- **Performance targets**: Throughput and memory usage within expected ranges
+- **Result verification**: Expected tokens/sec and TFLOPS metrics
+
+
+
+
 
 InfiniBand (IB Perf) test script
 --------------------------------
