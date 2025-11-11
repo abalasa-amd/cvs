@@ -6,9 +6,13 @@
 Health test configuration file
 ******************************
 
-The burn-in health tests are single-node diagnostic tests that validate the hardware and firmware versions' functionality and performance. 
+The burn-in health tests are single-node diagnostic tests that validate the hardware and firmware versions' functionality and performance.
 
 Here's a code snippet of the ``mi300_health_config.json`` file for reference:
+
+.. note::
+
+  In this configuration file, ``{user-id}`` will be resolved to the current username in the runtime. You can also manually change this value to your username. 
 
 .. dropdown:: ``mi300_health_config.json``
 
@@ -169,7 +173,7 @@ Here's a code snippet of the ``mi300_health_config.json`` file for reference:
             }
         ]
     }
- }
+
 
 Parameters
 ==========

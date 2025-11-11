@@ -14,7 +14,7 @@ Here's a code snippet of the ``ibperf_config.json`` file for reference:
 
   .. code:: json
       
-    {
+  {
       "ibperf":
       {
         "install_perf_package": "True",
@@ -47,7 +47,7 @@ Here's a code snippet of the ``ibperf_config.json`` file for reference:
         }
       }
   
-    }
+  }
 
 Parameters
 ==========

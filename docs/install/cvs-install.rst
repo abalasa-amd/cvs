@@ -75,7 +75,7 @@ Configure the CVS cluster file
 The cluster file is a JSON file containing the cluster's IP addresses. You must configure the cluster file before you run any CVS tests. 
 
 1. Go to ``cvs/input/cluster_file/cluster.json`` in your cloned repo.
-2. Edit the management IP and node dictionary with the list of IPs of the available cluster:
+2. Edit the management IP (``"mgmt_ip"``) and node dictionary (``"node_dict"``) with the list of IPs of the available cluster:
 
 Here's a code snippet of the ``cluster.json`` file for reference:
 
