@@ -305,7 +305,14 @@ def _resolve_placeholders_in_dict(target_dict, replacements, context_name=""):
     def replace_recursive(obj, path=""):
         """Recursively replace placeholders in nested structures."""
         if isinstance(obj, dict):
-            return {k: replace_recursive(v, f"{path}.{k}" if path else k) for k, v in obj.items()}
+            resolved_dict = {}
+            for k, v in obj.items():
+                # Resolve placeholders in the key
+                resolved_key = replace_in_string(k, f"{path}.{k}" if path else k)
+                # Resolve placeholders in the value
+                resolved_value = replace_recursive(v, f"{path}.{resolved_key}" if path else resolved_key)
+                resolved_dict[resolved_key] = resolved_value
+            return resolved_dict
         elif isinstance(obj, list):
             return [replace_recursive(item, f"{path}[{idx}]") for idx, item in enumerate(obj)]
         elif isinstance(obj, str):
