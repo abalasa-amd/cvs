@@ -22,7 +22,8 @@ Further, you can configure the ``mi35x_singlenode_megatron_llama.json`` file to 
 
 .. note::
 
-  Parameters with the ``<changeme>`` value must have that value modified to your specifications.
+  - Parameters with the ``<changeme>`` value must have that value modified to your specifications. 
+  - ``{user-id}`` will be resolved to the current username in the runtime. You can also manually change this value to your username. 
 
 Single node configuration
 =========================

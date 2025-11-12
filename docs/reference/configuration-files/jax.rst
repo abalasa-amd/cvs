@@ -12,6 +12,11 @@ remote execution, and the project's JAX library.
 Change the parameters as needed in the JAX training configuration files: ``mi300x_singlenode_llama3_1_70b.json`` and ``mi35x_singlenode_llama_3_1_70b.json`` for single node configuration,
 and ``mi300x_distributed_llama3_1_70b.json`` and ``mi300x_distributed_llama_3_1_405b.json`` for distributed node configuration.
 
+.. note::
+
+  - Parameters with the ``<changeme>`` value must have that value modified to your specifications. 
+  - ``{user-id}`` will be resolved to the current username in the runtime. You can also manually change this value to your username. 
+
 Single node configuration
 =========================
 
@@ -1240,8 +1245,8 @@ This is the ``mi300x_distributed_llama_3_1_405b.json`` configuration file:
     }
 
 
-Parameters (llama_3_1_405b)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Parameters (``llama_3_1_405b``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Use the parameters in these tables to configure the training file.
 
@@ -1832,10 +1837,8 @@ This is the ``mi300x_distributed_llama3_1_70b.json`` configuration file:
     
     }
  
-
-
-Parameters (llama3_1_70b)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Parameters (``llama3_1_70b``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Use the parameters in these tables to configure the training file.
 

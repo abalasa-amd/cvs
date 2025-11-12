@@ -171,8 +171,8 @@ Here's the test script:
   pytest -vvv --log-file=/tmp/test.log -s ./tests/rccl/rccl_multinode_cvs.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/rccl/rccl_config.json --html=/var/www/html/cvs/rccl.html --capture=tee-sys --self-contained-html
 
 
-JAX training test script
-------------------------
+JAX training test scripts
+-------------------------
 
 The JAX training tests perform end-to-end orchestration and validation of a distributed JAX training run (Llama 3.1) across a multi-node cluster using Docker containers, 
 remote execution, and the project's JAX library. 
