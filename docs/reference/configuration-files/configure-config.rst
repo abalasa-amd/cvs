@@ -13,7 +13,7 @@ You must go to each directory and edit the path given in the configuration file 
 
 .. note::
 
-  Ensure ROCm is installed correctly and the GPU drivers are loaded.
+  Ensure `ROCm <https://rocm.docs.amd.com/projects/install-on-linux/en/latest/>`_ is installed correctly, and the GPU drivers are loaded.
 
 The following list provides a link to code snippets and the parameters for each configuration file:
 
@@ -33,7 +33,7 @@ If Passwordless is not enabled, use these commands to enable it (you can enable 
 
 .. tip:: 
 
-  Perform these steps in the reverse order if you require a passwordless login from a head node to a child node.
+  Perform these steps in reverse order (child node first, then head node) if you require a passwordless login from a head node to a child node.
 
 1. Enable passwordless SSH for the head nodes:
    
@@ -51,15 +51,15 @@ If Passwordless is not enabled, use these commands to enable it (you can enable 
 
     chmod 600 ~/.ssh/authorized_keys
  
-3. Then check:
+3. Then check these settings:
 
     .. code:: bash
 
-    ssh username@remote_host-ip
+      ssh username@remote_host-ip
 
     If the username is also the same in both nodes, then just use the IP address:
 
     .. code:: bash
 
-    ssh remote-host-ip
+      ssh remote-host-ip
 
