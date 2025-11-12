@@ -224,7 +224,7 @@ Use the parameters in these tables to configure the training file.
      - Fraction of host memory XLA client may use
    * - ``xla_gpu_executable_warn_stuck_timeout``
      - 90
-     - 
+     - Warn if GPU kernel runs too long
    * - ``nccl_proto``
      - Simple
      - NCCL protocol selection
@@ -442,16 +442,16 @@ Use the parameters in these tables to configure the training file.
      - Use cublasLt optimized routines 
    * - ``xla_gpu_exec`` |br| ``utable_warn`` |br| ``_stuck_timeout``
      - 90
-     - 
+     - Warn if GPU kernel runs too long
    * - ``xla_gpu_exec`` |br| ``utable_term`` |br| ``inate_timeout``
      - 300
-     -   
+     - Sets how long (in seconds) XLA waits before terminating a GPU executable that appears hung during execution
    * - ``xla_gpu_first_`` |br| ``collective_call`` |br| ``_warn_stuck`` |br| ``_timeout_seconds``
      - 300
-     - 
+     - Time before XLA logs a warning if a collective GPU operation hasn't completed yet
    * - ``xla_gpu_first_`` |br| ``collective_call`` |br| ``_terminate_ti`` |br| ``meout_seconds``
      - 1200
-     - 
+     - Time (in seconds) before XLA terminates the first collective GPU call if it's still not finished
    * - ``xla_gpu_graph_level``
      - 0
      - Graph compilation level 
@@ -965,16 +965,16 @@ Use the parameters in these tables to configure the training file.
      - Use cublasLt optimized routines 
    * - ``xla_gpu_exec`` |br| ``utable_warn`` |br| ``_stuck_timeout``
      - 90
-     - 
+     - Warn if GPU kernel runs too long
    * - ``xla_gpu_exec`` |br| ``utable_term`` |br| ``inate_timeout``
      - 300
-     -   
+     - Sets how long (in seconds) XLA waits before terminating a GPU executable that appears hung during execution
    * - ``xla_gpu_first_`` |br| ``collective_call`` |br| ``_warn_stuck`` |br| ``_timeout_seconds``
      - 300
-     - 
+     - Time before XLA logs a warning if a collective GPU operation hasn't completed yet
    * - ``xla_gpu_first_`` |br| ``collective_call`` |br| ``_terminate_ti`` |br| ``meout_seconds``
      - 1200
-     - 
+     - Time (in seconds) before XLA terminates the first collective GPU call if it's still not finished
    * - ``xla_gpu_graph_level``
      - 0
      - Graph compilation level 
@@ -1557,16 +1557,16 @@ Use the parameters in these tables to configure the training file.
      - Use cublasLt optimized routines 
    * - ``xla_gpu_exec`` |br| ``utable_warn`` |br| ``_stuck_timeout``
      - 90
-     - 
+     - Warn if GPU kernel runs too long
    * - ``xla_gpu_exec`` |br| ``utable_term`` |br| ``inate_timeout``
      - 300
-     -   
+     - Sets how long (in seconds) XLA waits before terminating a GPU executable that appears hung during execution  
    * - ``xla_gpu_first_`` |br| ``collective_call`` |br| ``_warn_stuck`` |br| ``_timeout_seconds``
      - 300
-     - 
+     - Time before XLA logs a warning if a collective GPU operation hasn't completed yet
    * - ``xla_gpu_first_`` |br| ``collective_call`` |br| ``_terminate_ti`` |br| ``meout_seconds``
      - 1200
-     - 
+     - Time (in seconds) before XLA terminates the first collective GPU call if it's still not finished
    * - ``xla_gpu_graph_level``
      - 0
      - Graph compilation level 
@@ -2157,6 +2157,7 @@ Use the parameters in these tables to configure the training file.
      - Use cublasLt optimized routines 
    * - ``xla_gpu_exec`` |br| ``utable_warn`` |br| ``_stuck_timeout``
      - 90
+     - Warn if GPU kernel runs too long
    * - ``xla_gpu_graph_level``
      - 0
      - Graph compilation level 
