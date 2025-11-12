@@ -504,7 +504,7 @@ Use the parameters in these tables to configure the training file.
      - Whether dropout is enabled for training
    * - ``logits_via_embedding``
      - False
-     - 
+     - Uses the same embedding matrix for output logits
    * - ``normalization_layer_epsilon``
      - 1.0e-5 
      - Numeric epsilon for layernorm stability 
@@ -1027,7 +1027,7 @@ Use the parameters in these tables to configure the training file.
      - Whether dropout is enabled for training
    * - ``logits_via_embedding``
      - False
-     - 
+     - Uses the same embedding matrix for output logits
    * - ``normalization_layer_epsilon``
      - 1.0e-5 
      - Numeric epsilon for layernorm stability 
@@ -1306,7 +1306,7 @@ Use the parameters in these tables to configure the training file.
      - Network interface name for  Gloo fallback control plane
    * - ``_example_nccl_ib_gid_index``
      - 3
-     - 
+     - Example of GID index used for IB addressing (selects which GID entry on the HCA to use)
    * - ``nccl_ib_gid_index``
      - ``<changeme>``
      - GID index for IB addressing
@@ -1619,7 +1619,7 @@ Use the parameters in these tables to configure the training file.
      - Whether dropout is enabled for training
    * - ``logits_via_embedding``
      - False
-     - 
+     - Uses the same embedding matrix for output logits
    * - ``normalization_layer_epsilon``
      - 1.0e-5 
      - Numeric epsilon for layernorm stability 
@@ -1889,7 +1889,7 @@ Use the parameters in these tables to configure the training file.
      - Comma-separated list of IB HCAs (host channel adapters) to use for NCCL/RCCL communication
    * - ``nccl_ib_hca_list``
      - ``<changeme>`` 
-     - 
+     - Comma-separated list of InfiniBand HCA device names to use for NCCL/communication (multi-rail support)
    * - ``_example_nccl_ib_hca``
      - Values:
         - ``bnxt_re0``
@@ -1903,7 +1903,7 @@ Use the parameters in these tables to configure the training file.
      - Comma-separated list of IB HCAs (host channel adapters) to use for NCCL/RCCL communication
    * - ``nccl_ib_hca``
      - ``<changeme>`` 
-     - 
+     - Comma-separated list of IB HCAs (host channel adapters) to use for NCCL/RCCL communication
    * - ``nccl_socket_ifname``
      - ``<changeme>`` 
      - Network interface name for NCCL
@@ -2210,7 +2210,7 @@ Use the parameters in these tables to configure the training file.
      - Whether dropout is enabled for training
    * - ``logits_via_embedding``
      - False
-     - 
+     - Uses the same embedding matrix for output logits
    * - ``normalization_layer_epsilon``
      - 1.0e-5 
      - Numeric epsilon for layernorm stability 

@@ -2,9 +2,9 @@
   :description: Configure the RCCL configuration file variables
   :keywords: RCCL, ROCm, install, cvs
 
-*********************************************************************
-ROCm Communication Collectives Library (RCCL) test configuration file
-*********************************************************************
+**********************************************************************
+ROCm Communication Collectives Library (RCCL) test configuration files
+**********************************************************************
 
 These RCCL tests are comprehensive benchmarks that validate distributed GPU communication performance across AMD GPU clusters. 
 These tests ensure optimal performance for AI training, HPC workloads, and distributed computing.
