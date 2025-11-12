@@ -186,11 +186,35 @@ These are the JAX training test cases:
 - ``test_cleanup_stale_containers`` 
 - ``test_disable_firewall`` 
 
-Here's the test script:
+Use these test scripts to run the JAX tests.
+
+Single Node 70b MI3xx
+~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/jax_llama_training.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax_training_config.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html 
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax/mi300x_singlenode_llama3_1_70b.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+ 
+Single Node 70b MI35x
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax/mi35x_singlenode_llama_3_1_70b.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+ 
+Distributed 70b MI3xx
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/distributed_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax/mi300x_distributed_llama3_1_70b.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+ 
+Distributed 405b MI3xx
+~~~~~~~~~~~~~~~~~~~~~
+
+.. code:: bash
+
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/distributed_llama3_1_405b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax/mi300x_distributed_llama_3_1_405b.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
 
 Megatron training test scripts
 ------------------------------
@@ -219,42 +243,42 @@ Single Node 8b MI3xx
 
 .. code:: bash
 
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi3xx_singlenode_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi3xx_singlenode_megatron_llama.json --html=/var/www/html/cvs/megatron.html --capture=tee-sys --self-contained-html
 
 Single Node 8b MI35x
 ~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/ mi35x_singlenode_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/ mi35x_singlenode_megatron_llama.json --html=/var/www/html/cvs/megatron.html --capture=tee-sys --self-contained-html
 
 Single Node 70b MI3xx
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi3xx_singlenode_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi3xx_singlenode_megatron_llama.json --html=/var/www/html/cvs/megatron.html --capture=tee-sys --self-contained-html
 
 Single Node 70b MI35x
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi35x_singlenode_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi35x_singlenode_megatron_llama.json --html=/var/www/html/cvs/megatron.html --capture=tee-sys --self-contained-html
 
 Distributed 8b
 ~~~~~~~~~~~~~~
 
 .. code:: bash
 
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/distributed_llama3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/ mi3xx_distributed_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/distributed_llama3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/ mi3xx_distributed_megatron_llama.json --html=/var/www/html/cvs/megatron.html --capture=tee-sys --self-contained-html
 
 Distributed 70b
 ~~~~~~~~~~~~~~~
 
 .. code:: bash
 
-  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/distributed_llama3_1_70b.py--cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/ mi3xx_distributed_megatron_llama.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
+  pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/distributed_llama3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/ mi3xx_distributed_megatron_llama.json --html=/var/www/html/cvs/megatron.html --capture=tee-sys --self-contained-html
 
 InfiniBand (IB Perf) test script
 --------------------------------

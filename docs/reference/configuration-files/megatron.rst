@@ -16,7 +16,7 @@ The Megatron tests check:
 - **Performance targets**: Throughput and memory usage within expected ranges
 - **Result verification**: Expected tokens/sec and TFLOPS metrics
 
-Change the parameters as needed in the Megatron training configuration files: ``mi3xx_singlenode_megatron_llama.json`` and ``mi3xx_distributed_megatron_llama.json`` for single node and multiple node configurations, respectively.
+Change the parameters as needed in the Megatron training configuration files: ``mi3xx_singlenode_megatron_llama.json`` and ``mi3xx_distributed_megatron_llama.json`` for single node and distributed node configurations, respectively.
 
 Further, you can configure the ``mi35x_singlenode_megatron_llama.json`` file to run Megatron on a single node MI35x.
 
@@ -460,8 +460,8 @@ This section also contains the ``result_dict`` parameter. It describes the expec
           "tokens_per_gpu": "1100.0",
       }
 
-Multi-node configuration
-========================
+Distributed node configuration
+==============================
 
 This is the multi-node ``mi3xx_distributed_megatron_llama.json`` configuration file:
 
