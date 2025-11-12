@@ -461,6 +461,427 @@ This section also contains the ``result_dict`` parameter. It describes the expec
           "tokens_per_gpu": "1100.0",
       }
 
+Single node MI35x configuration 
+===============================
+
+The ``mi35x_singlenode_megatron_llama.json`` config file is used to run Megatron on a MI35x on a single node.
+
+.. dropdown:: ``mi35x_singlenode_megatron_llama.json`` 
+
+  .. code:: json
+
+    {
+ 
+        "config":
+
+        {
+            "container_image": "rocm/megatron-lm:v25.9_gfx950",
+            "container_name": "megatron_llama3.1_310",
+            "_example_nnodes": "4",
+            "nnodes": "<changeme>-no of nodes to run singlenode training",
+            "master_address": "localhost",
+            "_example_training_iterations": "30",
+            "training_iterations": "<changeme>",
+            "hf_token_file": "/home/{user-id}/.hf_token",
+            "shm_size": "128G",
+            "_comments_data_cache_dir": "This path should be accessible from all nodes like a common FS like NFS for distributed training",
+            "data_cache_dir": "/home/{user-id}/cache",
+            "mock_data": "True",
+            "log_dir": "/home/{user-id}/LOG_DIR",
+            "dataset_source":
+            {
+            },
+            "container_config":
+            {
+                "device_list": [ "/dev/dri", "/dev/kfd" ],
+                "volume_dict":
+                {
+                "/home/{user-id}": "/home/{user-id}"
+                }
+            }
+        },
+        "model_params":
+        {
+            "single_node":
+            {
+                "llama3_1_8b":
+                {
+                    "mi350":
+                    {
+                        "tokenizer_model": "NousResearch/Meta-Llama-3-8B",
+                        "model_size": "8",
+                        "batch_size": "128",
+                        "micro_batch_size": "4",
+                        "precision": "TE_FP8",
+                        "sequence_length": "8192",
+                                "fsdp": "0",
+                        "tensor_parallelism": "1",
+                        "pipeline_parallelism": "1",
+                        "recompute": "0",
+                        "result_dict":
+                        {
+                            "tokens_per_gpu": "18000.0"
+                        }
+                    },
+                    "mi355":
+                    {
+                        "tokenizer_model": "NousResearch/Meta-Llama-3-8B",
+                        "model_size": "8",
+                        "batch_size": "128",
+                        "micro_batch_size": "4",
+                        "precision": "TE_FP8",
+                        "sequence_length": "8192",
+                                "fsdp": "1",
+                        "tensor_parallelism": "1",
+                        "pipeline_parallelism": "1",
+                        "recompute": "1",
+                        "result_dict":
+                        {
+                            "tokens_per_gpu": "20000.0"
+                        }
+                    }
+                },
+                "llama3_1_70b":
+                {
+                    "mi350":
+                    {
+                        "tokenizer_model": "NousResearch/Meta-Llama-3-70B",
+                        "model_size": "70",
+                        "batch_size": "24",
+                        "micro_batch_size": "3",
+                        "precision": "TE_FP16",
+                        "sequence_length": "8192",
+                                "fsdp": "1",
+                        "tensor_parallelism": "1",
+                        "pipeline_parallelism": "1",
+                        "recompute": "1",
+                        "result_dict":
+                        {
+                            "tokens_per_gpu": "2000.0"
+                        }
+                    },
+                    "mi355":
+                    {
+                        "tokenizer_model": "NousResearch/Meta-Llama-3-70B",
+                        "model_size": "70",
+                        "batch_size": "24",
+                        "micro_batch_size": "3",
+                        "precision": "TE_FP16",
+                        "sequence_length": "8192",
+                                "fsdp": "1",
+                        "tensor_parallelism": "1",
+                        "pipeline_parallelism": "1",
+                        "recompute": "1",
+                        "result_dict":
+                        {
+                            "tokens_per_gpu": "2100.0"
+                        }
+                    }
+                }
+            }
+    
+        }
+  
+    }
+ 
+Parameters
+----------
+
+Use the parameters in these tables to configure the training file.
+
+``config``
+~~~~~~~~~~
+
+.. list-table::
+   :widths: 3 3 5
+   :header-rows: 1
+
+   * - Configuration parameters
+     - Default values
+     - Description
+   * - ``container_image``
+     - ``rocm/megatron-lm:v25.9_gfx950`` 
+     - Docker image used to run Megatron-LM
+   * - ``container_name``
+     - ``megatron_llama3.1_310`` 
+     - Name assigned to the container instance
+   * - ``_example_nnodes``
+     - 4
+     - Example of number of cluster nodes participating in the job 
+   * - ``Nnodes``
+     - "``<changeme>``-no of nodes to run singlenode training"
+     - Number of nodes in the distributed job 
+   * - ``master_address``
+     - ``<changeme>``
+     - IP of the master/coordinator node
+   * - ``_example_training_iterations``
+     - 30
+     - Example of number of training iterations/steps to run in this test
+   * - ``training_iterations``
+     - ``<changeme>``
+     - Number of training iterations/steps to run in this test
+   * - ``hf_token_file``
+     - ``/home/{user-id}/.hf_token``
+     - Path to a Hugging Face token file used to download tokenized models/datasets requiring authorization
+   * - ``shm_size``
+     - 128G
+     - Docker shared memory size mounted into container
+   * - ``_comments_data_cache_dir``
+     - "This path should be accessible from all nodes like a common FS like NFS for distributed training"
+     - Comment explaining ``data_cache_dir`` must be accessible from all nodes
+   * - ``data_cache_dir``
+     - ``/home/{user-id}/cache``
+     - Dataset/cache directory
+   * - ``mock_data``
+     - True
+     - "True"/"False": Use synthetic data (True) to avoid real dataset downloads in CI/smoke tests 
+   * - ``log_dir``
+     - ``/home/{user-id}/LOG_DIR``
+     - Path where training logs should be written on the host
+
+``dataset_source/container_config``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :widths: 3 3 5
+   :header-rows: 1
+
+   * - Configuration parameters
+     - Default values
+     - Description
+   * - ``device_list``
+     - Values:
+        - ``"/dev/dri"``
+        - ``"/dev/kfd"``
+        - ``"/dev/infiniband/rdma_cm"``
+     - Kernel devices exposed into the container
+   * - ``volume_dict``
+     - N/A
+     - Host-to-container mounts: map host paths (home, RDMA libs, ``/lib/libibverbs.d``, log output) into the container so code and drivers are accessible
+   * - ``/home/<changeme>``
+     - ``/home/{user-id}``
+     - The user's directory being used
+
+``model_params/single_node/llama3_1_8b/mi350``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :widths: 3 3 5
+   :header-rows: 1
+
+   * - Configuration parameters
+     - Default values
+     - Description
+   * - ``mi350``
+     - N/A
+     - The GPU being used
+   * - ``tokenizer_model``
+     - ``NousResearch/Meta-Llama-3-8B`` 
+     - HF model identifier or local path used to initialize tokenizer
+   * - ``model_size``
+     - 8
+     - The abbreviated model size
+   * - ``batch_size``
+     - 128
+     - Global batch size
+   * - ``micro_batch_size``
+     - 2
+     - Per-device micro-batch size
+   * - ``precision``
+     - TE_FP8
+     - Numeric precision mode used
+   * - ``sequence_length``
+     - 8192
+     - Maximum sequence length / context size
+   * - ``tensor_parallelism``
+     - 1
+     - Degree of tensor-model parallelism
+   * - ``pipeline_parallelism``
+     - 1
+     - Pipeline parallel stages count
+   * - ``recompute``
+     - 0
+     - Enable activation recomputation/checkpointing to reduce memory at cost of extra compute
+   * - ``fsdp``
+     - 0
+     - Whether FSDP-style fully-sharded data-parallel is enabled
+
+This section also contains the ``result_dict`` parameter. It describes the expected/target metrics used by tests to verify and run correctness and performance:
+
+.. dropdown:: result_dict
+
+  .. code:: json
+
+      "result_dict":
+      {
+          "tokens_per_gpu": "18000.0"
+      }
+
+``model_params/single_node/llama3_1_8b/mi355``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :widths: 3 3 5
+   :header-rows: 1
+
+   * - Configuration parameters
+     - Default values
+     - Description
+   * - ``mi355``
+     - N/A
+     - The GPU being used
+   * - ``tokenizer_model``
+     - ``NousResearch/Meta-Llama-3-8B`` 
+     - HF model identifier or local path used to initialize tokenizer
+   * - ``model_size``
+     - 8
+     - The abbreviated model size
+   * - ``batch_size``
+     - 128
+     - Global batch size
+   * - ``micro_batch_size``
+     - 4
+     - Per-device micro-batch size
+   * - ``precision``
+     - TE_FP8
+     - Numeric precision mode used
+   * - ``sequence_length``
+     - 8192
+     - Maximum sequence length / context size
+   * - ``tensor_parallelism``
+     - 1
+     - Degree of tensor-model parallelism
+   * - ``pipeline_parallelism``
+     - 1
+     - Pipeline parallel stages count
+   * - ``recompute``
+     - 1
+     - Enable activation recomputation/checkpointing to reduce memory at cost of extra compute
+   * - ``fsdp``
+     - 1
+     - Whether FSDP-style fully-sharded data-parallel is enabled
+
+This section also contains the ``result_dict`` parameter. It describes the expected/target metrics used by tests to verify and run correctness and performance:
+
+.. dropdown:: result_dict
+
+  .. code:: json
+
+      "result_dict":
+      {
+          "tokens_per_gpu": "20000.0"
+      }
+
+``model_params/single_node/llama3_1_70b/mi350``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :widths: 3 3 5
+   :header-rows: 1
+
+   * - Configuration parameters
+     - Default values
+     - Description
+   * - ``mi350``
+     - N/A
+     - The GPU being used
+   * - ``tokenizer_model``
+     - ``NousResearch/Meta-Llama-3-70B`` 
+     - HF model identifier or local path used to initialize tokenizer
+   * - ``model_size``
+     - 70
+     - The abbreviated model size
+   * - ``batch_size``
+     - 24
+     - Global batch size
+   * - ``micro_batch_size``
+     - 3
+     - Per-device micro-batch size
+   * - ``precision``
+     - TE_FP16
+     - Numeric precision mode used
+   * - ``sequence_length``
+     - 8192
+     - Maximum sequence length / context size
+   * - ``tensor_parallelism``
+     - 1
+     - Degree of tensor-model parallelism
+   * - ``pipeline_parallelism``
+     - 1
+     - Pipeline parallel stages count
+   * - ``recompute``
+     - 1
+     - Enable activation recomputation/checkpointing to reduce memory at cost of extra compute
+   * - ``fsdp``
+     - 1
+     - Whether FSDP-style fully-sharded data-parallel is enabled
+
+This section also contains the ``result_dict`` parameter. It describes the expected/target metrics used by tests to verify and run correctness and performance:
+
+.. dropdown:: result_dict
+
+  .. code:: json
+
+      "result_dict":
+      {
+          "tokens_per_gpu": "2000.0"
+      }
+
+``model_params/single_node/llama3_1_70b/mi355``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. list-table::
+   :widths: 3 3 5
+   :header-rows: 1
+
+   * - Configuration parameters
+     - Default values
+     - Description
+   * - ``mi355``
+     - N/A
+     - The GPU being used
+   * - ``tokenizer_model``
+     - ``NousResearch/Meta-Llama-3-70B`` 
+     - HF model identifier or local path used to initialize tokenizer
+   * - ``model_size``
+     - 70
+     - The abbreviated model size
+   * - ``batch_size``
+     - 24
+     - Global batch size
+   * - ``micro_batch_size``
+     - 3
+     - Per-device micro-batch size
+   * - ``precision``
+     - TE_FP16
+     - Numeric precision mode used
+   * - ``sequence_length``
+     - 8192
+     - Maximum sequence length / context size
+   * - ``tensor_parallelism``
+     - 1
+     - Degree of tensor-model parallelism
+   * - ``pipeline_parallelism``
+     - 1
+     - Pipeline parallel stages count
+   * - ``recompute``
+     - 1
+     - Enable activation recomputation/checkpointing to reduce memory at cost of extra compute
+   * - ``fsdp``
+     - 1
+     - Whether FSDP-style fully-sharded data-parallel is enabled
+
+This section also contains the ``result_dict`` parameter. It describes the expected/target metrics used by tests to verify and run correctness and performance:
+
+.. dropdown:: result_dict
+
+  .. code:: json
+
+      "result_dict":
+      {
+          "tokens_per_gpu": "2100.0"
+      }
+
 Distributed node configuration
 ==============================
 
@@ -988,423 +1409,3 @@ This section also contains the ``result_dict`` parameter. It describes the expec
           "tokens_per_gpu": "<changeme>"
       }
 
-Single node MI35x configuration 
-===============================
-
-The ``mi35x_singlenode_megatron_llama.json`` config file is used to run Megatron on a MI35x on a single node.
-
-.. dropdown:: ``mi35x_singlenode_megatron_llama.json`` 
-
-  .. code:: json
-
-    {
- 
-        "config":
-
-        {
-            "container_image": "rocm/megatron-lm:v25.9_gfx950",
-            "container_name": "megatron_llama3.1_310",
-            "_example_nnodes": "4",
-            "nnodes": "<changeme>-no of nodes to run singlenode training",
-            "master_address": "localhost",
-            "_example_training_iterations": "30",
-            "training_iterations": "<changeme>",
-            "hf_token_file": "/home/{user-id}/.hf_token",
-            "shm_size": "128G",
-            "_comments_data_cache_dir": "This path should be accessible from all nodes like a common FS like NFS for distributed training",
-            "data_cache_dir": "/home/{user-id}/cache",
-            "mock_data": "True",
-            "log_dir": "/home/{user-id}/LOG_DIR",
-            "dataset_source":
-            {
-            },
-            "container_config":
-            {
-                "device_list": [ "/dev/dri", "/dev/kfd" ],
-                "volume_dict":
-                {
-                "/home/{user-id}": "/home/{user-id}"
-                }
-            }
-        },
-        "model_params":
-        {
-            "single_node":
-            {
-                "llama3_1_8b":
-                {
-                    "mi350":
-                    {
-                        "tokenizer_model": "NousResearch/Meta-Llama-3-8B",
-                        "model_size": "8",
-                        "batch_size": "128",
-                        "micro_batch_size": "4",
-                        "precision": "TE_FP8",
-                        "sequence_length": "8192",
-                                "fsdp": "0",
-                        "tensor_parallelism": "1",
-                        "pipeline_parallelism": "1",
-                        "recompute": "0",
-                        "result_dict":
-                        {
-                            "tokens_per_gpu": "18000.0"
-                        }
-                    },
-                    "mi355":
-                    {
-                        "tokenizer_model": "NousResearch/Meta-Llama-3-8B",
-                        "model_size": "8",
-                        "batch_size": "128",
-                        "micro_batch_size": "4",
-                        "precision": "TE_FP8",
-                        "sequence_length": "8192",
-                                "fsdp": "1",
-                        "tensor_parallelism": "1",
-                        "pipeline_parallelism": "1",
-                        "recompute": "1",
-                        "result_dict":
-                        {
-                            "tokens_per_gpu": "20000.0"
-                        }
-                    }
-                },
-                "llama3_1_70b":
-                {
-                    "mi350":
-                    {
-                        "tokenizer_model": "NousResearch/Meta-Llama-3-70B",
-                        "model_size": "70",
-                        "batch_size": "24",
-                        "micro_batch_size": "3",
-                        "precision": "TE_FP16",
-                        "sequence_length": "8192",
-                                "fsdp": "1",
-                        "tensor_parallelism": "1",
-                        "pipeline_parallelism": "1",
-                        "recompute": "1",
-                        "result_dict":
-                        {
-                            "tokens_per_gpu": "2000.0"
-                        }
-                    },
-                    "mi355":
-                    {
-                        "tokenizer_model": "NousResearch/Meta-Llama-3-70B",
-                        "model_size": "70",
-                        "batch_size": "24",
-                        "micro_batch_size": "3",
-                        "precision": "TE_FP16",
-                        "sequence_length": "8192",
-                                "fsdp": "1",
-                        "tensor_parallelism": "1",
-                        "pipeline_parallelism": "1",
-                        "recompute": "1",
-                        "result_dict":
-                        {
-                            "tokens_per_gpu": "2100.0"
-                        }
-                    }
-                }
-            }
-    
-        }
-  
-    }
- 
-Parameters
-----------
-
-Use the parameters in these tables to configure the training file.
-
-``config``
-~~~~~~~~~~
-
-.. list-table::
-   :widths: 3 3 5
-   :header-rows: 1
-
-   * - Configuration parameters
-     - Default values
-     - Description
-   * - ``container_image``
-     - ``rocm/megatron-lm:v25.9_gfx950`` 
-     - Docker image used to run Megatron-LM
-   * - ``container_name``
-     - ``megatron_llama3.1_310`` 
-     - Name assigned to the container instance
-   * - ``_example_nnodes``
-     - 4
-     - Example of number of cluster nodes participating in the job 
-   * - ``Nnodes``
-     - "``<changeme>``-no of nodes to run singlenode training"
-     - Number of nodes in the distributed job 
-   * - ``master_address``
-     - ``<changeme>``
-     - IP of the master/coordinator node
-   * - ``_example_training_iterations``
-     - 30
-     - Example of number of training iterations/steps to run in this test
-   * - ``training_iterations``
-     - ``<changeme>``
-     - Number of training iterations/steps to run in this test
-   * - ``hf_token_file``
-     - ``/home/{user-id}/.hf_token``
-     - Path to a Hugging Face token file used to download tokenized models/datasets requiring authorization
-   * - ``shm_size``
-     - 128G
-     - Docker shared memory size mounted into container
-   * - ``_comments_data_cache_dir``
-     - "This path should be accessible from all nodes like a common FS like NFS for distributed training"
-     - Comment explaining ``data_cache_dir`` must be accessible from all nodes
-   * - ``data_cache_dir``
-     - ``/home/{user-id}/cache``
-     - Dataset/cache directory
-   * - ``mock_data``
-     - True
-     - "True"/"False": Use synthetic data (True) to avoid real dataset downloads in CI/smoke tests 
-   * - ``log_dir``
-     - ``/home/{user-id}/LOG_DIR``
-     - Path where training logs should be written on the host
-
-``dataset_source/container_config``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. list-table::
-   :widths: 3 3 5
-   :header-rows: 1
-
-   * - Configuration parameters
-     - Default values
-     - Description
-   * - ``device_list``
-     - Values:
-        - ``"/dev/dri"``
-        - ``"/dev/kfd"``
-        - ``"/dev/infiniband/rdma_cm"``
-     - Kernel devices exposed into the container
-   * - ``volume_dict``
-     - N/A
-     - Host-to-container mounts: map host paths (home, RDMA libs, ``/lib/libibverbs.d``, log output) into the container so code and drivers are accessible
-   * - ``/home/<changeme>``
-     - ``/home/{user-id}``
-     - The user's directory being used
-
-``model_params/single_node/llama3_1_8b/mi350``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. list-table::
-   :widths: 3 3 5
-   :header-rows: 1
-
-   * - Configuration parameters
-     - Default values
-     - Description
-   * - ``mi350``
-     - N/A
-     - The GPU being used
-   * - ``tokenizer_model``
-     - ``NousResearch/Meta-Llama-3-8B`` 
-     - HF model identifier or local path used to initialize tokenizer
-   * - ``model_size``
-     - 8
-     - The abbreviated model size
-   * - ``batch_size``
-     - 128
-     - Global batch size
-   * - ``micro_batch_size``
-     - 2
-     - Per-device micro-batch size
-   * - ``precision``
-     - TE_FP8
-     - Numeric precision mode used
-   * - ``sequence_length``
-     - 8192
-     - Maximum sequence length / context size
-   * - ``tensor_parallelism``
-     - 1
-     - Degree of tensor-model parallelism
-   * - ``pipeline_parallelism``
-     - 1
-     - Pipeline parallel stages count
-   * - ``recompute``
-     - 0
-     - Enable activation recomputation/checkpointing to reduce memory at cost of extra compute
-   * - ``fsdp``
-     - 0
-     - Whether FSDP-style fully-sharded data-parallel is enabled
-
-This section also contains the ``result_dict`` parameter. It describes the expected/target metrics used by tests to verify and run correctness and performance:
-
-.. dropdown:: result_dict
-
-  .. code:: json
-
-      "result_dict":
-      {
-          "tokens_per_gpu": "18000.0"
-      }
-
-``model_params/single_node/llama3_1_8b/mi355``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. list-table::
-   :widths: 3 3 5
-   :header-rows: 1
-
-   * - Configuration parameters
-     - Default values
-     - Description
-   * - ``mi355``
-     - N/A
-     - The GPU being used
-   * - ``tokenizer_model``
-     - ``NousResearch/Meta-Llama-3-8B`` 
-     - HF model identifier or local path used to initialize tokenizer
-   * - ``model_size``
-     - 8
-     - The abbreviated model size
-   * - ``batch_size``
-     - 128
-     - Global batch size
-   * - ``micro_batch_size``
-     - 4
-     - Per-device micro-batch size
-   * - ``precision``
-     - TE_FP8
-     - Numeric precision mode used
-   * - ``sequence_length``
-     - 8192
-     - Maximum sequence length / context size
-   * - ``tensor_parallelism``
-     - 1
-     - Degree of tensor-model parallelism
-   * - ``pipeline_parallelism``
-     - 1
-     - Pipeline parallel stages count
-   * - ``recompute``
-     - 1
-     - Enable activation recomputation/checkpointing to reduce memory at cost of extra compute
-   * - ``fsdp``
-     - 1
-     - Whether FSDP-style fully-sharded data-parallel is enabled
-
-This section also contains the ``result_dict`` parameter. It describes the expected/target metrics used by tests to verify and run correctness and performance:
-
-.. dropdown:: result_dict
-
-  .. code:: json
-
-      "result_dict":
-      {
-          "tokens_per_gpu": "20000.0"
-      }
-
-``model_params/single_node/llama3_1_70b/mi350``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. list-table::
-   :widths: 3 3 5
-   :header-rows: 1
-
-   * - Configuration parameters
-     - Default values
-     - Description
-   * - ``mi350``
-     - N/A
-     - The GPU being used
-   * - ``tokenizer_model``
-     - ``NousResearch/Meta-Llama-3-70B`` 
-     - HF model identifier or local path used to initialize tokenizer
-   * - ``model_size``
-     - 70
-     - The abbreviated model size
-   * - ``batch_size``
-     - 24
-     - Global batch size
-   * - ``micro_batch_size``
-     - 3
-     - Per-device micro-batch size
-   * - ``precision``
-     - TE_FP16
-     - Numeric precision mode used
-   * - ``sequence_length``
-     - 8192
-     - Maximum sequence length / context size
-   * - ``tensor_parallelism``
-     - 1
-     - Degree of tensor-model parallelism
-   * - ``pipeline_parallelism``
-     - 1
-     - Pipeline parallel stages count
-   * - ``recompute``
-     - 1
-     - Enable activation recomputation/checkpointing to reduce memory at cost of extra compute
-   * - ``fsdp``
-     - 1
-     - Whether FSDP-style fully-sharded data-parallel is enabled
-
-This section also contains the ``result_dict`` parameter. It describes the expected/target metrics used by tests to verify and run correctness and performance:
-
-.. dropdown:: result_dict
-
-  .. code:: json
-
-      "result_dict":
-      {
-          "tokens_per_gpu": "2000.0"
-      }
-
-``model_params/single_node/llama3_1_70b/mi355``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. list-table::
-   :widths: 3 3 5
-   :header-rows: 1
-
-   * - Configuration parameters
-     - Default values
-     - Description
-   * - ``mi355``
-     - N/A
-     - The GPU being used
-   * - ``tokenizer_model``
-     - ``NousResearch/Meta-Llama-3-70B`` 
-     - HF model identifier or local path used to initialize tokenizer
-   * - ``model_size``
-     - 70
-     - The abbreviated model size
-   * - ``batch_size``
-     - 24
-     - Global batch size
-   * - ``micro_batch_size``
-     - 3
-     - Per-device micro-batch size
-   * - ``precision``
-     - TE_FP16
-     - Numeric precision mode used
-   * - ``sequence_length``
-     - 8192
-     - Maximum sequence length / context size
-   * - ``tensor_parallelism``
-     - 1
-     - Degree of tensor-model parallelism
-   * - ``pipeline_parallelism``
-     - 1
-     - Pipeline parallel stages count
-   * - ``recompute``
-     - 1
-     - Enable activation recomputation/checkpointing to reduce memory at cost of extra compute
-   * - ``fsdp``
-     - 1
-     - Whether FSDP-style fully-sharded data-parallel is enabled
-
-This section also contains the ``result_dict`` parameter. It describes the expected/target metrics used by tests to verify and run correctness and performance:
-
-.. dropdown:: result_dict
-
-  .. code:: json
-
-      "result_dict":
-      {
-          "tokens_per_gpu": "2100.0"
-      }
