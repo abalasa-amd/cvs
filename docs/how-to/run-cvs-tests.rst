@@ -55,7 +55,7 @@ Here's the test script:
 Burn-in health test scripts
 ---------------------------
 
-The burn-in health tests are single-node diagnostic tests that validate the hardware and firmware versions' functionality and performance. 
+The burn-in health tests are single node diagnostic tests that validate the hardware and firmware versions' functionality and performance. 
 For the performance validation, they use the reference bandwidth or latency numbers provided as part of the input ``config_file`` for the relevant test. 
 
 Use these scripts to run each health test. These CVS test scripts have two parts: installing the functionality and running the tests.

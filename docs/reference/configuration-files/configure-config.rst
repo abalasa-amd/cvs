@@ -9,7 +9,7 @@ Test configuration files
 Each CVS test has a corresponding JSON configuration file. You must configure the JSON file for each test you want to run in CVS.
 
 The test configuration files are in the ``cvs/input/config_file`` directory of the cloned repo.
-You must go to each directory and edit the path given in the configuration file for each category. 
+You can go to each directory and edit the parameters as necessary for your testing requirements. 
 
 .. note::
 

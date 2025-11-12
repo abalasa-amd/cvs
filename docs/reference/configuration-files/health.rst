@@ -19,16 +19,16 @@ Here's a code snippet of the ``mi300_health_config.json`` file for reference:
   .. code:: json
     
     {
-
+    
         "agfhc":
         {
-          "path": "/opt/amd/agfhc",
-          "package_tar_ball": "/home/{user-id}/PACKAGES/agfhc-mi300x_1.22.0_ub2204.tar.bz2",
-          "install_dir": "/home/{user-id}/INSTALL/agfhc/",
-          "_comments_log_dir": "log_dir has to be a NON NFS local file system",
-          "log_dir": "/root/agfhc_logs",
-          "nfs_install": "True",
-          "hbm_test_duration": "00:01:30"
+            "path": "/opt/amd/agfhc",
+            "package_tar_ball": "/home/{user-id}/PACKAGES/agfhc-mi300x_1.22.0_ub2204.tar.bz2",
+            "install_dir": "/home/{user-id}/INSTALL/agfhc/",
+            "_comments_log_dir": "log_dir has to be a NON NFS local file system",
+            "log_dir": "/root/agfhc_logs",
+            "nfs_install": "True",
+            "hbm_test_duration": "00:01:30"
         },
         "transferbench":
         {
@@ -60,7 +60,7 @@ Here's a code snippet of the ``mi300_health_config.json`` file for reference:
                   "test4": "1264",
                   "test6": "48.6"
               }
-
+    
           }
         },
         "rvs":
@@ -74,105 +74,108 @@ Here's a code snippet of the ``mi300_health_config.json`` file for reference:
             "_comment_rvs_test_level": "RVS test level configuration (0-5). 0: Run individual tests (skip level test), 1-5: Run LEVEL config test if RVS >= 1.3.0, else run individual tests. Default is 4.",
             "rvs_test_level": 4,
             "tests": [
-            {
-                "name": "level_config",
-                "description": "RVS LEVEL Configuration Test - Runs all modules collectively",
-                "timeout": 14400,
-                "expected_pass": true,
-                "fail_regex_patterns": [
-                    "met:\\s*FALSE",
-                    "pass:\\s*FALSE",
-                    "\\[ERROR\\s*\\]",
-                    "FAIL",
-                    "ERROR:",
-                    "peqt false",
-                    "RVS-ERROR",
-                    "Missing packages\\s*:\\s*([1-9]\\d*)",
-                    "Version mismatch packages\\s*:\\s*([1-9]\\d*)"
-                ]
-            },
-            {
-                "name": "gpup_single",
-                "config_file": "gpup_single.conf",
-                "description": "GPU Properties Test",
-                "timeout": 1800,
-                "expected_pass": true,
-                "fail_regex_pattern": "FAIL|ERROR|RVS-ERROR"
-            },
-            {
-                "name": "mem_test",
-                "config_file": "mem.conf",
-                "description": "Memory Test",
-                "timeout": 9000,
-                "expected_pass": true,
-                "fail_regex_pattern": "FAIL|\\[ERROR\\s*\\]|RVS-ERROR"
-            },
-            {
-                "name": "gst_single",
-                "config_file": "gst_single.conf",
-                "description": "GPU Stress Test",
-                "timeout": 9000,
-                "expected_pass": true,
-                "fail_regex_pattern": "met:\\s*FALSE|RVS-ERROR"
-            },
-            {
-                "name": "iet_single",
-                "config_file": "iet_single.conf",
-                "description": "Input EDPp Test",
-                "timeout": 3600,
-                "expected_pass": true,
-                "fail_regex_pattern": "pass:\\s*FALSE|RVS-ERROR"
-            },
-            {
-                "name": "pebb_single",
-                "config_file": "pebb_single.conf",
-                "description": "PCI Express Bandwidth Benchmark",
-                "timeout": 3600,
-                "expected_pass": true,
-                "fail_regex_pattern": "\\[ERROR\\s*\\]|RVS-ERROR"
-            },
-            {
-                "name": "pbqt_single",
-                "config_file": "pbqt_single.conf",
-                "description": "P2P Benchmark and Qualification Tool",
-                "timeout": 3600,
-                "expected_pass": true,
-                "fail_regex_pattern": "FAIL|ERROR:|RVS-ERROR"
-            },
-            {
-                "name": "peqt_single",
-                "config_file": "peqt_single.conf",
-                "description": "PCI Express Qualification Tool",
-                "timeout": 1800,
-                "expected_pass": true,
-                "fail_regex_pattern": "peqt false|RVS-ERROR"
-            },
-            {
-                "name": "rcqt_single",
-                "config_file": "rcqt_single.conf",
-                "description": "ROCm Configuration Qualification Tool",
-                "timeout": 1800,
-                "expected_pass": "true",
-                "fail_regex_pattern": "\\[ERROR\\s*\\]|RVS-ERROR|Missing packages\\s*:\\s*([1-9]\\d*)|Version mismatch packages\\s*:\\s*([1-9]\\d*)"
-            },
-            {
-                "name": "tst_single",
-                "config_file": "tst_single.conf",
-                "description": "Thermal Stress Test",
-                "timeout": 1800,
-                "expected_pass": true,
-                "fail_regex_pattern": "pass: FLASE|RVS-ERROR"
-            },
-            {
-                "name": "babel_stream",
-                "config_file": "babel.conf",
-                "description": "BABEL Benchmark Test",
-                "timeout": 9000,
-                "expected_pass": true,
-                "fail_regex_pattern": "\\[ERROR\\s*\\]|RVS-ERROR"
-            }
-        ]
+                {
+                    "name": "level_config",
+                    "description": "RVS LEVEL Configuration Test - Runs all modules collectively",
+                    "timeout": 14400,
+                    "expected_pass": true,
+                    "fail_regex_patterns": [
+                        "met:\\s*FALSE",
+                        "pass:\\s*FALSE",
+                        "\\[ERROR\\s*\\]",
+                        "FAIL",
+                        "ERROR:",
+                        "peqt false",
+                        "RVS-ERROR",
+                        "Missing packages\\s*:\\s*([1-9]\\d*)",
+                        "Version mismatch packages\\s*:\\s*([1-9]\\d*)"
+                    ]
+                },
+                {
+                    "name": "gpup_single",
+                    "config_file": "gpup_single.conf",
+                    "description": "GPU Properties Test",
+                    "timeout": 1800,
+                    "expected_pass": true,
+                    "fail_regex_pattern": "FAIL|ERROR|RVS-ERROR"
+                },
+                {
+                    "name": "mem_test",
+                    "config_file": "mem.conf",
+                    "description": "Memory Test",
+                    "timeout": 10000,
+                    "expected_pass": true,
+                    "fail_regex_pattern": "FAIL|\\[ERROR\\s*\\]|RVS-ERROR"
+                },
+                {
+                    "name": "gst_single",
+                    "config_file": "gst_single.conf",
+                    "description": "GPU Stress Test",
+                    "timeout": 18000,
+                    "expected_pass": true,
+                    "fail_regex_pattern": "met:\\s*FALSE|RVS-ERROR"
+                },
+                {
+                    "name": "iet_single",
+                    "config_file": "iet_single.conf",
+                    "description": "Input EDPp Test",
+                    "timeout": 3600,
+                    "expected_pass": true,
+                    "fail_regex_pattern": "pass:\\s*FALSE|RVS-ERROR"
+                },
+                {
+                    "name": "pebb_single",
+                    "config_file": "pebb_single.conf",
+                    "description": "PCI Express Bandwidth Benchmark",
+                    "timeout": 3600,
+                    "expected_pass": true,
+                    "fail_regex_pattern": "\\[ERROR\\s*\\]|RVS-ERROR"
+                },
+                {
+                    "name": "pbqt_single",
+                    "config_file": "pbqt_single.conf",
+                    "description": "P2P Benchmark and Qualification Tool",
+                    "timeout": 3600,
+                    "expected_pass": true,
+                    "fail_regex_pattern": "FAIL|ERROR:|RVS-ERROR"
+                },
+                {
+                    "name": "peqt_single",
+                    "config_file": "peqt_single.conf",
+                    "description": "PCI Express Qualification Tool",
+                    "timeout": 1800,
+                    "expected_pass": true,
+                    "fail_regex_pattern": "peqt false|RVS-ERROR"
+                },
+                {
+                    "name": "rcqt_single",
+                    "config_file": "rcqt_single.conf",
+                    "description": "ROCm Configuration Qualification Tool",
+                    "timeout": 1800,
+                    "expected_pass": "true",
+                    "fail_regex_pattern": "\\[ERROR\\s*\\]|RVS-ERROR|Missing packages\\s*:\\s*([1-9]\\d*)|Version mismatch packages\\s*:\\s*([1-9]\\d*)"
+                },
+                {
+                    "name": "tst_single",
+                    "config_file": "tst_single.conf",
+                    "description": "Thermal Stress Test",
+                    "timeout": 1800,
+                    "expected_pass": true,
+                    "fail_regex_pattern": "pass: FLASE|RVS-ERROR"
+                },
+                {
+                    "name": "babel_stream",
+                    "config_file": "babel.conf",
+                    "description": "BABEL Benchmark Test",
+                    "timeout": 9000,
+                    "expected_pass": true,
+                    "fail_regex_pattern": "\\[ERROR\\s*\\]|RVS-ERROR"
+                }
+            ]
+        }
+    
     }
+
 
 
 Parameters
@@ -194,14 +197,20 @@ AGFHC
      - Default values
      - Description
    * - ``path``
-     - ``/root/cache/PACKAGES`` |br| ``/agfhc-mi300x_1.22.0`` |br| ``_ub2204.tar.bz2``
+     - ``/opt/amd/agfhc``
      - Path where AGFHC is installed
    * - ``package_tar_ball``
-     - ``/root/cache/INSTALL/agfhc/``
+     - ``/home/{user-id}/`` |br| ``PACKAGES/agfhc-mi300x`` |br| ``_1.22.0_ub2204.tar.bz2``
      - Path where the tar ball is downloaded   
    * - ``install_dir``
-     - ``/root/cache/INSTALL/agfhc/``
+     - ``/home/{user-id}/INSTALL/agfhc/``
      - Path where AGFHC runs
+   * - ``_comments_log_dir``
+     - ``/home/{user-id}/INSTALL/agfhc/``
+     - Path where AGFHC runs
+   * - ``log_dir``
+     - ``/root/agfhc_logs``
+     - Log directory
    * - ``nfs_install``
      - True
      - Set the flag to install nfs
@@ -223,10 +232,10 @@ TransferBench
      - ``/opt/amd/transferbench``
      - Path where TransferBench is installed
    * - ``example_tests_path``
-     - ``/root/cache/INSTALL`` |br| ``/TransferBench/examples``
+     - ``/home/{user-id}/INSTALL`` |br| ``/TransferBench/examples``
      - Path where TransferBench examples are installed
    * - ``git_install_path``
-     - ``/root/cache/INSTALL/``
+     - ``/home/{user-id}/INSTALL/``
      - Path where the Git repo is installed
    * - ``git_url``
      - `https://github.com/ROCm/TransferBench.git <https://github.com/ROCm/TransferBench.git>`_
@@ -300,7 +309,7 @@ ROCm Validation Suite (RVS)
      - ``/opt/rocm/bin``
      - Path where the RVS test is installed
    * - ``git_install_path``
-     - ``/root/cache/INSTALL``
+     - ``/home/{user-id}/INSTALL/rvs``
      - Path to installed Git repo
    * - ``git_url``
      - `https://github.com/ROCm/ROCmValidationSuite.git <https://github.com/ROCm/ROCmValidationSuite.git>`_
@@ -314,37 +323,208 @@ ROCm Validation Suite (RVS)
    * - ``config_path_default``
      - ``/opt/rocm/share/`` |br| ``rocm-validation`` |br| ``-suite/conf``
      -  Default path for RVS
+   * - ``_comment_rvs_test_level``
+     - "RVS test level configuration (0-5). 0: Run individual tests (skip level test), 1-5: Run LEVEL config test if RVS >= 1.3.0, else run individual tests. Default is 4."
+     -  RVS test comments
+   * - ``rvs_test_level``
+     - 4
+     - Test level
+   * - ``name``
+     - ``level_config``
+     - Test name
+   * - ``description``
+     - RVS LEVEL Configuration Test - Runs all modules collectively
+     - Test description
+   * - ``timeout``
+     - 14400
+     - Timeout in secs
+   * - ``expected_pass``
+     - True
+     - Result
+   * - ``fail_regex_pattern``
+     - Values:
+        - ``"met:\\s*FALSE",``
+        - ``"pass:\\s*FALSE",``
+        - ``"\\[ERROR\\s*\\]",``
+        - ``"FAIL",``
+        - ``"ERROR:",``
+        - ``"peqt false",``
+        - ``"RVS-ERROR",``
+        - ``"Missing packages\\s*:\\s*([1-9]\\d*)",``
+        - ``"Version mismatch packages\\s*:\\s*([1-9]\\d*)"``
+     - Regular expressions
+   * - ``name``
+     - ``gpup_single``
+     - Test name
+   * - ``config_file``
+     - ``gpup_single.conf``
+     - Test config file
+   * - ``description``
+     - GPU Properties Test
+     - Test description
+   * - ``timeout``
+     - 1800
+     - Timeout in secs
+   * - ``expected_pass``
+     - True
+     - Result
+   * - ``fail_regex_pattern``
+     - ``FAIL|ERROR|RVS-ERROR``
+     - Failure expression
+   * - ``name``
+     - ``mem_test``
+     - Test name
+   * - ``config_file``
+     - ``mem_test.conf``
+     - Test config file
+   * - ``description``
+     - Memory test
+     - Test description
+   * - ``timeout``
+     - 10000
+     - Timeout in secs
+   * - ``expected_pass``
+     - True
+     - Result
+   * - ``fail_regex_pattern``
+     - ``FAIL|\\[ERROR\\s*\\]|RVS-ERROR``
+     - Failure expression
    * - ``name``
      - ``gst_single``
      - Test name
    * - ``config_file``
      - ``gst_single.conf``
-     - Test configuration file
+     - Test config file
    * - ``description``
-     - GPU Stress Test - Single GPU validation
+     - GPU Stress Test
      - Test description
    * - ``timeout``
-     - 1800
-     - Timeout in seconds
+     - 18000
+     - Timeout in secs
    * - ``expected_pass``
      - True
      - Result
+   * - ``fail_regex_pattern``
+     - ``met:\\s*FALSE|RVS-ERROR``
+     - Failure expression
    * - ``name``
      - ``iet_single``
-     -  Test name
+     - Test name
    * - ``config_file``
      - ``iet_single.conf``
-     - Test configuration file
+     - Test config file
    * - ``description``
-     - Input EDPp Test - Single GPU validation
+     - Input EDPp Test
      - Test description
-   * - ``config_file``
-     - ``iet_single.conf``
-     - Test configuration file
+   * - ``timeout``
+     - 3600
+     - Timeout in secs
+   * - ``expected_pass``
+     - True
+     - Result
+   * - ``fail_regex_pattern``
+     - ``\\[ERROR\\s*\\]|RVS-ERROR``
+     - Failure expression
    * - ``name``
-     - ``pebb_single``
-     -  Test name
+     - ``pbqt_single``
+     - Test name
    * - ``config_file``
-     - ``pebb_single.conf``
-     - Test configuration file
- 
+     - ``pbqt_single.conf``
+     - Test config file
+   * - ``description``
+     - P2P Benchmark and Qualification Tool
+     - Test description
+   * - ``timeout``
+     - 3600
+     - Timeout in secs
+   * - ``expected_pass``
+     - True
+     - Result
+   * - ``fail_regex_pattern``
+     - ``FAIL|ERROR:|RVS-ERROR``
+     - Failure expression
+   * - ``name``
+     - ``peqt_single``
+     - Test name
+   * - ``config_file``
+     - ``peqt_single.conf``
+     - Test config file
+   * - ``description``
+     - PCI Express Qualification Tool
+     - Test description
+   * - ``timeout``
+     - 1800
+     - Timeout in secs
+   * - ``expected_pass``
+     - True
+     - Result
+   * - ``fail_regex_pattern``
+     - ``peqt false|RVS-ERROR``
+     - Failure expression
+   * - ``name``
+     - ``rcqt_single``
+     - Test name
+   * - ``config_file``
+     - ``rcqt_single.conf``
+     - Test config file
+   * - ``description``
+     - ROCm Configuration Qualification Tool
+     - Test description
+   * - ``timeout``
+     - 1800
+     - Timeout in secs
+   * - ``expected_pass``
+     - True
+     - Result
+   * - ``fail_regex_pattern``
+     - ``\\[ERROR\\s*\\]|RVS-ERROR|`` |br| ``Missing packages\\s*:`` |br| ``\\s*([1-9]\\d*)|Version`` |br| ``mismatch packages`` |br| ``\\s*:\\s*([1-9]\\d*)``
+     - Failure expression
+   * - ``name``
+     - ``tst_single``
+     - Test name
+   * - ``config_file``
+     - ``tst_single.conf``
+     - Test config file
+   * - ``description``
+     - Thermal Stress Test
+     - Test description
+   * - ``timeout``
+     - 1800
+     - Timeout in secs
+   * - ``expected_pass``
+     - True
+     - Result
+   * - ``fail_regex_pattern``
+     - ``pass: FLASE|RVS-ERROR``
+     - Failure expression
+   * - ``name``
+     - ``babel_stream``
+     - Test name
+   * - ``config_file``
+     - ``babel_stream.conf``
+     - Test config file
+   * - ``description``
+     - BABEL Benchmark Test
+     - Test description
+   * - ``timeout``
+     - 9000
+     - Timeout in secs
+   * - ``expected_pass``
+     - True
+     - Result
+   * - ``fail_regex_pattern``
+     - ``\\[ERROR\\s*\\]|RVS-ERROR``
+     - Failure expression
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+   
