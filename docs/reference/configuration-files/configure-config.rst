@@ -27,9 +27,9 @@ The following list provides a link to code snippets and the parameters for each 
 Enable passwordless SSH
 =======================
 
-Passwordless SSH is enabled among the head and child nodes for these files. 
+Passwordless SSH is enabled among the head and child nodes for the configuration files by default. 
 
-If Passwordless is not enabled, use these commands to enable it (you can enable this for any SSH key, not just the RSA key):
+If Passwordless SSH is not enabled, use these commands to enable it (you can enable this for any SSH key, not just the RSA key):
 
 .. tip:: 
 
@@ -57,7 +57,7 @@ If Passwordless is not enabled, use these commands to enable it (you can enable 
 
     ssh username@remote_host-ip
 
-  If the username is also the same in both nodes, then just use the IP address:
+4. If the username is also the same in both nodes, then just use the IP address:
 
    .. code:: bash
 
