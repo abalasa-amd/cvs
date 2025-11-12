@@ -224,7 +224,7 @@ Use the parameters in these tables to configure the training file.
      - Fraction of host memory XLA client may use
    * - ``xla_gpu_executable_warn_stuck_timeout``
      - 90
-     - Warn if GPU kernel runs too long
+     - Warning if GPU kernel runs too long
    * - ``nccl_proto``
      - Simple
      - NCCL protocol selection
@@ -750,7 +750,7 @@ Use the parameters in these tables to configure the training file.
      - Fraction of host memory XLA client may use
    * - ``xla_gpu_executable_warn_stuck_timeout``
      - 90
-     - 
+     - Warning if GPU kernel runs too long
    * - ``hf_token_file``
      - ``/home/{user-id}/.hf_token``
      - Path to Hugging Face token file for model access
@@ -1345,7 +1345,7 @@ Use the parameters in these tables to configure the training file.
      - Docker shared memory size for container
    * - ``xla_gpu_executable_warn_stuck_timeout``
      - 90
-     - 
+     - Warning if GPU kernel runs too long
    * - ``_comments_data_cache_dir``
      - "This path should be accessible from all nodes like a common FS like NFS for distributed training"
      - A comment stating that ``data_cache_dir`` should be shared across nodes
@@ -1942,7 +1942,7 @@ Use the parameters in these tables to configure the training file.
      - Fraction of host memory XLA client may use
    * - ``xla_gpu_executable_warn_stuck_timeout``
      - 90
-     - 
+     - Warning if GPU kernel runs too long
    * - ``hf_token_file``
      - ``/home/{user-id}/.hf_token``
      - Path to Hugging Face token file for model access
