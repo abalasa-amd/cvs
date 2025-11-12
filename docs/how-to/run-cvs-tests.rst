@@ -253,28 +253,28 @@ Use these test scripts to run the JAX tests.
 
   Ensure all nodes are capable of running dockers.
 
-Single Node 70b MI3xx
+Single Node 70b MI3XX
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax/mi300x_singlenode_llama3_1_70b.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
  
-Single Node 70b MI35x
+Single Node 70b MI35X
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax/mi35x_singlenode_llama_3_1_70b.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
  
-Distributed 70b MI3xx
+Distributed 70b MI3XX
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/training/jax/distributed_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/jax/mi300x_distributed_llama3_1_70b.json --html=/var/www/html/cvs/jax.html --capture=tee-sys --self-contained-html
  
-Distributed 405b MI3xx
+Distributed 405b MI3XX
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
@@ -303,28 +303,28 @@ Here are the Megatron training test cases:
  
 Use these scripts to run the Megatron tests.
 
-Single Node 8b MI3xx
+Single Node 8b MI3XX
 ~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi3xx_singlenode_megatron_llama.json --html=/var/www/html/cvs/megatron.html --capture=tee-sys --self-contained-html
 
-Single Node 8b MI35x
+Single Node 8b MI35X
 ~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_8b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/ mi35x_singlenode_megatron_llama.json --html=/var/www/html/cvs/megatron.html --capture=tee-sys --self-contained-html
 
-Single Node 70b MI3xx
+Single Node 70b MI3XX
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash
 
   pytest -vvv --log-file=/tmp/test.log -s ./tests/training/megatron/singlenode_llama_3_1_70b.py --cluster_file input/cluster_file/cluster.json  --config_file input/config_file/training/megatron/mi3xx_singlenode_megatron_llama.json --html=/var/www/html/cvs/megatron.html --capture=tee-sys --self-contained-html
 
-Single Node 70b MI35x
+Single Node 70b MI35X
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. code:: bash

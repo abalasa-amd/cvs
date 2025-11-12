@@ -57,7 +57,7 @@ If Passwordless SSH is not enabled, use these commands to enable it (you can ena
 
     ssh username@remote_host-ip
 
-4. If the username is also the same in both nodes, then just use the IP address:
+4. If the username is also the same in both nodes, then use the IP address:
 
    .. code:: bash
 
