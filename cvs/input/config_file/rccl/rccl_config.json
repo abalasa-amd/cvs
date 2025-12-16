@@ -44,6 +44,8 @@
        "nccl_ib_split_data_on_qps": "0",
        "nccl_pxn_disable": [ "0", "1" ],
        "nccl_net_plugin": "none",
+       "_comment_channel_config_list": "NCCL channel configurations in 'min-max' format (e.g., '16-16' sets NCCL_MIN_NCHANNELS=16 and NCCL_MAX_NCHANNELS=16). Each value creates a separate test case. For GFX950: 1-node use [14-14, 28-28, 56-56, 112-112 (default)], multi-node use [16-16, 32-32, 48-48, 64-64 (default)]. For GFX942: 1-node use [14-14, 28-28, 56-56 (default)], multi-node use [16-16, 32-32, 48-48, 64-64 (default)].",
+       "channel_config_list": [ "16-16", "32-32", "48-48", "64-64" ],
        "verify_bus_bw": "False",
        "verify_bw_dip": "True",
        "verify_lat_dip": "True",
