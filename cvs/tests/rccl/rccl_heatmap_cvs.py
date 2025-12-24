@@ -282,7 +282,7 @@ def pytest_generate_tests(metafunc):
 
     gpu_count_list = rccl.get("gpu_count_list", ["8", "16"])
     data_type_list = rccl.get("data_type_list", ["float", "bfloat16"])
-    channel_config_list = rccl.get("channel_config_list", ["64-64"])
+    channel_config_list = rccl.get("channel_config_list", ["default"])
     all_keys = ("rccl_collective", "gpu_count", "data_type", "channel_config")
 
     active = [k for k in all_keys if k in metafunc.fixturenames]
@@ -339,8 +339,13 @@ def test_rccl_perf(cluster_dict, config_dict, rccl_collective, gpu_count, data_t
     node_list = full_node_list[:no_of_nodes]
     no_of_global_ranks = int(gpu_count)
     
-    # Parse channel configuration (format: "min-max")
-    if "-" in str(channel_config):
+    # Parse channel configuration (format: "min-max" or "default")
+    if str(channel_config).lower() == "default":
+        # Use RCCL defaults (don't specify channel parameters)
+        min_channels = None
+        max_channels = None
+    elif "-" in str(channel_config):
+        # Parse "min-max" format
         min_channels, max_channels = channel_config.split("-")
         min_channels = int(min_channels)
         max_channels = int(max_channels)
