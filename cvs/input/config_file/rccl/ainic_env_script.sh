@@ -1,6 +1,8 @@
 # Recommended AINIC env setting
 export IONIC_LOCKFREE=all
-export NCCL_IB_FIFO_TC=185
+export NCCL_IB_TC=0 #change it as per the network settings
+export NCCL_IB_FIFO_TC=0 #change it as per the network settings
+export HSA_NO_SCRATCH_RECLAIM=1
 export NCCL_GDR_FLUSH_DISABLE=1
 export NCCL_IGNORE_CPU_AFFINITY=1
 export NCCL_NET_OPTIONAL_RECV_COMPLETION=1
