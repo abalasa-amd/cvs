@@ -573,7 +573,7 @@ class SglangDisaggPD:
                 out_dict = self.p_phdl.exec(
                     f'grep -B 20 -A 20 "200 OK" {self.log_dir}/prefill_node{node_no}/prefill_server.log'
                 )
-                if re.search('GET', out_dict[head_node], re.I):
+                if re.search('GET|POST', out_dict[head_node], re.I):
                     print('Wait 60 secs to start serving traffic')
                     time.sleep(60)
                     # if re.search('fired up and ready to roll', out_dict[head_node], re.I ):
@@ -592,7 +592,7 @@ class SglangDisaggPD:
                 out_dict = self.d_phdl.exec(
                     f'grep -B 20 -A 20 "200 OK" {self.log_dir}/decode_node{node_no}/decode_server.log'
                 )
-                if re.search('GET', out_dict[head_node]):
+                if re.search('GET|POST', out_dict[head_node]):
                     print('Wait 60 secs to start serving traffic')
                     time.sleep(60)
                     # if re.search('fired up and ready to roll', out_dict[head_node], re.I ):
