@@ -24,7 +24,7 @@ inference_err_dict = {
     'rocm Err': 'FAILED_PRECONDITION: No visible GPU devices|failed call to hipInit: HIP_ERROR_NoDevice|librocm reported version is: NOT_FOUND',
     'python err': 'ModuleNotFoundError: No module named|Fatal Python error:',
     'resource': 'RESOURCE_EXHAUSTED: Out of memory|failed: RESOURCE_EXHAUSTED|urllib.error.URLError|ConnectionRefusedError,HSA_STATUS_ERROR_OUT_OF_RESOURCES',
-    'app_err': 'Service Unavailable|No decode workers available|No prefill workers available|Please check if decode servers are configured and healthy|Please check if prefill servers are configured and healthy|Cannot access gated repo|You must have access to it and be authenticated'
+    'app_err': 'Service Unavailable|No decode workers available|No prefill workers available|Please check if decode servers are configured and healthy|Please check if prefill servers are configured and healthy|Cannot access gated repo|You must have access to it and be authenticated',
 }
 
 err_counters_pattern = 'err|retransmit|drop|discard|naks|invalid|oflow|out_of_buffer|reset|fail'
@@ -47,9 +47,9 @@ class SglangDisaggPD:
         b_phdl=None,
         gpu_type='mi300',
         user_name=None,
-        priv_key_file=None
+        priv_key_file=None,
     ):
-        # 
+        #
         self.user_name = user_name
         self.priv_key_file = priv_key_file
         self.model_name = model_name
@@ -89,7 +89,6 @@ class SglangDisaggPD:
         if self.b_phdl is None:
             self.b_phdl = Pssh(log, self.benchmark_serv_node, user=self.user_name, pkey=self.priv_key_file)
 
-
         self.job_cmd = ''
         self.job_cmd_list = []
         self.inference_results_dict = {}
@@ -115,10 +114,10 @@ class SglangDisaggPD:
         self.inf_dict.setdefault('nccl_debug', 'ERROR')
         self.inf_dict.setdefault('data_cache_dir', f'{self.home_dir}/cache')
         self.inf_dict.setdefault('log_dir', f'{self.home_dir}/LOG_DIR')
-        self.inf_dict.setdefault('max_concurrent_requests', '-1' )
-        self.inf_dict.setdefault('queue_size', '100' )
-        self.inf_dict.setdefault('queue_timeout_secs', '60' )
-        self.inf_dict.setdefault('max_retries', '5' )
+        self.inf_dict.setdefault('max_concurrent_requests', '-1')
+        self.inf_dict.setdefault('queue_size', '100')
+        self.inf_dict.setdefault('queue_timeout_secs', '60')
+        self.inf_dict.setdefault('max_retries', '5')
 
         print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         print(f'inference_dict = {self.inf_dict}')
@@ -162,13 +161,9 @@ class SglangDisaggPD:
         print(f'benchmark_params_dict = {self.bp_dict}')
         print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
 
-
-
-
-
-
-
-    def install_container_packages( self, ):
+    def install_container_packages(
+        self,
+    ):
         print('Run pre inference tasks')
         # Install ip tools
         cmd = f'docker exec {self.container_name} /bin/bash -c " \
@@ -180,8 +175,9 @@ class SglangDisaggPD:
         self.d_phdl.exec(cmd)
         self.r_phdl.exec(cmd)
 
-
-    def exec_nic_setup_scripts( self, ):
+    def exec_nic_setup_scripts(
+        self,
+    ):
         """
         Execute NIC-related setup steps inside the inference container.
 
@@ -216,27 +212,24 @@ class SglangDisaggPD:
                     print(dout_dict[node])
                     fail_test(f'Broadcom libbnxt rdma driver is not properly copied on node {node}')
 
-
-
-
-
-    def bringup_etcd_mooncake( self, ):
+    def bringup_etcd_mooncake(
+        self,
+    ):
         print('To be added in future, for now use NCCL')
 
-
-
-
-    def check_ibv_devices( self, ):
-        for hdl in [ self.p_phdl, self.d_phdl ]:
+    def check_ibv_devices(
+        self,
+    ):
+        for hdl in [self.p_phdl, self.d_phdl]:
             cmd = f'''docker exec {self.container_name} /bin/bash -c "ibv_devinfo" '''
-            out_dict = hdl.exec(cmd) 
+            out_dict = hdl.exec(cmd)
             for node in out_dict.keys():
-                if re.search( 'No IB devices found', out_dict[node], re.I ):
-                    fail_test( f'IB devices not seen inside the container for node {node}' )
+                if re.search('No IB devices found', out_dict[node], re.I):
+                    fail_test(f'IB devices not seen inside the container for node {node}')
 
-
-    def setup_prefill_container_env( self, ):
-
+    def setup_prefill_container_env(
+        self,
+    ):
         # Env setup for Prefill Nodes ..
         p_cmd = f'''docker exec {self.container_name} /bin/bash -c "echo '
 
@@ -265,10 +258,9 @@ class SglangDisaggPD:
                    chmod 755 /tmp/prefill_env_script.sh; /tmp/prefill_env_script.sh" '''
         self.p_phdl.exec(cmd)
 
-
-
-
-    def setup_decode_container_env( self, ):
+    def setup_decode_container_env(
+        self,
+    ):
         # Env setup for Decode Nodes ..
         d_cmd = f'''docker exec {self.container_name} /bin/bash -c "echo '
 
@@ -297,10 +289,9 @@ class SglangDisaggPD:
                    chmod 755 /tmp/decode_env_script.sh; /tmp/decode_env_script.sh" '''
         self.d_phdl.exec(cmd)
 
-
-
-
-    def setup_proxy_router_container_env( self, ):
+    def setup_proxy_router_container_env(
+        self,
+    ):
         # Env setup for Proxy Router Node ..
         r_cmd = f'''docker exec {self.container_name} /bin/bash -c "echo '
 
@@ -324,9 +315,9 @@ class SglangDisaggPD:
                    chmod 755 /tmp/router_env_script.sh; /tmp/router_env_script.sh" '''
         self.r_phdl.exec(cmd)
 
-
-
-    def setup_benchmark_serv_container_env( self, ):
+    def setup_benchmark_serv_container_env(
+        self,
+    ):
         # Env setup for Benchserv node ..
         b_cmd = f'''docker exec {self.container_name} /bin/bash -c "echo '
 
@@ -350,37 +341,33 @@ class SglangDisaggPD:
         self.b_phdl.exec(cmd)
         time.sleep(5)
 
-
-
-    def start_etcd_on_prefill_nodes( self, ):
+    def start_etcd_on_prefill_nodes(
+        self,
+    ):
         # Start ETCd on Prefill nodes ..
         print('start etcd')
 
-
-    def run_test_rmsnorm( self, max_jobs=192 ):
+    def run_test_rmsnorm(self, max_jobs=192):
         print('#================ * * * =========================#')
         print('Run rmsnorm2d')
         print('#================ * * * =========================#')
         cmd = f'''docker exec {self.container_name} /bin/bash -c  "MAX_JOBS={max_jobs} \
                 python /sgl-workspace/aiter/op_tests/test_rmsnorm2d.py > /tmp/rsmnorm_test.log 2>&1 &" '''
-        for hdl in [ self.p_phdl, self.d_phdl, self.r_phdl ]:
+        for hdl in [self.p_phdl, self.d_phdl, self.r_phdl]:
             out_dict = hdl.exec(cmd)
         print('Wait 180 secs for tests to complete')
         time.sleep(180)
-        for hdl in [ self.p_phdl, self.d_phdl, self.r_phdl ]:
+        for hdl in [self.p_phdl, self.d_phdl, self.r_phdl]:
             cmd = f'''docker exec {self.container_name} /bin/bash -c  "cat /tmp/rsmnorm_test.log" '''
             out_dict = hdl.exec(cmd)
             for node in out_dict.keys():
-                if re.search( 'fail', out_dict[node], re.I ):
+                if re.search('fail', out_dict[node], re.I):
                     print(f'Some failures observed in test rmsnorm on node {node}')
                     fail_test(f'Some failures observed in test rmsnorm on node {node}')
 
-
-
-
     # supported --dtype {auto,half,float16,bfloat16,float,float32}
     # supported --kv-cache-dtype {auto,fp8_e5m2,fp8_e4m3,bf16,bfloat16,fp4_e2m1}
-    def launch_prefill_servers( self, dtype='auto', kv_cache_dtype='auto' ):
+    def launch_prefill_servers(self, dtype='auto', kv_cache_dtype='auto'):
         print('#================ * * * =========================#')
         print('Create Prefill launch script on Prefill nodes')
         print('#================ * * * =========================#')
@@ -428,9 +415,7 @@ class SglangDisaggPD:
         self.p_phdl.exec_cmd_list(cmd_list)
         time.sleep(5)
 
-
-
-    def launch_decode_servers( self, dtype='auto', kv_cache_dtype='auto' ):
+    def launch_decode_servers(self, dtype='auto', kv_cache_dtype='auto'):
         print('#================ * * * =========================#')
         print('Create Decode launch script on Decode nodes')
         print('#================ * * * =========================#')
@@ -477,18 +462,19 @@ class SglangDisaggPD:
             cmd_list.append(formatted_cmd)
         self.d_phdl.exec_cmd_list(cmd_list)
 
-
-
-    def poll_and_check_server_ready( self, ):
+    def poll_and_check_server_ready(
+        self,
+    ):
         print('Waiting 120 secs after launching decode script')
         time.sleep(120)
         for node_no in range(0, self.prefill_nnodes):
-            self.poll_for_server_ready( node_no, 'prefill')
+            self.poll_for_server_ready(node_no, 'prefill')
         for node_no in range(0, self.decode_nnodes):
-            self.poll_for_server_ready( node_no, 'decode')
+            self.poll_for_server_ready(node_no, 'decode')
 
-
-    def launch_proxy_router( self, ):
+    def launch_proxy_router(
+        self,
+    ):
         prefill_str = ''
         for prefill_node in self.prefill_node_list:
             prefill_str = prefill_str + f"--prefill http://{prefill_node}:{self.inf_dict['prefill_serv_port']} "
@@ -525,10 +511,9 @@ class SglangDisaggPD:
         print('Waiting 120 secs after launching proxy router script')
         time.sleep(120)
 
-
-
-
-    def run_gsm8k_benchmark_test( self, ):
+    def run_gsm8k_benchmark_test(
+        self,
+    ):
         print('#================ * * * =========================#')
         print('Create Benchmark script')
         print('#================ * * * =========================#')
@@ -543,22 +528,22 @@ class SglangDisaggPD:
                       --parallel {i_dict['max_concurrency']} \
                       --host http://0.0.0.0 --port {self.inf_dict['proxy_router_serv_port']}" '''
         formatted_cmd = textwrap_for_yml(cmd)
-        out_dict = self.b_phdl.exec(formatted_cmd, timeout=800 )
+        out_dict = self.b_phdl.exec(formatted_cmd, timeout=800)
         time.sleep(5)
         for node in out_dict.keys():
-            if not re.search( 'Output throughput', out_dict[node], re.I ):
-                fail_test( f'Benchmark test did not complete properly on node {node}, no throughput pattern seen')
+            if not re.search('Output throughput', out_dict[node], re.I):
+                fail_test(f'Benchmark test did not complete properly on node {node}, no throughput pattern seen')
             else:
-                match = re.search( 'Output throughput:\s+([0-9\.]+)\s+token', out_dict[node], re.I)
+                match = re.search('Output throughput:\s+([0-9\.]+)\s+token', out_dict[node], re.I)
                 actual_tps = match.group(1)
                 if float(actual_tps) < float(i_dict['expected_results']['tokens_per_sec']):
-                    fail_test( f"Test FAILED due to low performance, \
-                            expected tokens per sec = {i_dict['expected_results']['token_per_sec']}, \
-                            actual tokens per sec = {actual_tps}" )
+                    fail_test(
+                        f"Test FAILED due to low performance, \
+                            expected tokens per sec = {i_dict['expected_results']['tokens_per_sec']}, \
+                            actual tokens per sec = {actual_tps}"
+                    )
 
-
-
-    def benchserv_test_random( self, d_type='auto' ):
+    def benchserv_test_random(self, d_type='auto'):
         print('#================ * * * =========================#')
         print('Benchmark Random Dataset')
         print('#================ * * * =========================#')
@@ -575,29 +560,25 @@ class SglangDisaggPD:
                       --host 0.0.0.0 --port {self.inf_dict['proxy_router_serv_port']} \
                       > {self.log_dir}/benchmark_node/benchmark_results.log" '''
         formatted_cmd = textwrap_for_yml(cmd)
-        out_dict = self.b_phdl.exec(formatted_cmd, timeout=500 )
+        out_dict = self.b_phdl.exec(formatted_cmd, timeout=500)
         time.sleep(5)
-        self.poll_for_inference_completion( iterations=10, \
-            waittime_between_iters=60 )
-        self.verify_inference_results( 'bench_serv', i_dict['expected_results'][d_type] )
+        self.poll_for_inference_completion(iterations=10, waittime_between_iters=60)
+        self.verify_inference_results('bench_serv', i_dict['expected_results'][d_type])
 
-
-
-
-
-
-    def poll_for_server_ready(self, node_no, sglang_function, no_of_iterations=11 ):
-
+    def poll_for_server_ready(self, node_no, sglang_function, no_of_iterations=11):
         # This method assumes the LOG directory is on common FS like NFS and
         # accessible from all nodes.
-        if re.search( 'prefill', sglang_function ):
+        if re.search('prefill', sglang_function):
             head_node = self.prefill_node_list[0]
-            for j in range(1,no_of_iterations):
+            for j in range(1, no_of_iterations):
                 print(f'Starting poll iteration {j}')
-                out_dict = self.p_phdl.exec( f'grep -B 20 -A 20 "200 OK" {self.log_dir}/prefill_node{node_no}/prefill_server.log')
-                if re.search( 'GET', out_dict[head_node], re.I ):
-                    #time.sleep(45)
-                    #if re.search('fired up and ready to roll', out_dict[head_node], re.I ):
+                out_dict = self.p_phdl.exec(
+                    f'grep -B 20 -A 20 "200 OK" {self.log_dir}/prefill_node{node_no}/prefill_server.log'
+                )
+                if re.search('GET', out_dict[head_node], re.I):
+                    print('Wait 60 secs to start serving traffic')
+                    time.sleep(60)
+                    # if re.search('fired up and ready to roll', out_dict[head_node], re.I ):
                     #    print('Prefill server {node_no} ready to serve')
                     return
                 else:
@@ -606,14 +587,17 @@ class SglangDisaggPD:
             head_node = self.prefill_node_list[0]
             print(f'Prefill node {node_no} did not get to ready to serve 200 OK state in {j} iterations')
             fail_test(f'Prefill node {node_no} did not get to ready to serve 200 OK state in {j} iterations')
-        elif re.search( 'decode', sglang_function ):
+        elif re.search('decode', sglang_function):
             head_node = self.decode_node_list[0]
-            for j in range(1,no_of_iterations):
+            for j in range(1, no_of_iterations):
                 print(f'Starting poll iteration {j}')
-                out_dict = self.d_phdl.exec( f'grep -B 20 -A 20 "200 OK" {self.log_dir}/decode_node{node_no}/decode_server.log')
-                if re.search( 'GET', out_dict[head_node] ):
-                    #time.sleep(45)
-                    #if re.search('fired up and ready to roll', out_dict[head_node], re.I ):
+                out_dict = self.d_phdl.exec(
+                    f'grep -B 20 -A 20 "200 OK" {self.log_dir}/decode_node{node_no}/decode_server.log'
+                )
+                if re.search('GET', out_dict[head_node]):
+                    print('Wait 60 secs to start serving traffic')
+                    time.sleep(60)
+                    # if re.search('fired up and ready to roll', out_dict[head_node], re.I ):
                     #    print('Decode server {node_no} ready to serve')
                     return
                 else:
@@ -622,13 +606,7 @@ class SglangDisaggPD:
             print(f'Decode node {node_no} did not get to ready to serve 200 OK state in {j} iterations')
             fail_test(f'Decode node {node_no} did not get to ready to serve 200 OK state in {j} iterations')
 
-
-
-
-
-
     def get_inference_results_dict(self, out_dict):
-
         self.inference_results_dict = {}
         print('Inside get_inference_results_dict')
         print(out_dict)
@@ -692,12 +670,6 @@ class SglangDisaggPD:
         print(self.inference_results_dict)
         return self.inference_results_dict
 
-
-
-
-
-
-
     def scan_for_inference_errors(
         self,
     ):
@@ -735,15 +707,11 @@ class SglangDisaggPD:
                     log.error('Aborting inference log polling')
                     inference_pass = False
 
-
         return inference_pass
 
-
-
-
-
-    def poll_for_inference_completion(self, iterations=10, \
-            waittime_between_iters=60, total_timeout=3600, require_all_nodes=True):
+    def poll_for_inference_completion(
+        self, iterations=10, waittime_between_iters=60, total_timeout=3600, require_all_nodes=True
+    ):
         # Initial wait to give inference time to start logging
         time.sleep(60)
 
@@ -806,11 +774,7 @@ class SglangDisaggPD:
             print(msg)
             return {"status": "stuck_in_progress", "reason": msg}
 
-
-
-    def verify_inference_results(
-        self, test_name, expected_result_dict
-    ):
+    def verify_inference_results(self, test_name, expected_result_dict):
         print('Verify Inference Completion Msg')
         print('%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
         print(self.inference_results_dict)

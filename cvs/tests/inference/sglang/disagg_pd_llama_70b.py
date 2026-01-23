@@ -20,9 +20,6 @@ from cvs.lib import globals
 log = globals.log
 
 
-
-
-
 # Importing additional cmd line args to script ..
 @pytest.fixture(scope="module")
 def cluster_file(pytestconfig):
@@ -60,10 +57,6 @@ def inference_config_file(pytestconfig):
     return pytestconfig.getoption("config_file")
 
 
-
-
-
-
 # Importing the cluster and cofig files to script to access node, switch, test config params
 @pytest.fixture(scope="module")
 def cluster_dict(cluster_file):
@@ -86,9 +79,6 @@ def cluster_dict(cluster_file):
     cluster_dict = resolve_cluster_config_placeholders(cluster_dict)
     log.info(cluster_dict)
     return cluster_dict
-
-
-
 
 
 @pytest.fixture(scope="module")
@@ -142,22 +132,20 @@ def hf_token(inference_dict):
     return hf_token
 
 
-
-
-
-
 @pytest.fixture(scope="module")
 def p_phdl(cluster_dict, inference_dict):
     print(cluster_dict)
-    p_phdl = Pssh(log, inference_dict['prefill_node_list'], user=cluster_dict['username'], \
-            pkey=cluster_dict['priv_key_file'])
+    p_phdl = Pssh(
+        log, inference_dict['prefill_node_list'], user=cluster_dict['username'], pkey=cluster_dict['priv_key_file']
+    )
     return p_phdl
 
 
 @pytest.fixture(scope="module")
 def d_phdl(cluster_dict, inference_dict):
-    d_phdl = Pssh(log, inference_dict['decode_node_list'], user=cluster_dict['username'], \
-            pkey=cluster_dict['priv_key_file'])
+    d_phdl = Pssh(
+        log, inference_dict['decode_node_list'], user=cluster_dict['username'], pkey=cluster_dict['priv_key_file']
+    )
     return d_phdl
 
 
@@ -165,22 +153,16 @@ def d_phdl(cluster_dict, inference_dict):
 def r_phdl(cluster_dict, inference_dict):
     node_list = []
     node_list.append(inference_dict['proxy_router_node'])
-    r_phdl = Pssh(log, node_list, user=cluster_dict['username'], \
-            pkey=cluster_dict['priv_key_file'])
+    r_phdl = Pssh(log, node_list, user=cluster_dict['username'], pkey=cluster_dict['priv_key_file'])
     return r_phdl
-
 
 
 @pytest.fixture(scope="module")
 def b_phdl(cluster_dict, inference_dict):
     node_list = []
     node_list.append(inference_dict['benchmark_serv_node'])
-    b_phdl = Pssh(log, node_list, user=cluster_dict['username'], \
-            pkey=cluster_dict['priv_key_file'])
+    b_phdl = Pssh(log, node_list, user=cluster_dict['username'], pkey=cluster_dict['priv_key_file'])
     return b_phdl
-
-
-
 
 
 @pytest.fixture(scope="module")
@@ -207,23 +189,13 @@ def gpu_type(p_phdl, cluster_dict):
     return gpu_type
 
 
-
 # Create the SGlang Inference Object Fixture
 @pytest.fixture(scope="module")
-def im_obj( p_phdl, d_phdl, r_phdl, b_phdl, gpu_type, inference_dict, \
-        benchmark_params_dict, hf_token):
+def im_obj(p_phdl, d_phdl, r_phdl, b_phdl, gpu_type, inference_dict, benchmark_params_dict, hf_token):
     globals.error_list = []
     bp_dict = benchmark_params_dict['llama-70b']
     im_obj = sglang_disagg_lib.SglangDisaggPD(
-        bp_dict['model'],
-        inference_dict,
-        bp_dict,
-        hf_token,
-        p_phdl,
-        d_phdl,
-        r_phdl,
-        b_phdl,
-        gpu_type
+        bp_dict['model'], inference_dict, bp_dict, hf_token, p_phdl, d_phdl, r_phdl, b_phdl, gpu_type
     )
     return im_obj
 
@@ -255,16 +227,11 @@ def test_cleanup_stale_containers(p_phdl, d_hdl, r_hdl, inference_dict):
     r_hdl.exec(f'sudo rm -rf {self.log_dir}')
 
 
-
-def test_cleanup_stale_containers( p_phdl, d_phdl, r_phdl, b_phdl, inference_dict):
-
-    for a_phdl in [ p_phdl, d_phdl, r_phdl ]:
+def test_cleanup_stale_containers(p_phdl, d_phdl, r_phdl, b_phdl, inference_dict):
+    for a_phdl in [p_phdl, d_phdl, r_phdl]:
         container_name = inference_dict['container_name']
         docker_lib.kill_docker_container(a_phdl, container_name)
         docker_lib.delete_all_containers_and_volumes(a_phdl)
-
-
-
 
 
 def test_launch_inference_containers(p_phdl, d_phdl, r_phdl, b_phdl, inference_dict):
@@ -273,9 +240,9 @@ def test_launch_inference_containers(p_phdl, d_phdl, r_phdl, b_phdl, inference_d
     container_name = inference_dict['container_name']
     # Launch the containers ..
     if inference_dict['proxy_router_node'] == inference_dict['benchmark_serv_node']:
-        hdl_list = [ p_phdl, d_phdl, r_phdl ]
+        hdl_list = [p_phdl, d_phdl, r_phdl]
     else:
-        hdl_list = [ p_phdl, d_phdl, r_phdl, b_phdl ]
+        hdl_list = [p_phdl, d_phdl, r_phdl, b_phdl]
 
     for a_phdl in hdl_list:
         docker_lib.launch_docker_container(
@@ -291,7 +258,7 @@ def test_launch_inference_containers(p_phdl, d_phdl, r_phdl, b_phdl, inference_d
     # ADD verifications ..
     time.sleep(30)
     print('Verify if the containers have been launched properly')
-    for a_phdl in [ p_phdl, d_phdl, r_phdl, b_phdl ]:
+    for a_phdl in [p_phdl, d_phdl, r_phdl, b_phdl]:
         out_dict = a_phdl.exec('docker ps')
         for node in out_dict.keys():
             if not re.search(f'{container_name}', out_dict[node], re.I):
@@ -299,26 +266,22 @@ def test_launch_inference_containers(p_phdl, d_phdl, r_phdl, b_phdl, inference_d
     update_test_result()
 
 
-
-
 # Setup the ib devices and ensure they show up in the container
-def test_setup_ibv_devices( im_obj ):
+def test_setup_ibv_devices(im_obj):
     globals.error_list = []
     im_obj.check_ibv_devices()
     im_obj.exec_nic_setup_scripts()
     update_test_result()
 
 
-
-def test_rms_norm( im_obj ):
+def test_rms_norm(im_obj):
     globals.error_list = []
     im_obj.run_test_rmsnorm()
     update_test_result()
 
 
-
 # Test to start the prefill servers using sglang.launch_server
-def test_launch_prefill_servers( im_obj ):
+def test_launch_prefill_servers(im_obj):
     globals.error_list = []
     im_obj.setup_prefill_container_env()
     im_obj.launch_prefill_servers()
@@ -326,23 +289,23 @@ def test_launch_prefill_servers( im_obj ):
 
 
 # Test to start the decode servers using sglang.launch_server
-def test_launch_decode_servers( im_obj ):
+def test_launch_decode_servers(im_obj):
     globals.error_list = []
     im_obj.setup_decode_container_env()
     im_obj.launch_decode_servers()
     update_test_result()
 
 
-# Test to validate the Prefill and Decode servers are ready to serve 
+# Test to validate the Prefill and Decode servers are ready to serve
 # Inference traffic
-def test_poll_for_server_ready( im_obj ):
+def test_poll_for_server_ready(im_obj):
     globals.error_list = []
     im_obj.poll_and_check_server_ready()
     update_test_result()
 
 
 # Start the proxy router serving using sglang_router.launch_router
-def test_launch_proxy_router( im_obj ):
+def test_launch_proxy_router(im_obj):
     globals.error_list = []
     im_obj.setup_proxy_router_container_env()
     im_obj.launch_proxy_router()
@@ -350,17 +313,16 @@ def test_launch_proxy_router( im_obj ):
 
 
 # Test to run the canned gsm8k benchmark packaged with the container
-def test_run_gsm8k_benchmark_test( im_obj ):
+def test_run_gsm8k_benchmark_test(im_obj):
     globals.error_list = []
     im_obj.setup_benchmark_serv_container_env()
     im_obj.run_gsm8k_benchmark_test()
     update_test_result()
 
 
-
 # Test to run the sglang Benchmarking Testing using bench_serv
-def test_run_benchmark_test( im_obj ):
+def test_run_benchmark_test(im_obj):
     globals.error_list = []
     im_obj.setup_benchmark_serv_container_env()
-    im_obj.benchserv_test_random( d_type='auto' )
+    im_obj.benchserv_test_random(d_type='auto')
     update_test_result()
