@@ -543,7 +543,7 @@ class SglangDisaggPD:
                       --parallel {i_dict['max_concurrency']} \
                       --host http://0.0.0.0 --port {self.inf_dict['proxy_router_serv_port']}" '''
         formatted_cmd = textwrap_for_yml(cmd)
-        out_dict = self.b_phdl.exec(formatted_cmd, timeout=500 )
+        out_dict = self.b_phdl.exec(formatted_cmd, timeout=800 )
         time.sleep(5)
         for node in out_dict.keys():
             if not re.search( 'Output throughput', out_dict[node], re.I ):
