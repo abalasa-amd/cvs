@@ -189,29 +189,9 @@ def gpu_type(p_phdl, cluster_dict):
     return gpu_type
 
 
-# Create the SGlang Inference Object Fixture
-@pytest.fixture(scope="module")
-def im_obj(p_phdl, d_phdl, r_phdl, b_phdl, gpu_type, inference_dict, benchmark_params_dict, hf_token):
-    globals.error_list = []
-    bp_dict = benchmark_params_dict['llama-70b']
-    im_obj = sglang_disagg_lib.SglangDisaggPD(
-        bp_dict['model'], inference_dict, bp_dict, hf_token, p_phdl, d_phdl, r_phdl, b_phdl, gpu_type
-    )
-    return im_obj
-
-
-def test_cleanup_stale_containers(p_phdl, d_hdl, r_hdl, inference_dict):
+def test_cleanup_stale_containers(p_phdl, d_phdl, r_phdl, b_phdl, inference_dict):
     """
     Pytest: Clean up potentially stale Docker containers and volumes before tests.
-
-    Args:
-      s_phdl: Parallel SSH/process handle used by docker_lib to run commands on nodes.
-      inference_dict (dict): Training configuration dict that includes:
-        - 'container_name': Name of the container to be killed if running.
-
-    Behavior:
-      - Kills the specific container identified by inference_dict['container_name'].
-      - Deletes all containers and volumes on the target nodes (broad cleanup).
 
     Notes:
       - This performs a broad cleanup via delete_all_containers_and_volumes; ensure the
@@ -220,11 +200,14 @@ def test_cleanup_stale_containers(p_phdl, d_hdl, r_hdl, inference_dict):
     """
 
     container_name = inference_dict['container_name']
-    docker_lib.kill_docker_container(s_phdl, container_name)
-    docker_lib.delete_all_containers_and_volumes(s_phdl)
-    # Cleanup log directory
+    for a_phdl in [p_phdl, d_phdl, r_phdl, b_phdl]:
+        docker_lib.kill_docker_container(a_phdl, container_name)
+        docker_lib.delete_all_containers_and_volumes(a_phdl)
+
+    # Cleanup log directory from one of the nodes
     print('Cleaning up log directory')
-    r_hdl.exec(f'sudo rm -rf {self.log_dir}')
+    r_phdl.exec(f"sudo rm -rf {inference_dict['log_dir']}")
+    time.sleep(5)
 
 
 def test_launch_inference_containers(p_phdl, d_phdl, r_phdl, b_phdl, inference_dict):
@@ -232,10 +215,29 @@ def test_launch_inference_containers(p_phdl, d_phdl, r_phdl, b_phdl, inference_d
     globals.error_list = []
     container_name = inference_dict['container_name']
     # Launch the containers ..
+    hdl_list = [p_phdl, d_phdl]
+    # Users can use the one of the prefill, decode nodes as proxy, benchmark, so
+    # check before scheduling
     if inference_dict['proxy_router_node'] == inference_dict['benchmark_serv_node']:
-        hdl_list = [p_phdl, d_phdl, r_phdl]
+        if (inference_dict['proxy_router_node'] in inference_dict['prefill_node_list']) or (
+            inference_dict['proxy_router_node'] in inference_dict['decode_node_list']
+        ):
+            print('Already part of the handle list, no need to add')
+        else:
+            hdl_list.extend(r_phdl)
     else:
-        hdl_list = [p_phdl, d_phdl, r_phdl, b_phdl]
+        if (inference_dict['proxy_router_node'] in inference_dict['prefill_node_list']) or (
+            inference_dict['proxy_router_node'] in inference_dict['decode_node_list']
+        ):
+            print('Already part of the handle list, no need to add')
+        else:
+            hdl_list.extend(r_phdl)
+        if (inference_dict['benchmark_serv_node'] in inference_dict['prefill_node_list']) or (
+            inference_dict['benchmark_serv_node'] in inference_dict['decode_node_list']
+        ):
+            print('Already part of the handle list, no need to add')
+        else:
+            hdl_list.extend(b_phdl)
 
     for a_phdl in hdl_list:
         docker_lib.launch_docker_container(
@@ -274,6 +276,17 @@ def test_setup_ibv_devices(im_obj):
     im_obj.check_ibv_devices()
     im_obj.exec_nic_setup_scripts()
     update_test_result()
+
+
+# Create the SGlang Inference Object Fixture
+@pytest.fixture(scope="module")
+def im_obj(p_phdl, d_phdl, r_phdl, b_phdl, gpu_type, inference_dict, benchmark_params_dict, hf_token):
+    globals.error_list = []
+    bp_dict = benchmark_params_dict['llama-70b']
+    im_obj = sglang_disagg_lib.SglangDisaggPD(
+        bp_dict['model'], inference_dict, bp_dict, hf_token, p_phdl, d_phdl, r_phdl, b_phdl, gpu_type
+    )
+    return im_obj
 
 
 def test_rms_norm(im_obj):

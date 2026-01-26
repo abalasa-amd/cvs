@@ -737,9 +737,7 @@ class SglangDisaggPD:
         print('Waiting 120 secs after launching proxy router script')
         time.sleep(120)
 
-    def run_gsm8k_benchmark_test(
-        self,
-    ):
+    def run_gsm8k_benchmark_test(self, d_type='auto'):
         """
         Run the GSM8K inference benchmark against the SGLang disaggregated
         Prefill/Decode deployment and validate throughput.
@@ -792,10 +790,10 @@ class SglangDisaggPD:
             else:
                 match = re.search('Output throughput:\s+([0-9\.]+)\s+token', out_dict[node], re.I)
                 actual_tps = match.group(1)
-                if float(actual_tps) < float(i_dict['expected_results']['tokens_per_sec']):
+                if float(actual_tps) < float(i_dict['expected_results'][d_type]['tokens_per_sec']):
                     fail_test(
                         f"Test FAILED due to low performance, \
-                            expected tokens per sec = {i_dict['expected_results']['tokens_per_sec']}, \
+                            expected tokens per sec = {i_dict['expected_results'][d_type]['tokens_per_sec']}, \
                             actual tokens per sec = {actual_tps}"
                     )
 
@@ -853,7 +851,7 @@ class SglangDisaggPD:
         self.poll_for_inference_completion(iterations=10, waittime_between_iters=60)
         self.verify_inference_results('bench_serv', i_dict['expected_results'][d_type])
 
-    def poll_for_server_ready(self, node_no, sglang_function, no_of_iterations=11):
+    def poll_for_server_ready(self, node_no, sglang_function, no_of_iterations=16):
         """
         Poll SGLang Prefill or Decode server logs to determine when the server
         is ready to accept inference traffic.
