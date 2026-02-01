@@ -480,6 +480,7 @@ class InferenceBaseJob:
         self.poll_client_completion()
 
     def get_inference_results_dict(self, out_dict):
+        print('Get the inference results dict using get_inference_results_dict')
         self.inference_results_dict = {}
         for node in out_dict.keys():
             self.inference_results_dict[node] = {}
@@ -615,7 +616,7 @@ class InferenceBaseJob:
                     msg = f"Timeout while waiting for inference completion after ~{int(time.time() - start_time)}s"
                     print(msg)
                     return {"status": "timeout", "reason": msg}
-                print('Training still in progress')
+                print('Inference Benchmark is still in progress')
                 # Short progress wait before the longer inter-iteration sleep
                 time.sleep(30)
                 time.sleep(int(waittime_between_iters))
