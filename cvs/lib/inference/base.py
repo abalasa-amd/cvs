@@ -502,6 +502,9 @@ class InferenceBaseJob:
             if re.search('Output token throughput \(tok/s\):', out_dict[node], re.I):
                 match = re.search('Output token throughput \(tok/s\):\s+([0-9\.]+)', out_dict[node], re.I)
                 self.inference_results_dict[node]['output_throughput_per_sec'] = match.group(1)
+            if re.search('Total Token throughput \(tok/s\):', out_dict[node], re.I):
+                match = re.search('Total Token throughput \(tok/s\):\s+([0-9\.]+)', out_dict[node], re.I)
+                self.inference_results_dict[node]['total_throughput_per_sec'] = match.group(1)
             if re.search('Mean TTFT \(ms\):', out_dict[node], re.I):
                 match = re.search('Mean TTFT \(ms\):\s+([0-9\.]+)', out_dict[node], re.I)
                 self.inference_results_dict[node]['mean_ttft_ms'] = match.group(1)
