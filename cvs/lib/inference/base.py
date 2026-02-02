@@ -567,13 +567,14 @@ class InferenceBaseJob:
                     inference_pass = False
         return inference_pass
 
-    def poll_for_inference_completion(self, waittime_between_iters=60, total_timeout=3600, require_all_nodes=True):
+    def poll_for_inference_completion(self, waittime_between_iters=120, iterations=15, \
+            total_timeout=3600, require_all_nodes=True):
         # Initial wait to give inference time to start logging
         time.sleep(60)
 
         num_prompts = self.bp_dict['num_prompts']
         # Assume 1000 prompts completes in 120 secs ..
-        iterations = int(float(num_prompts) / 60)
+        #iterations = int(float(num_prompts) / 60)
         self.inference_poll_iterations = iterations
         completion_pattern = self.get_completion_pattern()
 
