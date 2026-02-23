@@ -11,11 +11,6 @@ on:
         type: string
         required: true
         default: "Aorta Benchmark"
-  pull_request:
-    types:
-      - labeled
-      - opened
-      - synchronize
       
 
 permissions:
