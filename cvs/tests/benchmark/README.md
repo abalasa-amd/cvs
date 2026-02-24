@@ -12,13 +12,13 @@ Example from the ``cvs`` directory (repository root):
 ```bash
 (myenv) [user@host]~/cvs:(main)$ pwd
 /home/user/cvs/cvs
-(myenv) [user@host]~/cvs:(main)$ pytest -vvv --log-file=/tmp/test.log -s ./tests/benchmark/test_aorta.py --cluster_file input/cluster_file/cluster.json --config_file input/config_file/aorta/aorta_benchmark.yaml --html=/var/www/html/cvs/aorta.html --capture=tee-sys --self-contained-html
+(myenv) [user@host]~/cvs:(main)$ cvs run test_aorta --cluster_file input/cluster_file/cluster.json --config_file input/config_file/aorta/aorta_benchmark.yaml --html=logs/www/html/cvs/aorta.html --capture=tee-sys --self-contained-html --log-file=logs/aorta.log -vvv -s
 ```
 
 With verbose logging:
 
 ```bash
-pytest ./tests/benchmark/test_aorta.py --cluster_file input/cluster_file/cluster.json --config_file input/config_file/aorta/aorta_benchmark.yaml -v --log-cli-level=INFO
+cvs run test_aorta --cluster_file input/cluster_file/cluster.json --config_file input/config_file/aorta/aorta_benchmark.yaml --html=logs/www/html/cvs/aorta.html --capture=tee-sys --self-contained-html --log-file=logs/aorta.log -v --log-cli-level=INFO
 ```
 
 # Config and expected results
