@@ -468,13 +468,20 @@ You can list all available JAX training test cases using the CLI:
 
 You can run all JAX llama training tests using the CVS CLI:
 
+
 .. code:: bash
 
   cvs run jax_llama3_1_405b_distributed --cluster_file input/cluster_file/cluster.json --config_file input/config_file/training/jax/mi300x_jax_llama3_1_405b_distributed.json --html=/var/www/html/cvs/jax_llama3_1_405b_distributed.html --capture=tee-sys --self-contained-html --log-file=/tmp/jax_llama3_1_405b_distributed.log -vvv -s
 
+.. code:: bash
+
   cvs run jax_llama3_1_70b_distributed --cluster_file input/cluster_file/cluster.json --config_file input/config_file/training/jax/mi300x_jax_llama3_1_70b_distributed.json --html=/var/www/html/cvs/jax_llama3_1_70b_distributed.html --capture=tee-sys --self-contained-html --log-file=/tmp/jax_llama3_1_70b_distributed.log -vvv -s
 
+.. code:: bash
+
   cvs run jax_llama3_1_70b_single --cluster_file input/cluster_file/cluster.json --config_file input/config_file/training/jax/mi300x_jax_llama3_1_70b_single.json --html=/var/www/html/cvs/jax_llama3_1_70b_single.html --capture=tee-sys --self-contained-html --log-file=/tmp/jax_llama3_1_70b_single.log -vvv -s
+
+.. code:: bash
 
   cvs run jax_llama3_1_70b_single --cluster_file input/cluster_file/cluster.json --config_file input/config_file/training/jax/mi35x_jax_llama3_1_70b_single.json --html=/var/www/html/cvs/jax_llama3_1_70b_single.html --capture=tee-sys --self-contained-html --log-file=/tmp/jax_llama3_1_70b_single.log -vvv -s
   
