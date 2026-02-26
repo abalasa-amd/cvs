@@ -123,7 +123,7 @@ def pytest_runtest_makereport(item, call):  # noqa: ARG001
                 encoding="utf-8",
             )
 
-            rel_path = log_path.relative_to(htmlpath.parent)
+            rel_path = log_path.relative_to(log_dir)
             extras.append(pytest_html.extras.url(str(rel_path), name="Full Log"))
 
         report.extras = extras
