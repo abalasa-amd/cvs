@@ -80,12 +80,14 @@ def pytest_metadata(metadata):
     metadata["Cluster File"] = cluster_file
     metadata["Config File"] = config_file
 
+
 # Order of execution of hooks: (function names are standard names recognized by plugin manager)
 # pytest_sessionstart
 # pytest_runtest_makereport (for each test phase)
 # pytest_html_results_table_html (when pytest-html renders each row)
 # pytest_html_results_summary (when pytest-html builds summary section)
 # pytest_sessionfinish (end of session)
+
 
 # Prepare a clean per-run log directory before tests start.
 def pytest_sessionstart(session):
