@@ -98,8 +98,21 @@ class HtmlReportManager:
 
             # Link must be relative to the main report location, not the log directory itself.
             rel_path = log_path.relative_to(self.htmlpath.parent)
-            extras.append(pytest_html.extras.url(str(rel_path), name="Full Log"))
-            log.info("Added Full Log link for test '%s': %s", report.nodeid, rel_path)
+            rel_path_str = str(rel_path)
+
+            # Avoid duplicate links if another hook/plugin invocation already added the same URL extra.
+            already_added = any(
+                isinstance(extra, dict)
+                and extra.get("format_type") == "url"
+                and extra.get("name") == "Full Log"
+                and extra.get("content") == rel_path_str
+                for extra in extras
+            )
+            if already_added:
+                log.info("Skipped duplicate Full Log link for test '%s': %s", report.nodeid, rel_path_str)
+            else:
+                extras.append(pytest_html.extras.url(rel_path_str, name="Full Log"))
+                log.info("Added Full Log link for test '%s': %s", report.nodeid, rel_path_str)
         else:
             log.info("No captured sections found for test '%s'; no external log file created.", report.nodeid)
 
