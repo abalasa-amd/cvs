@@ -80,11 +80,19 @@ def pytest_metadata(metadata):
     metadata["Cluster File"] = cluster_file
     metadata["Config File"] = config_file
 
+# Order of execution of hooks: (function names are standard names recognized by plugin manager)
+# pytest_sessionstart
+# pytest_runtest_makereport (for each test phase)
+# pytest_html_results_table_html (when pytest-html renders each row)
+# pytest_html_results_summary (when pytest-html builds summary section)
+# pytest_sessionfinish (end of session)
 
+# Prepare a clean per-run log directory before tests start.
 def pytest_sessionstart(session):
     session.config._html_report_manager.setup_log_dir()
 
 
+# Capture each test report and attach a per-test external log link.
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):  # noqa: ARG001
     outcome = yield
@@ -92,18 +100,17 @@ def pytest_runtest_makereport(item, call):  # noqa: ARG001
     report.extras = item.config._html_report_manager.write_test_log(report)
 
 
+# Replace inline pytest-html log content with a short externalized-log message.
 def pytest_html_results_table_html(report, data):
     HtmlReportManager.replace_table_html(report, data)
 
 
+# Inject CSS overrides to simplify/hide unused report UI controls.
 def pytest_html_results_summary(prefix, summary, postfix):
     HtmlReportManager.inject_style_overrides(prefix)
 
 
-# This pytest hook is called when the test session finishes. It waits until all plugins
-# (such as pytest-html) have completed writing reports, then bundles the main HTML report and
-# all per-test log files (if any exist) into a timestamped zip archive. The zip file is named
-# with the suite name (or report file stem) and a timestamp, and is saved next to the HTML report.
+# Bundle the final HTML report and per-test log files into a zip at session end.
 @pytest.hookimpl(hookwrapper=True)
 def pytest_sessionfinish(session, exitstatus):  # noqa: ARG001
     yield  # wait for pytest-html and all other plugins to finish writing the report
