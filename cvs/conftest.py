@@ -1,9 +1,9 @@
-'''
+"""
 Copyright 2025 Advanced Micro Devices, Inc.
 All rights reserved. This notice is intended as a precaution against inadvertent publication and does not imply publication or any waiver of confidentiality.
 The year included in the foregoing notice is the year of creation of the work.
 All code contained here is Property of Advanced Micro Devices, Inc.
-'''
+"""
 
 import importlib.metadata
 import sys
@@ -22,6 +22,7 @@ def pytest_configure(config):
         suite_name = "test"
     config._test_html_dir = f"{suite_name}_html"
     config._html_report_manager = HtmlReportManager(config)
+
 
 # Add all additional cmd line arguments for the script
 def pytest_addoption(parser):
@@ -54,7 +55,7 @@ def pytest_metadata(metadata):
 
     # Get CVS version - try package metadata first, fallback to version.txt
     try:
-        cvs_version = importlib.metadata.version('cvs')
+        cvs_version = importlib.metadata.version("cvs")
     except importlib.metadata.PackageNotFoundError:
         # Fallback for development mode (running from cloned repo)
         try:
@@ -75,9 +76,9 @@ def pytest_metadata(metadata):
             config_file = sys.argv[i + 1]
 
     # Add custom metadata
-    metadata['CVS version'] = cvs_version
-    metadata['Cluster File'] = cluster_file
-    metadata['Config File'] = config_file
+    metadata["CVS version"] = cvs_version
+    metadata["Cluster File"] = cluster_file
+    metadata["Config File"] = config_file
 
 
 def pytest_sessionstart(session):
