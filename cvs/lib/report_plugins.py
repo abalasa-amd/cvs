@@ -65,7 +65,7 @@ class HtmlReportManager:
                 log.info(f"Failed to remove stale log directory: {log_dir} - {e}")
         log_dir.mkdir(parents=True, exist_ok=True)
 
-    def write_test_log(self, report):
+    def write_test_log(self, report, test_name=None):
         """Write an external HTML log file for a single test and return the extras list."""
         extras = getattr(report, "extras", [])
 
@@ -73,16 +73,11 @@ class HtmlReportManager:
         if not self.is_enabled or report.when != "call":
             return extras
 
-        # Use nodeid minus module path to keep filenames readable.
-        nodeid_parts = report.nodeid.split("::")
-        if len(nodeid_parts) > 1:
-            reduced_nodeid = "::".join(nodeid_parts[1:])
-        else:
-            reduced_nodeid = report.nodeid
-        safe_name = reduced_nodeid.replace("::", "_").replace("/", "_").replace("\\", "_")
-        # Add a random suffix from a UUID to ensure unique filenames for concurrent/repeated test case runs
+        # Use the bare test function name (without parametrize params) to keep filenames short.
+        if not test_name:
+            test_name = report.nodeid.split("::")[-1].split("[")[0]
         temp_id = str(uuid.uuid4()).split("-")[-1]
-        safe_name = f"{safe_name}_{temp_id}"
+        safe_name = f"{test_name}_{temp_id}"
 
         log_dir = self.htmlpath.parent / self._test_html_dir
         log_dir.mkdir(parents=True, exist_ok=True)

@@ -99,7 +99,7 @@ def pytest_sessionstart(session):
 def pytest_runtest_makereport(item, call):  # noqa: ARG001
     outcome = yield
     report = outcome.get_result()
-    report.extras = item.config._html_report_manager.write_test_log(report)
+    report.extras = item.config._html_report_manager.write_test_log(report, item.originalname)
 
 
 # Replace inline pytest-html log content with a short externalized-log message.
